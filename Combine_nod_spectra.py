@@ -44,23 +44,36 @@ def SumNods(Spectra, Headers, Pos="All", Norm="None"):
     """ Currently this implements baised on expected nod ordering, 
     If want to be more sure the correct nods are added the headers
     should be checked for its nod position"""
+    if Pos == "All":
+        NodNum = len(Spectra)
+    else:
+        NodNum = len(Spectra)/2.0
+    #print("number of nods ", NodNum)
     #if Headers[i]["HIERARCH ESO SEQ NODPOS"] == Pos:
     NodSum = np.zeros_like(Spectra[0])
     if Pos.upper() == "ALL":
         # Sum all
-        NodNum = 8
-        for i in range(8):
-            NodSum += np.array(Spectra[i])
+        #NodNum = 8
+        for Spec in Spectra:
+            NodSum += np.array(Spec)
+
     elif Pos.upper() == "A":
         # Sum A nods
-        NodNum = 4
-        for i in [0,3,4,7]:
-            NodSum += np.array(Spectra[i])
+        #NodNum = 4
+        #for i in [0,3,4,7]:
+           # NodSum += np.array(Spectra[i])
+        for Spec, hdr in zip(Spectra, Headers):
+            if hdr["HIERARCH ESO SEQ NODPOS"] == "A":
+                NodSum += np.array(Spec)
+
     elif Pos.upper() == "B":   
         # Sum B nods
-        NodNum = 4
-        for i in [1,2,5,6]:
-            NodSum += np.array(Spectra[i])
+        #NodNum = 4
+        #for i in [1,2,5,6]:
+            #NodSum += np.array(Spectra[i])
+        for Spec, hdr in zip(Spectra, Headers):
+            if hdr["HIERARCH ESO SEQ NODPOS"] == "B":
+                NodSum += np.array(Spec)    
     if Norm.upper() == "MEDIAN":
       NodSum /= np.median(NodSum)
     elif Norm.upper() == "MEAN":
@@ -137,16 +150,7 @@ if __name__ == '__main__':
         dracs_All = SumNods(I_dracs, I_dracs_hdrs, Pos="All", Norm="Divide")
         dracs_A = SumNods(I_dracs, I_dracs_hdrs, Pos="A", Norm="Divide")
         dracs_B = SumNods(I_dracs, I_dracs_hdrs, Pos="B", Norm="Divide")
-                #print(type(fits.getdata(ThisFile,0)))
-        #load Dracs files
-        ## Speed testing  open verse getdata/getheader
-        # for name in norm_vals:    
-        #         #print("name", name)
-        #         ThisFile = path + name
-        #         I_norm.append(fits.getdata(ThisFile))
-        #         I_norm_hdrs.append(fits.getheader(ThisFile))
-        #         #print(type(I_norm))
-
+         
         #print(norm_vals)
         for name in norm_vals:
                 ThisFile = path + name
@@ -156,9 +160,8 @@ if __name__ == '__main__':
                 I_norm.append(ThisNorm[0].data)
                 ThisNorm.close()
 
-        #print("Inorm",I_norm)
+        print("Inorm",I_norm)
 
-        #Last_normhdr.verify()
         NormalizeMethod = "Divide"
         Norm_All = SumNods(I_norm, I_norm_hdrs, Pos="All", Norm=NormalizeMethod)
         Norm_A = SumNods(I_norm, I_norm_hdrs, Pos="A", Norm=NormalizeMethod)
@@ -182,17 +185,18 @@ if __name__ == '__main__':
         T_Now = str(time.gmtime()[0:6])
 #        testhdr['Date'] = (T_Now, ' Time fits was last changed')        
 
-        outputfile = path + norm_vals[-1][0:-4]+ "comb.fits"   
+        outputfile = path + norm_vals[-1][0:-4] + "comb.fits"   
         print("Output file name", outputfile)
-        hdrkeys = ["Discription"]
+        hdrkeys = ["Description"]
         hdrvals = ["Combine DRACS Nomalized CRIRES Nod Spectra"]
-        hdrkeys = ['COMBINEDATE',"COMBINEMETHOD", "COMBNORMALIZE"]
-        hdrvals = [(T_Now, "Time Nods were combined"),("Addition","How nods were added"),(NormalizeMethod, "Method for normalizing combined spectra by divide, mean or median")]
+        hdrkeys = ['COMBINEDATE', "COMBINEMETHOD", "COMBNORMALIZE"]
+        hdrvals = [(T_Now, "Time Nods were combined"), ("Addition", "How nods were added"), \
+                  (NormalizeMethod, "Method for normalizing combined spectra (divide/mean/median)")]
     
         for i, name in zip(range(len(org_vals)), org_vals):
             hdrkeys.append("CRIRES NOD FILE " + str(i + 1))
             hdrvals.append((name, "Input filename"))
-        ExportToFits(outputfile,Norm_All,Norm_A,Norm_B,Last_normhdr,hdrkeys,hdrvals)
+        ExportToFits(outputfile, Norm_All, Norm_A, Norm_B, Last_normhdr, hdrkeys, hdrvals)
         print("Wrote to fits Succesfully")
 
         #break
