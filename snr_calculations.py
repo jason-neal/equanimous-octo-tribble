@@ -31,33 +31,48 @@ def snrscan(Spec, width):
 
     return snr_list
 
+def click_snr(wl, Spec):
+    """ Calculate snr in a specific range given by clicks on a plot """
+    plt.figure()
+    plt.plot(wl, Spec)
+    plt.show(block=False)
+    # points from click
 
+    # temp values untill implement above
+    point2 = np.max(wl) 
+    point1 = np.min(wl) 
+    map2 = wl < point2
+    map1 = wl > point1
+    wl_slice = wl[map1*map2]
+    Spec_slice = Spec[map1*map2]
+ 
+    # Calculate SNR on the slice
+    snr = 1 / np.std(Spec_slice)
+
+    return snr
 
 
 def main(fname, binsize=5):
-
-#load the fits file 
+    binsize = int(binsize)
+    # load the fits file 
     data = fits.getdata(fname)
     hdr = fits.getheader(fname)
     try:
         test = data["Extracted_OPT"]
-    else:
+    except:
         test = data["Extracted_DRACS"]
 #test = [1,2,3,4,2,1,2,1,1,2,3,2,1,4,2,1,2,3,4,1,2,3,4,1,2,4,2,1,2,3,2,2.5,2,2,2,1,1,2,3,4]
 #tests = [t / 100 for t in test]
     x = range(len(test))
-    x5 = [xi + 2.5 for xi in x]
-    x10 = [xi + 5 for xi in x]
-    #print(snrscan(tests,10))
-    #print(tests)
-    print(len(x),len(x10),len(x5))
 
-    snrlist10 = snrscan(test,10)
-    snrlist5 = snrscan(test,5)
+    xbin = [xi + binsize/2 for xi in x]  # center snr values
+    xbin = xbin[:-binsize]
+    
+    snrlist = snrscan(test, binsize)
+
     plt.figure
     plt.plot(x, test, label="data")
-    plt.plot(x10[:-10], snrlist10, label="snr10")
-    plt.plot(x5[:-5], snrlist5, label="snr5")
+    plt.plot(xbin, snrlist, label="snr sze"+ str(binsize))
     plt.legend()
     plt.show()
 
