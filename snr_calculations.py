@@ -26,7 +26,7 @@ def _parser():
 def snrscan(Spec, width):
     snr_list = []
     for i in range(len(Spec)-width):
-        snr = 1 / np.std(Spec[i:i+width])
+        snr = np.mean(Spec[i:i+width]) / np.std(Spec[i:i+width], ddof=0)
         snr_list.append(snr)
 
     return snr_list
