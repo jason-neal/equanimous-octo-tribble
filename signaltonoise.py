@@ -39,7 +39,7 @@ def load_telluric(tapas_path, filename):
     return tell  
 
 def snr(spectra):
-	snr = 1. / np.var(spectra)
+	snr = np.mean(spectra) / np.std(spectra, ddof=0)
 	return snr
 
 def snr_map(spectra, mindt=3, maxdt=10):
@@ -74,7 +74,8 @@ def snr_map(spectra, mindt=3, maxdt=10):
     #plt.figure()
 
     plt.plot(dt, snrdt)
-
+    plt.xlabel("Number of pixels to include in SNR")
+    plt.ylabel("SNR value")
     plt.show()
     return dt
 
