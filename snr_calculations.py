@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,11 +25,16 @@ def _parser():
     args = parser.parse_args()
     return args
 
+def snr(spectra, ddof=0):
+	snr = np.mean(spectra) / np.std(spectra, ddof=ddof)
+	return snr
+
 def snrscan(Spec, width):
     snr_list = []
     for i in range(len(Spec)-width):
-        snr = np.mean(Spec[i:i+width]) / np.std(Spec[i:i+width], ddof=0)
-        snr_list.append(snr)
+        #snr = np.mean(Spec[i:i+width]) / np.std(Spec[i:i+width], ddof=0)
+	SNR = snr(Spec[i:i+width])
+        snr_list.append(SNR)
 
     return snr_list
 
@@ -47,9 +54,9 @@ def click_snr(wl, Spec):
     Spec_slice = Spec[map1*map2]
  
     # Calculate SNR on the slice
-    snr = 1 / np.std(Spec_slice)
+    SNR = snr(Spec_slice)
 
-    return snr
+    return SNR
 
 
 def main(fname, binsize=5):
