@@ -8,6 +8,8 @@
 """
 
 from astropy.io import fits
+from astropy import units as u
+from astropy.coordinates import Angle
 
 def _parser():
     """Take care of all the argparse stuff.
@@ -16,7 +18,13 @@ def _parser():
     """
     parser = argparse.ArgumentParser(description='Telluric Removal')
     parser.add_argument('fname', help='Input fits file')
-    
+    parser.add_argument("-l", "--listpectra", help="If fname points to list of spectra for observation", default=False)    
+    parser.add_argument("-r", "--resolution", help="Spcify Instrument Resolution", default=False) 
+    parser.add_argument("-s", "--sampling", help="Sampling ratio", default=10)     
+    parser.add_argument("-i", "--ifuntion", help="Instrument function-Gaussian(1) or None(-1)", default="gaussian")     
+    parser.add_argument("-u", "--unit", help="Spectra Unit - Options: Air, Vacuum, Wavenumber", default="Air")
+    parser.add_argument("-b", "--berv", help="Have BERV RV correction applied to the Tapas spectra", default=False) 
+    parser.add_argument("-f", "--tapas_format", help="Tapas file format Options: FITS,ASCII,NETCDF,VO", default="ASCII")     
     # name  with a flag to specify if the name is to a listspectra.txt file to do whole observation!
 
 
@@ -24,78 +32,80 @@ def _parser():
 # Try get most from fits files
     #parser.add_argument('-x', '--export', default=False,
  #                       help='Export result to fits file True/False')
-    #parser.add_argument('-o', '--output', default=False,
-#                        help='Ouput Filename')
-    #parser.add_argument('-t', '--tellpath', default=False,
- #                       help='Path to find the telluric spectra to use.')
-    #parser.add_argument('-k', '--kind', default="linear",
- #                       help='Interpolation order, linear, quadratic or cubic')
-    #parser.add_argument('-m', '--method', default="scipy",
- #                       help='Interpolation method numpy or scipy')
-    #parser.add_argument("-s", "--show", default=True,
-  #                      help="Show plots") #Does not wokwithout display though for some reason
     args = parser.parse_args()
     return args
 
 
-def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits"):
+def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits", listspectra=False, resolution=False, unit="air", ifunction="gaussian", sampling=10, berv=False, tapas_format="ASCII" )
 
 
-    header = fits.getheader(fname)
-
+    output_file = "/home/jneal/Phd/Codes/UsefulModules/Tapas_xml_request_file.xml"
     
-    print(header["DATE-OBS"])
-     # Observation Specifications
+    # Observation Settings
+    if listspectra:
+        pass
+#        date =
+        #target_ra = header["RA"]
+        #target_dec = header["DEC"]
+    else:
+        header = fits.getheader(fname)
+    
+        date = header["DATE-OBS"][:-1]+"Z"     
+        print(header["DATE-OBS"])
+        target_ra = header["RA"]
+        target_dec = header["DEC"]
+        wl_min = header["HIERARCH ESO INS WLEN MIN"])
+        wl_max = header["HIERARCH ESO INS WLEN MAX"]) 
+        instrument = header["INSTRUME"]
+        telescope = header["TELESCOP"]
+        slit_width = header["HIERARCH ESO INS SLIT1 WID"]
+   # Observation Specifications
     # Date
     #MJD-OBS =       56024.00590250 / Obs start 2012-04-07T00:08:29.976
     #DATE-OBS= '2012-04-07T00:08:29.9764' / Observing date
     #EXPTIME =          180.0000000 / Integration time
 
-    date = header["DATE-OBS"][:-1]+"Z"     
 
-    print("TODO !!! - Time correct for tapas timing issue")
-    print("date", date)
-    #date = "2013-11-17T00:41:00.000Z"
-    if "VLT" in header["TELESCOP"]:
+        print("TODO !!! - Time correct for tapas timing issue")
+    
+   # Observatory settings 
+    if "VLT" in telscope:
     	obs_name = "ESO Paranal Chile (VLT)"
     else:
-    	print("Don't have TAPAS telecope location name (just the fits one)")
-    	obs_name = header["TELESCOP"]
+    	print("Don't have TAPAS telecope location nam (Using the Obervation value)")
+    	obs_name = telescope
 
     obs_long = header["HIERARCH ESO TEL GEOLON"]
     obs_lat = header["HIERARCH ESO TEL GEOLAT"]
     obs_alt = header["HIERARCH ESO TEL GEOELEV"]
 
-    # Target 
-    # Procees cooords
-    from astropy import units as u
-    from astropy.coordinates import Angle
-    ra_angle = Angle(header["RA"], u.degree)
+    # Target Settings
+    ra_angle = Angle(target_ra, u.degree)
     ra_j2000 = str(ra_angle.to_string(unit=u.hour, sep=':',precision=0, pad=True))  # Extra str to get rid of u"string" which failed in template
-    print("Angle =",ra_angle, "header ra =",header["RA"], "ra_2000 ::=",ra_j2000)
-    dec_angle = Angle(header["DEC"], u.deg)
+    dec_angle = Angle(target_dec, u.deg)
     dec_j2000 = str(dec_angle.to_string(unit=u.degree, sep=':', precision=0, pad=True)) # Extra str to get rid of u"string" which failed in template
-    print("Angle =",dec_angle, "header DEC =", header["DEC"], "dec_2000 ::=", dec_j2000)
-
-    print(dec_j2000)
-
-
+    print("RA Angle =",ra_angle, "RA deg =", target_ra, "ra_2000 h:m:s=", ra_j2000)
+    print("Dec Angle =",dec_angle, "DEC deg =", target_dec, "dec_2000 d:m:s=", dec_j2000)
 
     #spectral_range = "{0} {1}".format(min_range, max_range)
-    spec_range_min = round(header["HIERARCH ESO INS WLEN MIN"] - 10)
-    spec_range_max = round(header["HIERARCH ESO INS WLEN MAX"] + 10) 
+    spec_range_min = round(wl_min - 10)
+    spec_range_max = round(wl_max + 10) 
 
-
-    if "CRIRES" in header["INSTRUME"]:
-        if header["HIERARCH ESO INS SLIT1 WID"] == 0.400:
-            print("Slit width was 0.4, \nSetting resolving_power = 50000")
-            resolving_power = 50000    # if Crires take the two slit width/Resolution values
-        elif header["HIERARCH ESO INS SLIT1 WID"] == 0.200:
-            print("Slit width was 0.2, \nSetting resolving_power = 100000")
-            resolving_power = 100000    # if Crires take the two slit width/Resolution values
+    if resolution:
+        resolving_power = resolution
+    else:
+        if "CRIRES" in instrument:
+            if slit_width == 0.400:
+                print("Slit width was 0.4, \nSetting resolving_power = 50000")
+                resolving_power = 50000    # if Crires take the two slit width/Resolution values
+            elif slit_width == 0.200:
+                print("Slit width was 0.2, \nSetting resolving_power = 100000")
+                resolving_power = 100000    # if Crires take the two slit width/Resolution values
+            else:
+        	    print("Slitwidth of CRIRES does not match 2 fixed settings")
+        	    print("Is this older CRIRES data?")
         else:
-        	print("Slitwidth of CRIRES does not match 2 fixed settings")
-        	print("Is this older data?")
+            print("Resolving power not defined")
 
 # Things want out of observations files 
 #["DATE-OBS"]
@@ -113,9 +123,24 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
 #Test_file = 
     #Template_xml_file = "/home/jneal/Phd/Codes/UsefulModules/tapas_xml_template.txt"
     
-    # Tapas Specifications 
-    Format = "ASCII"
-    Resquest_ID = "10000"    # Iterate on previous ID if found
+    # Tapas Specifications
+    if tapas_format in ["ASCII","FITS","NETCDF","VO"]:
+          tapas_format = tapas_format
+    else:
+        print("TAPAS format was not correct, using default of ASCII")
+        tapas_format = "ASCII"
+
+# open save file, find request id, add 1
+    try:
+        with open(output_file, "r") as f:
+            for line in f:
+                if line.startswith("<request_Id"):
+                    ID_num = line.split('"')[1]
+                    print("ID_number from last file", ID_num)
+    else:
+        Request_ID = "10000"    # Iterate on previous ID if found
+
+
     ray = "YES"
     h20 = "NO"   # alternate yes no for h20 for scaling
     o3 = "YES"
@@ -123,15 +148,27 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     co2 = "YES"
     ch4 = "YES"
     n2o = "YES"
-    #"if Air:
-    spectral_choice = "Standard Wavelength (nm)" 
-    #"if vac"
-    #"if wavenumber"
-    ilsf_choice = 1    # -1, 0, 1
-   
-    sampling_ratio = 10
-    apply_berv = "YES"
+    
+    if "air" in unit.lower():
+        spectral_choice = "Standard Wavelength (nm)" 
+    if "vac" in unit.lower():
+        spectral_choice = "Vacuum Wavelength (nm)" 
+    if "wave" in unit.lower():
+        spectral_choice = "Wavenumber (cm-1)"
 
+    ifunction = str(ifunction).lower()
+    if ifunction == "-1" or "none" in ifunction:
+        ilsf_choice = -1    # -1, 0, 1
+    elif ifunction == "1" or "gaussian" in ifunction:
+        ilsf_choice = 1    # -1, 0, 1
+    else:
+        print("Instrumnet function not specifid correctly\n Valid choices are none(-1) or gaussian(1), The defualt is gaussian.")
+
+    sampling_ratio = sampling # defualt 10
+    if berv:
+        apply_berv = "YES"
+    else:
+        apply_berv = "NO"
 
     #arletty_file = "canr_2013111700.arl"
     #ecmwf_file = "canr_2013111700_qo3.txt"
@@ -142,11 +179,11 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     print("arletty_file", arletty_file)
     print("ecmwf_file", ecmwf_file)
 
-    d = {"Resquest_ID":Resquest_ID, "Format":Format, "ray":ray, "h20":h20, "o3":o3, "o2":o2, "co2":co2, "ch4":ch4, "n2o":n2o, "date":date, "obs_name":obs_name, "obs_long":obs_long, "obs_lat":obs_lat, "obs_alt":obs_alt, "ra_j2000":ra_j2000, "dec_j2000":dec_j2000, "spectral_choice":spectral_choice, "spec_range_min":spec_range_min, "spec_range_max":spec_range_max, "ilsf_choice":ilsf_choice, "resolving_power":resolving_power, "sampling_ratio":sampling_ratio, "apply_berv":apply_berv, "arletty_file":arletty_file, "ecmwf_file":ecmwf_file}
+    d = {"Request_ID":Request_ID, "Format":Format, "ray":ray, "h20":h20, "o3":o3, "o2":o2, "co2":co2, "ch4":ch4, "n2o":n2o, "date":date, "obs_name":obs_name, "obs_long":obs_long, "obs_lat":obs_lat, "obs_alt":obs_alt, "ra_j2000":ra_j2000, "dec_j2000":dec_j2000, "spectral_choice":spectral_choice, "spec_range_min":spec_range_min, "spec_range_max":spec_range_max, "ilsf_choice":ilsf_choice, "resolving_power":resolving_power, "sampling_ratio":sampling_ratio, "apply_berv":apply_berv, "arletty_file":arletty_file, "ecmwf_file":ecmwf_file}
 
     template = """‹?xml version="1.0" encoding="UTF-8"?›
 <tapas Id="Ether_TAPAS_999"›
-<request Id="$Resquest_ID"›
+<request Id="$Request_ID"›
 <preferences>
 <format valid="VO,ASCII,FITS,NETCDF">$Format</format>
 <rayleigh_extinction valid="YES,NO">$ray</rayleigh_extinction>
