@@ -54,7 +54,7 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     date = header["DATE-OBS"][:-1]+"Z"     
 
     print("TODO !!! - Time correct for tapas timing issue")
-    print(date)
+    print("date", date)
     #date = "2013-11-17T00:41:00.000Z"
     if "VLT" in header["TELESCOP"]:
     	obs_name = "ESO Paranal Chile (VLT)"
@@ -123,7 +123,6 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     co2 = "YES"
     ch4 = "YES"
     n2o = "YES"
-
     #"if Air:
     spectral_choice = "Standard Wavelength (nm)" 
     #"if vac"
@@ -131,10 +130,19 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     ilsf_choice = 1    # -1, 0, 1
    
     sampling_ratio = 10
-
     apply_berv = "YES"
 
-    d = {"Resquest_ID":Resquest_ID, "Format":Format, "ray":ray, "h20":h20, "o3":o3, "o2":o2, "co2":co2, "ch4":ch4, "n2o":n2o, "date":date, "obs_name":obs_name, "obs_long":obs_long, "obs_lat":obs_lat, "obs_alt":obs_alt, "ra_j2000":ra_j2000, "dec_j2000":dec_j2000, "spectral_choice":spectral_choice, "spec_range_min":spec_range_min, "spec_range_max":spec_range_max, "ilsf_choice":ilsf_choice, "resolving_power":resolving_power, "sampling_ratio":sampling_ratio, "apply_berv":apply_berv}
+
+    #arletty_file = "canr_2013111700.arl"
+    #ecmwf_file = "canr_2013111700_qo3.txt"
+    #date = "2013-11-17T00:41:00.000Z"
+    arletty_file = "canr_"+ date[0:4] + date[5:7] + date[8:10] + date[11:13] + ".arl"
+    ecmwf_file = "canr_" + date[0:4] + date[5:7] + date[8:10] + date[11:13] + "_qo3.txt"
+    
+    print("arletty_file", arletty_file)
+    print("ecmwf_file", ecmwf_file)
+
+    d = {"Resquest_ID":Resquest_ID, "Format":Format, "ray":ray, "h20":h20, "o3":o3, "o2":o2, "co2":co2, "ch4":ch4, "n2o":n2o, "date":date, "obs_name":obs_name, "obs_long":obs_long, "obs_lat":obs_lat, "obs_alt":obs_alt, "ra_j2000":ra_j2000, "dec_j2000":dec_j2000, "spectral_choice":spectral_choice, "spec_range_min":spec_range_min, "spec_range_max":spec_range_max, "ilsf_choice":ilsf_choice, "resolving_power":resolving_power, "sampling_ratio":sampling_ratio, "apply_berv":apply_berv, "arletty_file":arletty_file, "ecmwf_file":ecmwf_file}
 
     template = """‹?xml version="1.0" encoding="UTF-8"?›
 <tapas Id="Ether_TAPAS_999"›
@@ -172,11 +180,13 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
 </observation>
 <atmosphere>
 <reference valid="0,1,2,3,4,5,6">0</reference>
-<arletty_file>/data/tapas///arletty/canr_2013111700.arl</arletty_file>
-<ecmwf_file>/data/tapas///ecmwf/canr_2013111700_qo3.txt</ecmwf_file>
+<arletty_file>/data/tapas///arletty/$arletty_file</arletty_file>
+<ecmwf_file>/data/tapas///ecmwf/$ecmwf_file</ecmwf_file>
 </atmosphere>
 </request> 
 </tapas> """
+
+
 
 # ECMWF = ARLETTY 
 #[{"text":"ECMWF","value":0},{"text":"TROPICAL","value":1},{"text":"MEDIUM_LATITUDE_SUMMER","value":2},{"text":"MEDIUM_LATITUDE_WINTER","value":3},{"text":"SUBARCTIC_SUMMER","value":4},{"text":"SUBARCTIC_WINTER","value":5},{"text":"US_STANDARD_1976","value":6}]
