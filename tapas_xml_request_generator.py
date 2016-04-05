@@ -36,7 +36,7 @@ def _parser():
     return args
 
 
-def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits", listspectra=False, resolution=False, unit="air", ifunction="gaussian", sampling=10, berv=False, tapas_format="ASCII" )
+def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits", listspectra=False, resolution=False, unit="air", ifunction="gaussian", sampling=10, berv=False, tapas_format="ASCII"):
 
 
     output_file = "/home/jneal/Phd/Codes/UsefulModules/Tapas_xml_request_file.xml"
@@ -60,7 +60,6 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
         telescope = header["TELESCOP"]
         slit_width = header["HIERARCH ESO INS SLIT1 WID"]
    # Observation Specifications
-    # Date
     #MJD-OBS =       56024.00590250 / Obs start 2012-04-07T00:08:29.976
     #DATE-OBS= '2012-04-07T00:08:29.9764' / Observing date
     #EXPTIME =          180.0000000 / Integration time
@@ -106,22 +105,6 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
         	    print("Is this older CRIRES data?")
         else:
             print("Resolving power not defined")
-
-# Things want out of observations files 
-#["DATE-OBS"]
-#TELESCOP= 'ESO-VLT-U1'
-#RA      =            71.409028          / 04:45:38.1 RA (J2000) pointing (deg)
-#DEC     =            -50.07734 
-#HIERARCH ESO INS SLIT1 WID   =        0.400 
-#INSTRUME= 'CRIRES  '
-#HIERARCH ESO TEL GEOELEV     =         2648. / Elevation above sea level (m)
-#HIERARCH ESO TEL GEOLAT      =     -24.6276 / Tel geo latitute (+=North) (deg)
-#HIERARCH ESO TEL GEOLON      =     -70.4051 / Tel geo longitude (+=East) (deg)
-#HIERARCH ESO INS WLEN MAX    =     2160.205 / Wavelength Limit + [nm].
-#HIERARCH ESO INS WLEN MIN    =     2121.056 / Wavelength Limit - [nm].
-
-#Test_file = 
-    #Template_xml_file = "/home/jneal/Phd/Codes/UsefulModules/tapas_xml_template.txt"
     
     # Tapas Specifications
     if tapas_format in ["ASCII","FITS","NETCDF","VO"]:
@@ -140,15 +123,47 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     else:
         Request_ID = "10000"    # Iterate on previous ID if found
 
-
-    ray = "YES"
-    h20 = "NO"   # alternate yes no for h20 for scaling
-    o3 = "YES"
-    o2 = "YES"
-    co2 = "YES"
-    ch4 = "YES"
-    n2o = "YES"
+# Specify different tapas spectra
+    if species == "all":
+        species_map = [1,1,1,1,1,1]
+    elif species == "ray":
+        species_map = [1,0,0,0,0,0]
+    elif species == "h2o":
+        species_map = [0,1,0,0,0,0]
+    elif species == "o2":
+        species_map = [0,0,1,0,0,0]
+    elif species == "o3":
+        species_map = [0,0,0,1,0,0]
+    elif species == "co2":
+3       species_map = [0,0,0,0,1,0]
+    elif species == "not_h2o":
+        species_map = [1,0,1,1,1,1]
     
+    if species_map[0]:
+        ray = "YES"
+    else:
+        ray = "NO"
+    if species_map[1]:
+        h20 = "YES"   # alternate yes no for h20 for scaling
+    else:
+        h20 = "NO"   # alternate yes no for h20 for scaling
+    if species_map[2]:
+        o3 = "YES"
+    else:
+        o3 = "NO"
+    if species_map[3]:
+        o2 = "YES"
+    else:
+        o2 = "NO"
+    if species_map[4]:
+        co2 = "YES"
+    else:
+        co2 = "NO"
+    if species_map[5]:
+        ch4 = "YES"
+    else:
+        ch4 = "NO"
+
     if "air" in unit.lower():
         spectral_choice = "Standard Wavelength (nm)" 
     if "vac" in unit.lower():
