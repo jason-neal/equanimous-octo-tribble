@@ -86,11 +86,11 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     if wl_min:
         spec_range_min = int(wl_min)
     else:
-        spec_range_min = round(obs_wl_min - 10)
+        spec_range_min = int(obs_wl_min - 10)
     if wl_max:
         spec_range_max = int(wl_max)
     else:
-        spec_range_max = round(obs_wl_max + 10) 
+        spec_range_max = int(obs_wl_max + 10) 
     # Check for TAPAS consistency    
     #Tapas wavelength range is from 350 to 2500 nm in vacuum.
     if spec_range_min < 350:
