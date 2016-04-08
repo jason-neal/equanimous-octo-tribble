@@ -1,10 +1,10 @@
-‹?xml version="1.0" encoding="UTF-8"?›
-<tapas Id="Ether_TAPAS_999"›
-<request Id="10000"›
+<?xml version="1.0" encoding="UTF-8"?>
+<tapas Id="Ether_TAPAS_2977">
+<request Id="10000">
 <preferences>
 <format valid="VO,ASCII,FITS,NETCDF">ASCII</format>
 <rayleigh_extinction valid="YES,NO">YES</rayleigh_extinction>
-<h2o_extinction valid="YES,NO">NO</h2o_extinction>
+<h2o_extinction valid="YES,NO">YES</h2o_extinction>
 <o3_extinction valid="YES,NO">YES</o3_extinction>
 <o2_extinction valid="YES,NO">YES</o2_extinction>
 <co2_extinction valid="YES,NO">YES</co2_extinction>
@@ -25,11 +25,11 @@
 </los>
 <instrument>
 <spectral_choice valid="Vacuum Wavelength (nm),Standard Wavelength (nm),Wavenumber (cm-1)">Standard Wavelength (nm)</spectral_choice>
-<spectral_range>2111.0 2170.0</spectral_range>
+<spectral_range>2111 2170</spectral_range>
 <ilsf_choice valid="-1,0,1">1</ilsf_choice>
-<resolving_power min="0">50000</resolving_power>
-<sampling_ratio min="0">10</sampling_ratio>
-<appli_berv valid="YES,NO">YES</appli_berv>
+<resolving_power min="0">100</resolving_power>
+<sampling_ratio min="0">20</sampling_ratio>
+<appli_berv valid="YES,NO">NO</appli_berv>
 </instrument>
 </observation>
 <atmosphere>
