@@ -219,12 +219,8 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     else:
         apply_berv = "NO"
 
-    #arletty_file = "canr_2013111700.arl"
-    #ecmwf_file = "canr_2013111700_qo3.txt"
-    #date = "2013-11-17T00:41:00.000Z"
 
     ###### Atmosphere Parameters
-    #ARletty files are not correct
     arletty_file = "canr_"+ date[0:4] + date[5:7] + date[8:10] + date[11:13] + ".arl"
     ecmwf_file = "canr_" + date[0:4] + date[5:7] + date[8:10] + date[11:13] + "_qo3.txt"
     
@@ -298,21 +294,13 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
 
 
 
-
-
-
-
-
-
     from string import Template
     s = Template(template)
-
 
     print(s)
     
     sub = s.substitute(d)
     print(sub)
-
 
     # Save xml ouptut for copying to tapas 
     #TOTRY in future - submit straight to tapas
@@ -330,7 +318,7 @@ if __name__ == "__main__":
     fname = args.pop('fname')
     opts = {k: args[k] for k in args}
     
-    fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits"  # for testing
+#    fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits"  # for testing
     print(opts)
 
     main(fname, **opts)
