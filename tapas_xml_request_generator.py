@@ -28,6 +28,7 @@ def _parser():
     parser.add_argument("--request_id", help="Request ID number", type=int, default="10000")    
     parser.add_argument("--wl_min", help="Minimum Wavelength", default=False)    
     parser.add_argument("--wl_max", help="Maximum Wavelength", default=False)    
+    parser.add_argument("-n", "--request_number", help="Request number, iterate this", default=0, type=int)    
 
     args = parser.parse_args()
     return args
@@ -35,7 +36,7 @@ def _parser():
 
 def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits", 
         listspectra=False, resolvpower=False, unit="air", instrument_function="gaussian",
-        sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file=False, request_id=10000, wl_min=False, wl_max=False):
+        sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file=False, request_id=10000, wl_min=False, wl_max=False,request_number=0):
 
     output_file = "/home/jneal/Phd/Codes/UsefulModules/Tapas_xml_request_file.xml"  # For testing
     
@@ -114,6 +115,11 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
         tapas_format = "ASCII"
 
 # open save file, find request id, add 1
+# get request number from previous xml file if not given.
+    if not request_number:
+        # get from prvious
+        #request_number = ######
+        pass
     #try:
     #    with open(output_file, "r") as f:
      #       for line in f:
@@ -225,11 +231,11 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     print("arletty_file", arletty_file)
     print("ecmwf_file", ecmwf_file)
 
-    d = {"Request_ID":Request_ID, "tapas_format":tapas_format, "ray":ray, "h20":h20, "o3":o3, "o2":o2, "co2":co2, "ch4":ch4, "n2o":n2o, "date":date, "obs_name":obs_name, "obs_long":obs_long, "obs_lat":obs_lat, "obs_alt":obs_alt, "ra_j2000":ra_j2000, "dec_j2000":dec_j2000, "spectral_choice":spectral_choice, "spec_range_min":spec_range_min, "spec_range_max":spec_range_max, "ilsf_choice":ilsf_choice, "resolving_power":resolving_power, "sampling_ratio":sampling_ratio, "apply_berv":apply_berv, "arletty_file":arletty_file, "ecmwf_file":ecmwf_file}
+    d = {"request_number":request_number, "Request_ID":Request_ID, "tapas_format":tapas_format, "ray":ray, "h20":h20, "o3":o3, "o2":o2, "co2":co2, "ch4":ch4, "n2o":n2o, "date":date, "obs_name":obs_name, "obs_long":obs_long, "obs_lat":obs_lat, "obs_alt":obs_alt, "ra_j2000":ra_j2000, "dec_j2000":dec_j2000, "spectral_choice":spectral_choice, "spec_range_min":spec_range_min, "spec_range_max":spec_range_max, "ilsf_choice":ilsf_choice, "resolving_power":resolving_power, "sampling_ratio":sampling_ratio, "apply_berv":apply_berv, "arletty_file":arletty_file, "ecmwf_file":ecmwf_file}
 
-    template = """‹?xml version="1.0" encoding="UTF-8"?›
-<tapas Id="Ether_TAPAS_999"›
-<request Id="$Request_ID"›
+    template = """<?xml version="1.0" encoding="UTF-8"?>
+<tapas Id="Ether_TAPAS_$request_number">
+<request Id="$Request_ID">
 <preferences>
 <format valid="VO,ASCII,FITS,NETCDF">$tapas_format</format>
 <rayleigh_extinction valid="YES,NO">$ray</rayleigh_extinction>
