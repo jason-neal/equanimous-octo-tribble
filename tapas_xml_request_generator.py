@@ -4,7 +4,10 @@
 """ Take CRIRES fits file and generate a tapas xml request to submit on tapas
 
 """
+import os
 import argparse
+import numpy as np
+from astropy.time import Time, TimeDelta
 from astropy.io import fits
 from astropy import units as u
 from astropy.coordinates import Angle
@@ -17,7 +20,7 @@ def _parser():
     parser = argparse.ArgumentParser(description='Xml generator for tapas submission')
     parser.add_argument("fname", help='Input file name', type=str)
     parser.add_argument("-o", "--output_file", help='Output file', type=str)
-    parser.add_argument("-l", "--listspectra", help="Was filename a list of spectra for observation", action="store_true")
+    parser.add_argument("-l", "--listspectra", help="Was filename a DRACS list of nod spectra for the observation (without fits extensions)", action="store_true")
     parser.add_argument("-r", "--resolvpower", help="Specify Instrument resolution power, defined as λ/FWHM for convolution", default=False) 
     parser.add_argument("-s", "--sampling", type=int, help="Sampling ratio - This is the number of points per FHWM interval on which the convolved transmission will be sampled.", default=10)     
     parser.add_argument("-i", "--instrument_function", help="Instrument function - gaussian or none", type=str, default="gaussian", choices=["none","gaussian"])     
@@ -25,7 +28,7 @@ def _parser():
     parser.add_argument("-b", "--berv", help="Have BERV RV correction applied to the Tapas spectra", action="store_true") 
     parser.add_argument("-f", "--tapas_format", help="Tapas file format", type=str, default="ascii", choices=["fits","ascii","netcdf","vo"])     
     parser.add_argument("-c","--constituents", help="Atmospheric constituents for spectra", type=str, default="all", choices=[ "all","ray", "h2o", "o2", "o3", "co2", "ch4", "n2o", "not_h2o"])    
-    parser.add_argument("--request_id", help="Request ID number", type=int, default="10000")    
+    parser.add_argument("--request_id", help="Request ID number", type=int, default="100")    
     parser.add_argument("--wl_min", help="Minimum Wavelength", default=False)    
     parser.add_argument("--wl_max", help="Maximum Wavelength", default=False)    
     parser.add_argument("-n", "--request_number", help="Request number, iterate this", default=0, type=int)    
@@ -36,21 +39,89 @@ def _parser():
 
 def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits", 
         listspectra=False, resolvpower=False, unit="air", instrument_function="gaussian",
-        sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file=False, request_id=10000, wl_min=False, wl_max=False,request_number=0):
+        sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file=False, request_id=100, wl_min=False, wl_max=False, request_number=0):
 
     output_file = "/home/jneal/Phd/Codes/UsefulModules/Tapas_xml_request_file.xml"  # For testing
     
 
     ############### Observation Settings
+    path = os.getcwd() + "/"
+    print("fname to make path")
+    path = "/".join(fname.split("/")[:-1]) + "/"
+    print("path from fname", path )
     if listspectra:
-        pass
+        nod_airmasses = []
+        nod_dates = []
+        nod_slits = []
+        nod_exptimes = []
+        nod_instruments = []
+        with open(fname, "r") as f:
+            for line in f:
+                fitsname = line[:-1] + ".fits"
+                print("The fits file to open is" ,fitsname)
+                try:
+                    print("Trying Raw_files with ..")
+                    print("Trying location", path+"../Raw_files/"+fitsname)
+                    header = fits.getheader(path+"../Raw_files/"+fitsname)
+                except:
+                    try:
+                        print("Raw files folder")
+                        print("Trying location 2 =", path+"Raw_files/"+fitsname)
+                        header = fits.getheader(path+"Raw_files/"+fitsname)
+                    except:
+                        header = fits.getheader(path+fitsname)
+
+                obsdate = header["DATE-OBS"]
+                #nod_airmass.append()
+                nod_dates.append(obsdate)
+                nod_slits.append(header["HIERARCH ESO INS SLIT1 WID"])
+                nod_exptimes.append(header["EXPTIME"])
+                nod_instruments.append(header["INSTRUME"])
+            
+            print("Showing things out of list")
+            print("dates", nod_dates)
+            print("slit widths", nod_slits)
+            print("exptimes ", nod_exptimes)
+            print("instruments", nod_instruments)
+            if len(set(nod_instruments)) == 1:
+                instrument = nod_instruments[0]
+            else:
+                #raise error as list intruments are not unique
+                raise NodError("Nods in list were not taken on the same instrument")
+            if len(set(nod_exptimes)) == 1:
+                exptime = nod_exptimes[0]
+            else:
+                #raise error as list exptime are not unique
+                raise NodError("Nods in the list do not have same exposure times")
+            if len(set(nod_slits)) == 1:
+                slit_width = nod_slits[0]
+            else:
+                #raise error as list exptime are not unique
+                raise NodError("Nods in list do not have same slit widths")
+            # Get average time of observation (adding exposure time)
+            jd_days = []
         # Calcualte averages from loading all headers
-    #MJD-OBS =       56024.00590250 / Obs start 2012-04-07T00:08:29.976
-    #DATE-OBS= '2012-04-07T00:08:29.9764' / Observing date
-    #EXPTIME =          180.0000000 / Integration time
-        #target_ra = header["RA"]
-        #target_dec = header["DEC"]
-        header = fits.getheader(firstlist_name)  # for telescope info later
+            for nod_date in nod_dates:
+                t = Time(nod_date, format="fits") + TimeDelta(exptime, format="sec")
+                t.format= 'jd'
+            #    mean_obs_time += t.value
+                jd_days.append(t.value)
+            print("nod dates in Jd", jd_days)
+            if max(jd_days)-min(jd_days) > len(jd_days)*2*exptime/86400.:
+                raise NodError("Essue with time for the nod observations took longer then twice exposure time for each exposure (maybe need to add a lower limit for quick observations) ")
+            mean_obs_time = np.mean(jd_days)
+            print("mean obs time averged in jd", np.mean(jd_days))
+            print("median obs time in jd", np.median(jd_days))
+            date = Time(mean_obs_time, format="jd")
+            date.format = "fits"  # Turn back into fits format
+            #print("date", date)
+            #print("date value", date.value)
+            date = date.value[:-5] + "Z"    # Going from Time object back to string and adding Z to end for Tapas
+            #print("date after adding Z", date)
+            target_ra = header["RA"]   # of the last observation in the list
+            target_dec = header["DEC"]
+            obs_wl_min = header["HIERARCH ESO INS WLEN MIN"]
+            obs_wl_max = header["HIERARCH ESO INS WLEN MAX"] 
     else:
         header = fits.getheader(fname)
     
@@ -60,7 +131,6 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
         obs_wl_min = header["HIERARCH ESO INS WLEN MIN"]
         obs_wl_max = header["HIERARCH ESO INS WLEN MAX"] 
         slit_width = header["HIERARCH ESO INS SLIT1 WID"]
-
 
     ####### Observatory Settings 
     instrument = header["INSTRUME"]
@@ -77,11 +147,11 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
 
     ####### Target Settings
     ra_angle = Angle(target_ra, u.degree)
-    ra_j2000 = str(ra_angle.to_string(unit=u.hour, sep=':',precision=0, pad=True))  # Extra str to get rid of u"string" which failed in template
+    ra_j2000 = str(ra_angle.to_string(unit=u.hour, sep=':', precision=0, pad=True))  # Extra str to get rid of u"string" which failed in template
     dec_angle = Angle(target_dec, u.deg)
     dec_j2000 = str(dec_angle.to_string(unit=u.degree, sep=':', precision=0, pad=True)) # Extra str to get rid of u"string" which failed in template
-    print("RA Angle =",ra_angle, "RA deg =", target_ra, "ra_2000 h:m:s=", ra_j2000)
-    print("Dec Angle =",dec_angle, "DEC deg =", target_dec, "dec_2000 d:m:s=", dec_j2000)
+    print("RA Angle =", ra_angle, "RA deg =", target_ra, "ra_2000 h:m:s=", ra_j2000)
+    print("Dec Angle =", dec_angle, "DEC deg =", target_dec, "dec_2000 d:m:s=", dec_j2000)
 
     #spectral_range = "{0} {1}".format(min_range, max_range)
     if wl_min:
@@ -117,7 +187,7 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
 # open save file, find request id, add 1
 # get request number from previous xml file if not given.
     if not request_number:
-        # get from prvious
+        # get from previous
         #request_number = ######
         pass
     #try:
@@ -202,6 +272,8 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
        resolving_power = resolvpower
     else:
         if "CRIRES" in instrument:
+            R = 100000/0.2 * slit_width
+            print("Rule of thumb resolving power,R= ", R)
             if slit_width == 0.400:
                 print("Slit width was 0.4, \nSetting resolving_power = 50000")
                 resolving_power = 50000    # if Crires take the two slit width/Resolution values
@@ -211,6 +283,8 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
             else:
                 print("Slitwidth of CRIRES does not match the two fixed settings")
                 print("Is this older CRIRES data?")
+                print("Using the rule of thumb equation")
+                resolving_power = R
         else:
             print("Resolving power not defined")
 
@@ -221,8 +295,9 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
 
 
     ###### Atmosphere Parameters
-    arletty_file = "canr_"+ date[0:4] + date[5:7] + date[8:10] + date[11:13] + ".arl"
-    ecmwf_file = "canr_" + date[0:4] + date[5:7] + date[8:10] + date[11:13] + "_qo3.txt"
+    file_date = date[0:4] + date[5:7] + date[8:10] + date[11:13]
+    arletty_file = "canr_" + file_date + ".arl"
+    ecmwf_file = "canr_" + file_date + "_qo3.txt"
     
     print("arletty_file", arletty_file)
     print("ecmwf_file", ecmwf_file)
