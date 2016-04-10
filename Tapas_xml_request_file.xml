@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tapas Id="Ether_TAPAS_3007">
-<request Id="0">
+<tapas Id="Ether_TAPAS_3016">
+<request Id="100">
 <preferences>
 <format valid="VO,ASCII,FITS,NETCDF">ASCII</format>
 <rayleigh_extinction valid="YES,NO">YES</rayleigh_extinction>
@@ -12,7 +12,7 @@
 <n2o_extinction valid="YES,NO">YES</n2o_extinction>
 </preferences>
 <observation>
-<date>2012-08-02T08:47:30.842Z</date>
+<date>2012-08-02T09:03:02.369Z</date>
 <observatory>
 <name>ESO Paranal Chile (VLT)</name>
 <longitude min="-180" max="180">-70.4051</longitude>
@@ -21,7 +21,7 @@
 </observatory>
 <los>
 <ra_j2000>04:45:38</ra_j2000>
-<dec_j2000>-50:04:32</dec_j2000>
+<dec_j2000>-50:04:33</dec_j2000>
 </los>
 <instrument>
 <spectral_choice valid="Vacuum Wavelength (nm),Standard Wavelength (nm),Wavenumber (cm-1)">Standard Wavelength (nm)</spectral_choice>
@@ -34,8 +34,8 @@
 </observation>
 <atmosphere>
 <reference valid="0,1,2,3,4,5,6">0</reference>
-<arletty_file>/data/tapas///arletty/canr_2012080208.arl</arletty_file>
-<ecmwf_file>/data/tapas///ecmwf/canr_2012080208_qo3.txt</ecmwf_file>
+<arletty_file>/data/tapas///arletty/canr_2012080209.arl</arletty_file>
+<ecmwf_file>/data/tapas///ecmwf/canr_2012080209_qo3.txt</ecmwf_file>
 </atmosphere>
 </request> 
 </tapas> 
