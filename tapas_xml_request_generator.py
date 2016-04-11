@@ -297,14 +297,14 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     sampling_ratio = sampling # defualt 10
 
     if resolvpower:
-       resolving_power = resolvpower
+       resolving_power = int(resolvpower)
        v_print("Resolving power manually specified at {}".format(resolving_power))
     else:
         if "CRIRES" in instrument:
             v_print("Resolving Power\nUsing the rule of thumb equation from the CRIRES manual. \nWarning! The use of adpative optics is not checked for!!")
             R = 100000*0.2 / slit_width
             
-            resolving_power = R
+            resolving_power = int(R)
             v_print("Slit width was {0} inches.\nTherefore the resolving_power is set = {1}".format(slit_width, resolving_power))
             
             #TO DO Specify other instruments in here?
@@ -320,7 +320,20 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
 
     ###### Atmosphere Parameters
     # hours(date[11:13]) only seem to work if multiple of 06 hours 
-    file_date = date[0:4] + date[5:7] + date[8:10] + date[11:13]
+    #assuming 00 is for 00->06 hours 
+    hour = int(date[11:13])
+    if hour >= 0 and hour < 6:
+        hour_out = "00"
+    elif hour >= 6 and hour < 12:
+        hour_out = "06"
+    elif hour >= 12 and hour < 18:
+        hour_out = "12"
+    elif hour >= 18 and hour < 24:
+        hour_out = "18"
+    else: 
+        raise HourError("Error with the arletty timing. The request will fail")
+
+    file_date = date[0:4] + date[5:7] + date[8:10] + hour_out
     arletty_file = "canr_" + file_date + ".arl"
     ecmwf_file = "canr_" + file_date + "_qo3.txt"
     
