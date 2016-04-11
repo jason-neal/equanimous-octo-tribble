@@ -1,0 +1,9 @@
+
+#### GIT IGNORE ###
+
+### Backup files ###
+*.swp
+*.swo
+*.pyc
+*.pyo
+*.bak
