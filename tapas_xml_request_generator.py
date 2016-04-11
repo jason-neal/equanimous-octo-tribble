@@ -301,7 +301,7 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
        v_print("Resolving power manually specified at {}".format(resolving_power))
     else:
         if "CRIRES" in instrument:
-            v_print("Resolving Power\nUsing the rule of thumb equation from the CRIRES manual.")
+            v_print("Resolving Power\nUsing the rule of thumb equation from the CRIRES manual. \nWarning! The use of adpative optics is not checked for!!")
             R = 100000*0.2 / slit_width
             
             resolving_power = R
