@@ -39,13 +39,14 @@ def _parser():
 
 def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits", 
         listspectra=False, resolvpower=False, unit="air", instrument_function="gaussian",
-        sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file=False, request_id=10, wl_min=False, wl_max=False, request_number=0):
+        sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file="tapas_request.xml", request_id=10, wl_min=False, wl_max=False, request_number=0):
 
     output_file = "/home/jneal/Phd/Codes/UsefulModules/Tapas_xml_request_file.xml"  # For testing
     
 
     ############### Observation Settings
     path = os.getcwd() + "/"
+    print("os path", path)
     print("fname to make path")
     path = "/".join(fname.split("/")[:-1]) + "/"
     print("path from fname", path )
@@ -395,16 +396,24 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     # Save xml ouptut for copying to tapas 
     #TO TRY in future - submit straight to tapas
 
-    output_file = "/home/jneal/Phd/Codes/UsefulModules/Tapas_xml_request_file.xml"
-    with open(output_file, "w") as out:
-    	out.write(sub)
-    print("Saved tapas xml request to copy at \t {}".format(output_file))
-
+    #output_file = "/home/jneal/Phd/Codes/UsefulModules/Tapas_xml_request_file.xml"
+    try:
+        with open(output_file, "w") as out:
+    	    out.write(sub)
+        print("Saved tapas xml request to \t {0}".format(output_file))
+    except:
+        print("Failed to save xml request to \t {0}. \nHere is a printed version.".format(output_file))
+        print("\n{}\n".format(sub))
 
     # save tapas request number as a dot file
-    with open("~/.tapas_request_num", "w") as req:
-        req.write("request_number = {}".format(request_number))
-    print("Stored current request number in ~/.tapas_request_num for later iteration")
+    dot_file ="~/.tapas_request_num"
+    try:
+        with open(dotfile, "w") as req:
+            req.write("request_number = {0}".format(request_number))
+        print("Stored current request number {0} in {1} for later iteration".format(request_number, dot_file))
+    except:
+        print("Failed to store request number {0} in {1} .".format(request_number, dot_file))
+
 
 if __name__ == "__main__":
     args = vars(_parser())
