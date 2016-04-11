@@ -203,10 +203,10 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
                 request_number = int(old_number) + 1
                 v_print("New request_number number = {}".format(request_number))
         except:
+            request_number = 0
             print("Could not read request number from previous request in {0}. The default value of {1} will need to be manually changed when submitting the request.".format(dot_file, request_number))
     else:
         # Manually given request number
-        request_number = 0
         v_print("Manually given request number={0} will be used.\n".format(request_number))
         
 
