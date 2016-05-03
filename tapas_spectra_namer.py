@@ -56,15 +56,25 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
     data, hdr = obt.load_telluric(path, filename)
 
     date = strftime("%Y-%m-%dT%H-%M-%S", strptime(hdr["DATE-OBS"], "%Y/%m/%d %H:%M:%S"))
-    
+    req_id = int(float(hdr["req_id"]))  # Id of request 
     berv = hdr["BARYDONE"]
-    sampling = int(float(hdr["SAMPRATI"]))
-    respower = int(float(hdr["RESPOWER"]))
+    
+    try:
+        sampling = int(float(hdr["SAMPRATI"]))
+    except:
+        sampling = -1
+   
+    try:
+        respower = int(float(hdr["RESPOWER"]))
+    except:
+        respower = -1
 
     if species:
-        new_name = "{}_R-{}_sratio-{}_barydone-{}_species-{}".format(date, respower, sampling, berv, species)
+        new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}_species-{}".format(date, req_id, respower, sampling, berv, species)
+    elif sampling is -1 and respower is -1:
+        new_name = "{}_ReqId_{}_No_Ifunction_barydone-{}".format(date, req_id, berv)
     else:
-        new_name = "{}_R-{}_sratio-{}_barydone-{}".format(date, respower, sampling, berv)
+        new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}".format(date, req_id, respower, sampling, berv)
   
     if prefix:
         new_name = path + "tapas_" + prefix + "_" + new_name + "." + ext
