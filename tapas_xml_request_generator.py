@@ -25,7 +25,7 @@ def _parser():
     parser.add_argument("-r", "--resolvpower", help="Specify Instrument resolution power, defined as λ/FWHM for convolution", default=False) 
     parser.add_argument("-s", "--sampling", type=int, help="Sampling ratio - This is the number of points per FHWM interval on which the convolved transmission will be sampled.", default=10)     
     parser.add_argument("-f", "--instrument_function", help="Instrument function - gaussian or none", type=str, default="gaussian", choices=["none", "gaussian"])     
-    parser.add_argument("-u", "--unit", help="Spectra Unit", choices=["air", "vacuum", "wavenumber"], type=str, default="air")
+    parser.add_argument("-u", "--unit", help="Spectra Unit", choices=["air", "vacuum", "wavenumber"], type=str, default="vacuum")
     parser.add_argument("-b", "--berv", help="Have BERV RV correction applied to the Tapas spectra", action="store_true") 
     parser.add_argument("-t", "--tapas_format", help="Tapas file format", type=str, default="ascii", choices=["ascii", "fits", "netcdf", "vo"])     
     parser.add_argument("-c", "--constituents", help="Atmospheric constituents for spectra", type=str, default="all", choices=[ "all", "ray", "h2o", "o2", "o3", "co2", "ch4", "n2o", "not_h2o"])    
@@ -39,7 +39,7 @@ def _parser():
 
 
 def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits", 
-        listspectra=False, resolvpower=False, unit="air", instrument_function="gaussian",
+        listspectra=False, resolvpower=False, unit="vacuum", instrument_function="gaussian",
         sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file="tapas_request.xml",
         request_id=10, wl_min=False, wl_max=False, request_number=None, verbose=False):
     
