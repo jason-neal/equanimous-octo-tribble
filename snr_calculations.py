@@ -5,6 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 from astropy.io import fits
+
+from numpy.lib import stride_tricks
+import pandas as pd
+import seaborn as sns
 # Testing for a snr of my spectra
 
 import SpectralTools as s_tools
@@ -72,6 +76,31 @@ def simple_plot(wav, flux, label="Spectra", xscale="nm"):
         plt.xlabel("Pixel number")
     plt.show()
 
+def strided_snr(data, frame_length, hop_length=1):
+    num_frames = 1 + (len(data)-frame_length)/hop_length
+    row_stride = data.itemsize * hop_length # *hopesize
+    col_stride = data.itemsize
+    data_strided = stride_tricks.as_strided(data, shape=(num_frames, frame_length), strides=(row_stride, col_stride))
+    
+    print("length of data_strided",len(data_strided))
+    snr = 1/np.std( data_strided, axis=1)
+    #print("frame_length", frame_length)
+    #print("num_frames", num_frames)
+    #print("len(snr)",len(snr))
+    #print(snr)
+    
+    #zeropad to make uniform length of spectra
+    missing_size = len(data)-len(snr)
+    print("missing size", missing_size)
+    before = missing_size//2
+    end = missing_size//2
+    if missing_size%2 is not 0:
+        print("missing size is not even !!!!")
+    padded_snr = np.pad(snr, (before, end),"constant")
+    #print("padded length",len(padded_snr))
+    #print(padded_snr)
+    return padded_snr
+
 def main(fname, binsize=5, interactive_mode=False, limits=None, plot=False):
     # load the fits file 
     data = fits.getdata(fname)
@@ -80,10 +109,13 @@ def main(fname, binsize=5, interactive_mode=False, limits=None, plot=False):
     try:
         # Gasgano reduction
         I = data["Extracted_OPT"]
+        I = np.array(I, dtype="float64")
     except:
         # Dracs reduction
         I = data["Extracted_DRACS"]
-   
+        print(type(I))
+        I = np.array(I, dtype="float64")
+        print(type(I))
     try:
         wl = data["Wavelength"]
         xscale = "nm"
@@ -102,9 +134,36 @@ def main(fname, binsize=5, interactive_mode=False, limits=None, plot=False):
         print("SNR of the spectra between the given limits {0}-{1} is {2}".format(limits[0], limits[1], limit_snr))
         if plot:
             simple_plot(wl, I, label="Spectra", xscale=xscale)
+
     else:
-       # 
-       binsize = int(binsize)
+        # Default to scan mode
+
+        binsize = int(binsize)
+       
+        snr_list = snrscan(I, binsize)
+        print(snr_list)
+        # Try using stride on np.array
+
+        # striding
+        
+        bins = np.arange(3,51,2)  # TODO make this an arg parse thing
+        hopper = 1
+        print("itemsize", I.itemsize, "dtype", I.dtype)
+        store_list = []
+        for i, b in enumerate(bins):
+            store_list.append(strided_snr(I, b, hop_length=hopper))
+        
+        # pandas dataframe (not nessesary)
+        #df_list = pd.DataFrame(store_list, index=bins, columns=np.round(wl,2))
+        #ploting heatmap
+        sns.set()
+        cmap = sns.diverging_palette(220, 10, as_cmap=True)
+        ax = sns.heatmap(store_list, cmap=cmap, xticklabels=200, vmax=300, vmin=10)
+        #ax = sns.heatmap(df_list)
+        #plt.xticks(np.arange(int(np.min(wl)), int(np.max(wl)+1), 1.0))
+        ax.set(ylabel="Binsize", xlabel="Wavelenght")
+
+        plt.show()
 
        # fancy colour plot if snr for different bin sizes verse central wavelenght value
        #
