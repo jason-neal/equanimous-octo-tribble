@@ -26,7 +26,9 @@ def _parser():
                         + 'to calculate the signal to noise of.')
     parser.add_argument('-b', '--binsize', default=5,
                         help='SNR binsize')
-    parser.add_argument('-l', '--limits', type=float, nargs=2,
+    parser.add_argument('-r', '--bin_range', type=int, nargs=3,
+                        help='Values for np.range of bin values [start, stop, step]')
+    parser.add_argument('-l', '--limits', type=int, nargs=2,
                         help='Bounds for the wavelength range to '
                             +'calculate snr for in format [min, max]')
     parser.add_argument('-p', '--plot', action='store_true',
@@ -82,7 +84,7 @@ def strided_snr(data, frame_length, hop_length=1):
     col_stride = data.itemsize
     data_strided = stride_tricks.as_strided(data, shape=(num_frames, frame_length), strides=(row_stride, col_stride))
     
-    print("length of data_strided",len(data_strided))
+    #print("length of data_strided",len(data_strided))
     snr = 1/np.std( data_strided, axis=1)
     #print("frame_length", frame_length)
     #print("num_frames", num_frames)
@@ -91,17 +93,17 @@ def strided_snr(data, frame_length, hop_length=1):
     
     #zeropad to make uniform length of spectra
     missing_size = len(data)-len(snr)
-    print("missing size", missing_size)
+    #print("missing size", missing_size)
     before = missing_size//2
     end = missing_size//2
     if missing_size%2 is not 0:
-        print("missing size is not even !!!!")
+        print("missing size is not even !!!! You need to use odd values with even steps")
     padded_snr = np.pad(snr, (before, end),"constant")
     #print("padded length",len(padded_snr))
     #print(padded_snr)
     return padded_snr
 
-def main(fname, binsize=5, interactive_mode=False, limits=None, plot=False):
+def main(fname, binsize=5, interactive_mode=False, bin_range=None, limits=None, plot=False):
     # load the fits file 
     data = fits.getdata(fname)
     hdr = fits.getheader(fname)
@@ -145,25 +147,34 @@ def main(fname, binsize=5, interactive_mode=False, limits=None, plot=False):
         # Try using stride on np.array
 
         # striding
-        
-        bins = np.arange(3,51,2)  # TODO make this an arg parse thing
-        hopper = 1
-        print("itemsize", I.itemsize, "dtype", I.dtype)
-        store_list = []
-        for i, b in enumerate(bins):
-            store_list.append(strided_snr(I, b, hop_length=hopper))
-        
-        # pandas dataframe (not nessesary)
-        #df_list = pd.DataFrame(store_list, index=bins, columns=np.round(wl,2))
-        #ploting heatmap
-        sns.set()
-        cmap = sns.diverging_palette(220, 10, as_cmap=True)
-        ax = sns.heatmap(store_list, cmap=cmap, xticklabels=200, vmax=300, vmin=10)
-        #ax = sns.heatmap(df_list)
-        #plt.xticks(np.arange(int(np.min(wl)), int(np.max(wl)+1), 1.0))
-        ax.set(ylabel="Binsize", xlabel="Wavelenght")
+        if bin_range:
 
-        plt.show()
+            bins = np.arange(bin_range[0], bin_range[1], bin_range[2])  # TODO ability for less than 3 args?
+            hopper = 1
+            print("itemsize", I.itemsize, "dtype", I.dtype)
+            store_list = []
+            for i, b in enumerate(bins):
+                store_list.append(strided_snr(I, b, hop_length=hopper))
+            
+            # pandas dataframe (not nessesary)
+            df_list = pd.DataFrame(store_list, index=bins, columns=np.round(wl,2))
+            # ploting heatmap
+            plt.subplot(221)
+            plt.plot(wl, I, label="spectra")
+            plt.ylabel("Flux")
+            plt.xlabel("Wavelength")
+            plt.title("Spectra of {0}".format(fname))
+            plt.subplot(212)
+            sns.set()
+            cmap = sns.diverging_palette(220, 10, as_cmap=True)
+            #ax = sns.heatmap(store_list, cmap=cmap, xticklabels=200, vmax=300, vmin=10)
+            ax = sns.heatmap(df_list, cmap=cmap, xticklabels=200, vmax=300, vmin=0)
+            #ax = sns.heatmap(df_list)
+            #plt.xticks(np.arange(int(np.min(wl)), int(np.max(wl)+1), 1.0))
+            ax.set(ylabel="Binsize", xlabel="Wavelength")
+            plt.title("SNR")
+            
+            plt.show()
 
        # fancy colour plot if snr for different bin sizes verse central wavelenght value
        #
