@@ -22,6 +22,9 @@ def BERVcorr(W1, Berv):
 
     Output:
     W0. - BERV corrected wavelength values 
+
+    Note:
+    pyasl.dopplerShift is much smoother than this function so use that instead. 
     """
     c = 299792.458 # km/s
     return W1 * (1 + Berv/c)  
