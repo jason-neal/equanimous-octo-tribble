@@ -84,7 +84,7 @@ def vac2air(vac):
 
 
 
-def fast_wav_selector(wav, flux, wav_min, wav_max, verbose=False):
+def wav_selector(wav, flux, wav_min, wav_max, verbose=False):
     """ Faster Wavelenght selector
     
     If passed lists it will return lists.
@@ -110,3 +110,121 @@ def fast_wav_selector(wav, flux, wav_min, wav_max, verbose=False):
     else:
           raise TypeError("Unsupported input wav type")
     return [wav_sel, flux_sel]
+
+
+
+
+# Wavelength Interplation from telluric correct
+def wl_interpolation(wl, spec, ref_wl, method="scipy", kind="linear", verbose=False):
+    """Interpolate Wavelengths of spectra to common WL
+    Most likely convert telluric to observed spectra wl after wl mapping performed"""
+    starttime = time.time()
+    if method == "scipy":
+        print(kind + " scipy interpolation")
+        linear_interp = interp1d(wl, spec, kind=kind)
+        new_spec = linear_interp(ref_wl)
+    elif method == "numpy":
+        if kind.lower() is not "linear":
+            print("Warning: Cannot do " + kind + " interpolation with numpy, switching to linear" )
+        print("Linear numpy interpolation")
+        new_spec = np.interp(ref_wl, wl, spec)  # 1-d peicewise linear interpolat
+    else:
+        print("Method was given as " + method)
+        raise("Not correct interpolation method specified")
+    print("Interpolation Time = " + str(time.time() - starttime) + " seconds")
+
+    return new_spec  # test inperpolations 
+
+
+
+
+
+
+
+###################################################################
+#                            Convolution
+###################################################################
+
+
+def unitary_Gauss(x, center, FWHM):
+    """
+    Gaussian_function of area=1
+    
+    p[0] = A;
+    p[1] = mean;
+    p[2] = FWHM;
+    """
+    
+    sigma = np.abs(FWHM) /( 2 * np.sqrt(2 * np.log(2)) );
+    Amp = 1.0 / (sigma*np.sqrt(2*np.pi))
+    tau = -((x - center)**2) / (2*(sigma**2))
+    result = Amp * np.exp( tau );
+    
+    return result
+
+def fast_convolve(wav_val, R, wav_extended, flux_extended, fwhm_lim):
+    """IP convolution multiplication step for a single wavelength value"""
+    FWHM = wav_val/R
+    
+    index_mask = (wav_extended > (wav_val - fwhm_lim*FWHM)) &  (wav_extended < (wav_val + fwhm_lim*FWHM))
+    
+    flux_2convolve = flux_extended[index_mask]
+    IP = unitary_Gauss(wav_extended[index_mask], wav_val, FWHM)
+    
+    sum_val = np.sum(IP*flux_2convolve) 
+    unitary_val = np.sum(IP*np.ones_like(flux_2convolve))  # Effect of convolution onUnitary. For changing number of points
+        
+    return sum_val/unitary_val
+
+def instrument_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True, verbose=True):
+    """Convolution code adapted from pedros code and speed up with np mask logic"""
+    
+    #print("types", type(wav), type(flux), type(chip))
+    #print("lengths", len(wav), len(flux), len(chip))
+    
+    # CRIRES HDR vals for chip limits don't match well with calibrated values (get interpolation out of range error)
+    # So will use limits from the obs data instead 
+    #wav_chip, flux_chip = chip_selector(wav, flux, chip)
+    wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
+    #we need to calculate the FWHM at this value in order to set the starting point for the convolution
+    
+    FWHM_min = wav_chip[0]/R    #FWHM at the extremes of vector
+    FWHM_max = wav_chip[-1]/R       
+    
+    #wide wavelength bin for the resolution_convolution
+    wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0]-fwhm_lim*FWHM_min, wav_chip[-1]+fwhm_lim*FWHM_max, verbose=False) 
+    # isinstance check is ~100*faster then arraying the array again.
+    if not isinstance(wav_extended, np.ndarray):
+        wav_extended = np.array(wav_extended, dtype="float64") 
+    if not isinstance(flux_extended, np.ndarray):
+        flux_extended = np.array(flux_extended, dtype="float64")
+    
+    print("Starting the Resolution convolution...")
+    # Predefine np array space
+    flux_conv_res = np.empty_like(wav_chip, dtype="float64")
+    counter = 0 
+    base_val = len(wav_chip)//20   # Adjust here to change % between reports
+    
+    for n, wav in enumerate(wav_chip):
+        # put value directly into the array
+        flux_conv_res[n] = fast_convolve(wav, R, wav_extended, flux_extended, fwhm_lim)
+        if(n%base_val== 0) and verbose:
+            counter = counter+5
+            print("Resolution Convolution at {}%%...".format(counter))
+    
+    #if not isinstance(flux_conv_res, np.ndarray):
+    #    flux_conv_res = np.array(flux_conv_res, dtype="float64")
+        
+    print("Done.\n")
+    
+    if(plot):
+        fig=plt.figure(1)
+        plt.xlabel(r"wavelength [ $\mu$m ])")
+        plt.ylabel(r"flux [counts] ")
+        plt.plot(wav_chip, flux_chip/np.max(flux_chip), color ='k', linestyle="-", label="Original spectra")
+        plt.plot(wav_chip, flux_conv_res/np.max(flux_conv_res), color ='b', linestyle="-", label="Spectrum observed at and R=%d ." % (R))
+        plt.legend(loc='best')
+        plt.show() 
+    return [wav_chip, flux_conv_res]
+
+
