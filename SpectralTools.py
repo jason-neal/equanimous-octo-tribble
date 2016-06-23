@@ -4,6 +4,8 @@
 # Collection of useful tools for dealing with spectra:
 from __future__ import division
 import numpy as np
+import time
+from scipy.interpolate import interp1d
 
 def BERVcorr(W1, Berv):
     """Barycentric Earth Radial Velocity correction from tapas 
@@ -112,20 +114,22 @@ def wav_selector(wav, flux, wav_min, wav_max, verbose=False):
 def wl_interpolation(wl, spec, ref_wl, method="scipy", kind="linear", verbose=False):
     """Interpolate Wavelengths of spectra to common WL
     Most likely convert telluric to observed spectra wl after wl mapping performed"""
+    v_print = print if verbose else lambda *a, **k: None
+
     starttime = time.time()
     if method == "scipy":
-        print(kind + " scipy interpolation")
+        v_print(kind + " scipy interpolation")
         linear_interp = interp1d(wl, spec, kind=kind)
         new_spec = linear_interp(ref_wl)
     elif method == "numpy":
         if kind.lower() is not "linear":
-            print("Warning: Cannot do " + kind + " interpolation with numpy, switching to linear" )
-        print("Linear numpy interpolation")
+            v_print("Warning: Cannot do " + kind + " interpolation with numpy, switching to linear" )
+        v_print("Linear numpy interpolation")
         new_spec = np.interp(ref_wl, wl, spec)  # 1-d peicewise linear interpolat
     else:
-        print("Method was given as " + method)
-        raise("Not correct interpolation method specified")
-    print("Interpolation Time = " + str(time.time() - starttime) + " seconds")
+        v_print("Method was given as " + method)
+        raise("Interpolation method not correct")
+    v_print("Interpolation Time = " + str(time.time() - starttime) + " seconds")
 
     return new_spec  # test inperpolations 
 
@@ -179,14 +183,14 @@ def instrument_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True, v
     # CRIRES HDR vals for chip limits don't match well with calibrated values (get interpolation out of range error)
     # So will use limits from the obs data instead 
     #wav_chip, flux_chip = chip_selector(wav, flux, chip)
-    wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
+    wav_chip, flux_chip = wav_selector(wav, flux, chip_limits[0], chip_limits[1])
     #we need to calculate the FWHM at this value in order to set the starting point for the convolution
     
     FWHM_min = wav_chip[0]/R    #FWHM at the extremes of vector
     FWHM_max = wav_chip[-1]/R       
     
     #wide wavelength bin for the resolution_convolution
-    wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0]-fwhm_lim*FWHM_min, wav_chip[-1]+fwhm_lim*FWHM_max, verbose=False) 
+    wav_extended, flux_extended = wav_selector(wav, flux, wav_chip[0]-fwhm_lim*FWHM_min, wav_chip[-1]+fwhm_lim*FWHM_max, verbose=False) 
     # isinstance check is ~100*faster then arraying the array again.
     if not isinstance(wav_extended, np.ndarray):
         wav_extended = np.array(wav_extended, dtype="float64") 
@@ -219,6 +223,7 @@ def instrument_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True, v
         plt.plot(wav_chip, flux_conv_res/np.max(flux_conv_res), color ='b', linestyle="-", label="Spectrum observed at and R=%d ." % (R))
         plt.legend(loc='best')
         plt.show() 
+        
     return [wav_chip, flux_conv_res]
 
 
