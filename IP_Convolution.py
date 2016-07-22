@@ -111,6 +111,6 @@ if __name__ == "__main__":
    
     
     chip_limits = [2042, 2049]  # range in which to have the convoled values. Be careful of the edges! 
-    R = 10000
+    R = 1000
     convolved_wav, convolved_flux = IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True)
  
