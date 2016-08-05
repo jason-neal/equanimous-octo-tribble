@@ -155,7 +155,7 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     dec_angle = Angle(target_dec, u.deg)
     dec_j2000 = str(dec_angle.to_string(unit=u.degree, sep=':', precision=0, pad=True)) # Extra str to get rid of u"string" which failed in template
     v_print("RA degrees = {0}, RA Angle = {1}, RA for tapas = {2}".format(target_ra, ra_angle, ra_j2000))
-    v_print("DEC degrees = {0}, DEC Angle = {1}, DEC for tapas = {2}".format(target_dec, ra_angle, ra_j2000))
+    v_print("DEC degrees = {0}, DEC Angle = {1}, DEC for tapas = {2}".format(target_dec, dec_angle, dec_j2000))
 
     if wl_min:
         spec_range_min = int(wl_min)
