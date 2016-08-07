@@ -110,7 +110,7 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
             # Get average time of observation (adding exposure time)
             jd_days = []
             for nod_date in nod_dates:
-                t = Time(nod_date, format="fits") + TimeDelta(exptime, format="sec")
+                t = Time(nod_date, format="fits") + TimeDelta(exptime/2, format="sec")
                 t.format= 'jd'
                 jd_days.append(t.value)
             v_print("Nod dates converted into JD {}".format(jd_days))
