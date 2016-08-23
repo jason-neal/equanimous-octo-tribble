@@ -52,12 +52,9 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
             filename = path + "tmp_file." + ext   
         subprocess.call(["cp", old_filename, filename])
     
-    print("Extract", extract, "ext", ext, filename)
     if extract and ext == "gz":
         subprocess.call(["gunzip", filename])
-        print("filename ",filename)
         filename = filename[:-3]
-        print("filename after", filename)
         ext = filename.split(".")[-1]
     elif ext == "gz":
         print("The file ends in .gz. Add -x to call to extract it first")
@@ -78,12 +75,16 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
     except:
         respower = -1
 
-    if species:
-        new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}_species-{}".format(date, req_id, respower, sampling, berv, species)
-    elif sampling is -1 and respower is -1:
-        new_name = "{}_ReqId_{}_No_Ifunction_barydone-{}".format(date, req_id, berv)
+    if sampling is -1 and respower is -1:
+        if species:
+            new_name = "{}_ReqId_{}_No_Ifunction_barydone-{}_species-{}".format(date, req_id, berv, species)
+        else:
+            new_name = "{}_ReqId_{}_No_Ifunction_barydone-{}".format(date, req_id, berv)
     else:
-        new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}".format(date, req_id, respower, sampling, berv)
+        if species:
+            new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}_species-{}".format(date, req_id, respower, sampling, berv, species)
+        else:
+            new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}".format(date, req_id, respower, sampling, berv)
   
     if prefix:
         new_name = path + "tapas_" + prefix + "_" + new_name + "." + ext
