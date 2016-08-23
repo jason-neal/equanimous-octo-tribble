@@ -95,10 +95,12 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
         new_name = path + "tapas_" + prefix + "_" + new_name + "." + ext
     else:
         new_name = path + "tapas_" + new_name + "." + ext
-    print("Name for file = ", new_name)
+    #print("Name for file = ", new_name)
 
     subprocess.call(["mv", filename, new_name])
-    print("Renamed {} to {}".format(filename, new_name))
+    #print("Renamed {} to {}".format(filename, new_name))
+    
+    print("Changed '{}' into  '{}'".format(fname, new_name))
 
 
 if __name__ == "__main__":
@@ -106,6 +108,6 @@ if __name__ == "__main__":
     fname = args.pop('fname')
     opts = {k: args[k] for k in args}
     
-    print(opts)
+    #print(opts)
 
     main(fname, **opts)
