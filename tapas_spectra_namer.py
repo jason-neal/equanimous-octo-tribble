@@ -4,6 +4,11 @@
 """ 
 Rename tapas spectra based on the some of the header information in it.
 
+
+TO DO - some improvements
+- Check for exitcodes on subprocessed calls
+- USE gunzips own -keep functionality for the extraction.
+
 """
 
 import argparse
