@@ -45,18 +45,19 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
     ext = filename.split(".")[-1]
 
     if keep_original:
-        old_fname = fname
+        old_filename = filename
         if ext == "gz":
-            fname = path + "tmp_file." + filename.split(".")[-2] + ".gz"
+            filename = path + "tmp_file." + filename.split(".")[-2] + ".gz"
         else:
-            fname = path + "tmp_file." + ext   
-        subprocess.call(["cp", old_fname, fname])
+            filename = path + "tmp_file." + ext   
+        subprocess.call(["cp", old_filename, filename])
     
-    if extract and ext == ".gz":
-        subprocess.call(["gunzip ", fname], shell=True)
-        print(filename)
+    print("Extract", extract, "ext", ext, filename)
+    if extract and ext == "gz":
+        subprocess.call(["gunzip", filename])
+        print("filename ",filename)
         filename = filename[:-3]
-        print(filename)
+        print("filename after", filename)
         ext = filename.split(".")[-1]
     elif ext == "gz":
         print("The file ends in .gz. Add -x to call to extract it first")
@@ -90,8 +91,8 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
         new_name = path + "tapas_" + new_name + "." + ext
     print("Name for file = ", new_name)
 
-    subprocess.call(["mv", fname, new_name])
-    print("Renamed {} to {}".format(fname, new_name))
+    subprocess.call(["mv", filename, new_name])
+    print("Renamed {} to {}".format(filename, new_name))
 
 
 if __name__ == "__main__":
