@@ -31,11 +31,18 @@ def _parser():
 
 
 def main(fname, extract=False, prefix="", keep_original=False, species=False):
-
-    ext = fname.split(".")[-1]
-    filename = fname.split("/")[-1]
-    path_folders = fname.split("/")[:-1]
-    path = "/".join(path_folders) + "/"
+    
+    split_fname = fname.split("/")
+    if len(split_fname) == 1:
+        # No path 
+        filename = fname
+        path = ""
+    else:
+        filename = fname.split("/")[-1]
+        path_folders = fname.split("/")[:-1]
+        path = "/".join(path_folders) + "/"
+    
+    ext = filename.split(".")[-1]
 
     if keep_original:
         old_fname = fname
@@ -47,8 +54,9 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
     
     if extract and ext == ".gz":
         subprocess.call(["gunzip ", fname], shell=True)
-
+        print(filename)
         filename = filename[:-3]
+        print(filename)
         ext = filename.split(".")[-1]
     elif ext == "gz":
         print("The file ends in .gz. Add -x to call to extract it first")
