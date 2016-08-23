@@ -40,7 +40,7 @@ def _parser():
 
 def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CRIRE.2012-04-07T00:08:29.976_1.nod.ms.norm.sum.wavecal.fits", 
         listspectra=False, resolvpower=False, unit="vacuum", instrument_function="gaussian",
-        sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file="tapas_request.xml",
+        sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file=False,
         request_id=10, wl_min=False, wl_max=False, request_number=None, verbose=False):
     
     # verbose printing on flag raise
@@ -418,6 +418,19 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     #TO TRY in future - submit straight to tapas
 
     #output_file = "/home/jneal/Phd/Codes/UsefulModules/Tapas_xml_request_file.xml"
+
+    if not output_file:
+        output_file = "tapas_request_{}.xml".format(request_number)
+    else:
+        # Add request number
+        split = output_file.split(".")
+        if len(split) == 2:
+            output_file = split[0] + "_{}.".format(request_number) + split[1]
+        else:
+            print("Warning output filename may not be the expected format 'some_name.xml'")
+        print("Split output file", split)
+
+
     try:
         with open(output_file, "w") as out:
     	    out.write(sub)
