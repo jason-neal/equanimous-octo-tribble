@@ -6,6 +6,7 @@ declare -a arr=("HD202206-1" "HD202206-2" "HD202206-3"
  "HD168443-1" "HD168443-2"
  "HD211847-1" "HD211847-2"
  "HD4747-1")
+
 ## now loop through the above array
 for FOLDER in "${arr[@]}"
 do

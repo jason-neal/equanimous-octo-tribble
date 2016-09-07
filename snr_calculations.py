@@ -53,7 +53,7 @@ def click_snr(wl, Spec):
     """ Calculate snr in a specific range given by clicks on a plot """
     plt.figure()
     plt.plot(wl, Spec)
-    plt.show(block=False)
+    plt.show(block=True)
     # points from click
 
     # temp values untill implement above
@@ -143,9 +143,10 @@ def main(fname, binsize=5, interactive_mode=False, bin_range=None, limits=None, 
         binsize = int(binsize)
        
         snr_list = snrscan(I, binsize)
-        print(snr_list)
+        print("snr list", snr_list)
         # Try using stride on np.array
-
+        plt.hist(snr_list)
+        plt.show()
         # striding
         if bin_range:
 
