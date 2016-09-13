@@ -27,6 +27,23 @@ def _parser():
 
 def main(star_name, companion_mass, stellar_age):
     """Compute flux ratio of star to companion """
+    
+    # Obtain Stellar parameters from astroquery
+    star_params = get_stellar_params(star_name):
+    
+    # Get parameters for this mass and age 
+    companion = get_brown_dwarf_information(companion_mass, stellar_age)
+  
+    Flux_ratios = calculate_flux_ratios(star_params, companion)
+
+    # Print flux ratios using a generator
+    print("{} band companion/star Flux ratio = {} ".format(key, val) for key, val in Flux_ratios.(dic unpack method))
+
+    # Compare to area ratio
+    Rstar = calculate_stellar_radius(star_params)
+    Rcomp_Rstar = companion["Radius"] / Rstar
+    print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar))
+    print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar**2))
 
 
 def calculate_flux_ratios(star_params, companion_params):
