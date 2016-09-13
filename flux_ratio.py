@@ -65,6 +65,25 @@ def calculate_stellar_radius(star_params):
     return R_Rs   # R star in solar radii
 #BD_R = BD_Radius / R_Rs          # Radius_bd / Radius_star
 #BD_area_ratio =  BD_R**2
+
+
+    pass
+
+
+def get_brown_dwarf_information(star_name, companion_mass, age):
+    """ baraffe 2003 table search
+    Need the tables in a file somewhere"""
+    
+
+
+    print("Interpolated companion parameters from barraffe 2003 tables.")
+    return  BD_parameters  # as a dictionary
+
+
+
+
+    
+
 if __name__ == '__main__':
     args = vars(_parser())
     star_name = args.pop('star_name')
