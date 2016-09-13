@@ -27,6 +27,17 @@ def _parser():
 
 def main(star_name, companion_mass, stellar_age):
     """Compute flux ratio of star to companion """
+
+
+def calculate_flux_ratios(star_params, companion_params):
+    """ Flux ratios for the different bands """
+    f = 2.512
+    Flux_ratios = dict()
+    Flux_ratios["J"] = f ** (companion_params["Jmag"]-star_params["Jmag"])
+    Flux_ratios["H"] = f ** (companion_params["Hmag"]-star_params["Hmag"])
+    Flux_ratios["K"] = f ** (companion_params["Kmag"]-star_params["Kmag"])
+    return Flux_ratios
+
     pass
 def calculate_stellar_radius(star_params):
     """ Based on R/Rs = (Ts/T)^2(L/Ls)^(1/2) equation"""
