@@ -38,7 +38,13 @@ def calculate_flux_ratios(star_params, companion_params):
     Flux_ratios["K"] = f ** (companion_params["Kmag"]-star_params["Kmag"])
     return Flux_ratios
 
+def get_stellar_params(star_name):
+    """ Astro query search """
+
+    #return Magnitudes, parralax, Temp
     pass
+
+
 def calculate_stellar_radius(star_params):
     """ Based on R/Rs = (Ts/T)^2(L/Ls)^(1/2) equation"""
     BminusV = star_params["Bmag"] - star_params["Vmag"]
