@@ -28,6 +28,26 @@ def _parser():
 def main(star_name, companion_mass, stellar_age):
     """Compute flux ratio of star to companion """
     pass
+def calculate_stellar_radius(star_params):
+    """ Based on R/Rs = (Ts/T)^2(L/Ls)^(1/2) equation"""
+    BminusV = star_params["Bmag"] - star_params["Vmag"]
+
+    if "Teff in star_params.keys(): # need table and interpolate to this B-V
+        teff_star
+    else: #
+        #Interpolate from B-V
+        teff_star = (4200-5100)/(1.16-0.85) * (BminusV-0.85) + 5100    # Linear interpolation
+
+    Ts_T = 5800. / teff_star    # Temperature ratio
+
+    Dm =   4.83 - star_params["AbsVmag"] # Differnce of aboslute magnitude
+    L_Ls = 2.51 ** Dm                    # Luminosity ratio
+
+    R_Rs = (Ts_T)**2*(L_Ls)**0.5    # Raidus of Star in Solar Radii
+
+    return R_Rs   # R star in solar radii
+#BD_R = BD_Radius / R_Rs          # Radius_bd / Radius_star
+#BD_area_ratio =  BD_R**2
 if __name__ == '__main__':
     args = vars(_parser())
     star_name = args.pop('star_name')
