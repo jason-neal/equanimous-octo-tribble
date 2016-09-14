@@ -140,7 +140,7 @@ if __name__ == '__main__':
     args = vars(_parser())
     star_name = args.pop('star_name')
     companion_mass = args.pop('companion_mass')
-    Age = args.pop('Age')
+    age = args.pop('age')
     opts = {k: args[k] for k in args}
 
     main(star_name, companion_mass, age, **opts)
