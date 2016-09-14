@@ -78,27 +78,34 @@ def get_stellar_params(star_name):
 
 def calculate_stellar_radius(star_params):
     """ Based on R/Rs = (Ts/T)^2(L/Ls)^(1/2) equation"""
-    BminusV = star_params["Bmag"] - star_params["Vmag"]
+    BminusV = star_params["FLUX_B"] - star_params["FLUX_V"]
+    print(BminusV, "b-v")
 
-    if Teff in star_params.keys(): # need table and interpolate to this B-V
-        teff_star
-    else: #
+    #if "Fe_H_Teff" in star_params.keys(): # need table and interpolate to this B-V
+    #    teff_star = star_params["Fe_H_Teff"]
+    #    print(teff_star)
+    #    print(teff_star[0])
+    #    print("temperature fromsimbad =", teff_star)
+    #else:
+    #    teff_star = 0
+    if True:
+    #if teff_star == 0:
         #Interpolate from B-V
-        teff_star = (4200-5100)/(1.16-0.85) * (BminusV-0.85) + 5100    # Linear interpolation
+        bminusvs=[-0.31, -0.24, -0.20, -0.12, 0.0, 0.15, 0.29, 0.42, 0.58, 0.69, 0.85, 1.16, 1.42, 1.61] 
+        temps = [34000, 23000, 18500, 13000, 9500, 8500, 7300, 6600, 5900, 5600, 5100, 4200, 3700, 3000]
+        #teff_star = (4200-5100)/(1.16-0.85) * (BminusV-0.85) + 5100    # Linear interpolation
+        teff_star = np.interp(BminusV, bminusvs, temps)
+        print("Temperature of star from b-v", teff_star)
 
-    Ts_T = 5800. / teff_star    # Temperature ratio
-
-    Dm =   4.83 - star_params["AbsVmag"] # Differnce of aboslute magnitude
-    L_Ls = 2.51 ** Dm                    # Luminosity ratio
-
-    R_Rs = (Ts_T)**2*(L_Ls)**0.5    # Raidus of Star in Solar Radii
+    Ts_T = 5800. / teff_star              # Temperature ratio
+    Dm =   4.83 - star_params["FLUX_V"]   # Differnce of aboslute magnitude
+    L_Ls = 2.51 ** Dm                     # Luminosity ratio
+    R_Rs = (Ts_T)**2 * np.sqrt(L_Ls)      # Raidus of Star in Solar Radii
 
     return R_Rs   # R star in solar radii
-#BD_R = BD_Radius / R_Rs          # Radius_bd / Radius_star
-#BD_area_ratio =  BD_R**2
+    #BD_R = BD_Radius / R_Rs          # Radius_bd / Radius_star
+    #BD_area_ratio =  BD_R**2
 
-
-    pass
 
 
 def get_brown_dwarf_information(companion_mass, age):
