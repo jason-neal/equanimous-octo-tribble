@@ -45,7 +45,9 @@ def main(star_name, companion_mass, stellar_age):
 
     # Print flux ratios using a generator
     [print("{} band companion/star Flux ratio = {} ".format(key, val)) for key, val in Flux_ratios.items()]
-  
+    
+    print("Star radius      = {} R_sun".format(Rstar))
+    print("Planet radius    = {} R_sun".format(companion["R"]))
     print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar))
     print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar**2))
     
