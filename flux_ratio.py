@@ -44,7 +44,7 @@ def main(star_name, companion_mass, stellar_age):
 
     # Compare to area ratio
     Rstar = calculate_stellar_radius(star_params)
-    Rcomp_Rstar = companion["Radius"] / Rstar
+    Rcomp_Rstar = companion["R"] / Rstar
     print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar))
     print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar**2))
 
