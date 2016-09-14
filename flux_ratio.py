@@ -18,12 +18,12 @@ def _parser():
 
     :returns: the args
     """
-    parser = argparse.ArgumentParser(description='Wavelength Calibrate Spectra')
+    parser = argparse.ArgumentParser(description='Determine flux ratio of stellar companion')
     
     parser.add_argument('star_name', help='Input fits file to calibrate')
 
-    parser.add_argument('companion_mass', help='Mass of companion')
-    parser.add_argument('age', help='Star age')
+    parser.add_argument('companion_mass', help='Mass of companion (M_Jup)', type=float)
+    parser.add_argument('age', help='Star age (Gyr)',type=float)
     args = parser.parse_args()
     return args
 
