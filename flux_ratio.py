@@ -12,6 +12,8 @@ import argparse
 import numpy as np
 from astroquery.simbad import Simbad
 import pandas as pd
+from PyAstronomy import pyasl
+import matplotlib.pyplot as plt
 
 def _parser():
     """Take care of all the argparse stuff.
@@ -19,9 +21,7 @@ def _parser():
     :returns: the args
     """
     parser = argparse.ArgumentParser(description='Determine flux ratio of stellar companion')
-    
     parser.add_argument('star_name', help='Input fits file to calibrate')
-
     parser.add_argument('companion_mass', help='Mass of companion (M_Jup)', type=float)
     parser.add_argument('age', help='Star age (Gyr)',type=float)
     args = parser.parse_args()
@@ -48,7 +48,8 @@ def main(star_name, companion_mass, stellar_age):
   
     print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar))
     print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar**2))
-
+    
+    get_sweet_cat_data()
 
 def calculate_flux_ratios(star_params, companion_params):
     """ Flux ratios for the different bands """
@@ -132,9 +133,39 @@ def get_brown_dwarf_information(companion_mass, age):
     return  BD_parameters  # as a dictionary
 
 
+def get_sweet_cat_data():
+    sc = pyasl.SWEETCat()
+    data = sc.data
+    print(data.head())
+    print(data.keys())
+    #data.plot('teff', 'vmag', kind='scatter')
+    #plt.show()
 
+    # We can also create another column for our table, e.g. luminosity so we can make a HR diagram
+    # Note that this works even though we have missing values
+    data['lum'] = (data.teff/5777)**4 * data.mass
+    #data.plot('teff', 'lum', kind='scatter', xlim=(8500, 2500))
 
+    # If we only are interested in a shorter table, with stars with Teff below 5000K, we can do so
+    data_cool = data[data.teff < 5000]
+
+    # See that it worked (print rows and columns)
+    print(data.shape)
+    print(data_cool.shape)
+
+    # And the plot
+    #plt.figure()
+    #data.plot('teff', 'lum', kind='scatter', xlim=(8500, 2500))
+    #plt.plot(data_cool.teff, data_cool.lum, 'oy')
+    #plt.show()
     
+    # Assuming given as hd******
+    number = star_name[2:]
+    this_entry = data[data.hd == number]
+    print("this entry = ", this_entry)
+   # Need to check for empty frames if the star is not in sweet-cat
+
+
 
 if __name__ == '__main__':
     args = vars(_parser())
