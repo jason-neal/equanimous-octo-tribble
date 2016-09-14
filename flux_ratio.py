@@ -54,10 +54,11 @@ def calculate_flux_ratios(star_params, companion_params):
     """ Flux ratios for the different bands """
     f = 2.512
     Flux_ratios = dict()
-    Flux_ratios["J"] = f ** (companion_params["Mj"]-star_params["Jmag"])
-    Flux_ratios["H"] = f ** (companion_params["Mh"]-star_params["Hmag"])
-    Flux_ratios["K"] = f ** (companion_params["Mk"]-star_params["Kmag"])
+    Flux_ratios["J"] = f ** (companion_params["Mj"]-star_params["FLUX_J"])
+    #Flux_ratios["H"] = f ** (companion_params["Mh"]-star_params["Hmag"])
+    Flux_ratios["K"] = f ** (companion_params["Mk"]-star_params["FLUX_K"])
     return Flux_ratios
+
 
 def get_stellar_params(star_name):
     """ Astro query search """
