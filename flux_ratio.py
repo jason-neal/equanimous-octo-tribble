@@ -32,7 +32,7 @@ def main(star_name, companion_mass, stellar_age):
     """Compute flux ratio of star to companion """
     
     # Obtain Stellar parameters from astroquery
-    star_params = get_stellar_params(star_name)
+    star_params = get_stellar_params(star_name)    # returns a astroquesry result table
     
     # Get parameters for this mass and age 
     companion = get_brown_dwarf_information(companion_mass, stellar_age)
@@ -64,12 +64,16 @@ def get_stellar_params(star_name):
     """ Astro query search """
 
     #return Magnitudes, parralax, Temp
-    Simbad
-    columns = ["HD", "SpType", "B-V", "Vmag"]
-    result_table = Simbad.query_object(star_name, columns=columns)
-    print("Table colums", result_table.columns)
+    customSimbad = Simbad()
+    # Can add more fluxes here if need to extend to more flux ranges. although K is the limit for simbad.
+    # if want higher need to search for Wise band in VISIER probably.
+    customSimbad.add_votable_fields('parallax', 'sp', 'fluxdata(B)', 'fluxdata(V)', 'fluxdata(J)', 'fluxdata(K)')
+   
+    result_table =  customSimbad.query_object(star_name)
+
+    #print("Table colums", result_table.colnames)
     
-    
+    return result_table
 
 
 def calculate_stellar_radius(star_params):
