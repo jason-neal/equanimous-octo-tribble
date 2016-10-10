@@ -1,7 +1,10 @@
-# from https://github.com/jason-neal/equanimous-octo-tribble/blob/master/IP_Convolution.py
+# Convolution Code from
+# https://github.com/jason-neal/equanimous-octo-tribble/blob/master/IP_Convolution.py
 # Convolution of spectra to a Instrument profile of resolution R.
 #
 # The spectra does not have to be equidistant in wavelength.
+
+# Multiprocess use and speed timing was contributed by Jorge Martins
 
 from __future__ import division, print_function
 import numpy as np
