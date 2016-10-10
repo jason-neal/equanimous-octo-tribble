@@ -13,7 +13,7 @@ import numpy as np
 from astroquery.simbad import Simbad
 import pandas as pd
 from PyAstronomy import pyasl
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 def _parser():
     """Take care of all the argparse stuff.

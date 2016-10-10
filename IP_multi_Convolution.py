@@ -3,10 +3,17 @@
 #
 # The spectra does not have to be equidistant in wavelength.
 
+# Multiprocessing is used to improve speed of convolution.
+# The addition of multiprocess was added by Jorge Martins
+# If you do not want to use multiprocessing then see IP_Convolution.py
+
+
 from __future__ import division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime as dt
+import multiprocess as mprocess
+from tqdm import tqdm
 
 
 def wav_selector(wav, flux, wav_min, wav_max):
@@ -35,8 +42,8 @@ def unitary_Gauss(x, center, FWHM):
     """
 
     sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)))
-    Amp = 1.0 / (sigma*np.sqrt(2*np.pi))
-    tau = -((x - center)**2) / (2*(sigma**2))
+    Amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
+    tau = -((x - center) ** 2) / (2 * (sigma ** 2))
     result = Amp * np.exp(tau)
 
     return result
@@ -44,27 +51,35 @@ def unitary_Gauss(x, center, FWHM):
 
 def fast_convolve(wav_val, R, wav_extended, flux_extended, FWHM_lim):
     """IP convolution multiplication step for a single wavelength value"""
-    FWHM = wav_val/R
+    FWHM = wav_val / R
     # Mask of wavelength range within 5 FWHM of wav
-    index_mask = ((wav_extended > (wav_val - FWHM_lim*FWHM)) &
-                  (wav_extended < (wav_val + FWHM_lim*FWHM)))
+    index_mask = ((wav_extended > (wav_val - FWHM_lim * FWHM)) &
+                  (wav_extended < (wav_val + FWHM_lim * FWHM)))
 
     flux_2convolve = flux_extended[index_mask]
     # Gausian Instrument Profile for given resolution and wavelength
     IP = unitary_Gauss(wav_extended[index_mask], wav_val, FWHM)
 
-    sum_val = np.sum(IP*flux_2convolve)
+    sum_val = np.sum(IP * flux_2convolve)
     # Correct for the effect of convolution with non-equidistant postions
-    unitary_val = np.sum(IP*np.ones_like(flux_2convolve))
+    unitary_val = np.sum(IP * np.ones_like(flux_2convolve))
 
     return sum_val / unitary_val
 
 
+def wrapper_fast_convolve(args):
+    """ Wrapper for fast_convolve needed to unpack the arguments for
+    fast_convolve as multiprocess.Pool.map does not accept multiple
+    arguments"""
+
+    return fast_convolve(*args)
+
+
 def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
-                  verbose=True):
+                  verbose=True, numProcs=None):
     """Spectral convolution which allows non-equidistance step values"""
 
-    # Make sure they are numpy arrays
+    # Turn into numpy arrays
     wav = np.asarray(wav, dtype='float64')
     flux = np.asarray(flux, dtype='float64')
 
@@ -82,24 +97,26 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
     wav_ext, flux_ext = wav_selector(wav, flux, wav_min, wav_max)
 
     print("Starting the Resolution convolution...")
-    # Predefine array space
-    flux_conv_res = np.empty_like(wav_chip, dtype="float64")
-    counter = 0
-    base_val = len(wav_chip)//20   # Adjust here to change % between reports
 
-    for n, wav in enumerate(wav_chip):
-        # Put convolution value directly into the array
-        flux_conv_res[n] = fast_convolve(wav, R, wav_ext, flux_ext,
-                                         FWHM_lim)
-        if (n % base_val == 0) and verbose:
-            counter = counter + 5  # And ajust here to change % between reports
-            print("Resolution Convolution at {}%%...".format(counter))
+    # multiprocessing part
+    if numProcs is None:
+        numProcs = mprocess.cpu_count() - 1
 
+    mprocPool = mprocess.Pool(processes=numProcs)
+
+    args_generator = tqdm([[wav, R, wav_ext, flux_ext, FWHM_lim]
+                          for wav in wav_chip])
+
+    flux_conv_res = np.array(mprocPool.map(wrapper_fast_convolve,
+                                           args_generator))
+
+    mprocPool.close()
     timeEnd = dt.now()
-    print("Single-Process convolution has been completed in"
-          " {}.\n".format(timeEnd-timeInit))
+    print("Multi-Proc convolution has been compelted in "
+          "{} using {}/{} cores.\n".format(timeEnd-timeInit, numProcs,
+                                           mprocess.cpu_count()))
 
-    if plot:
+    if (plot):
         plt.figure(1)
         plt.xlabel(r"wavelength [ nm ])")
         plt.ylabel(r"flux [counts] ")
