@@ -71,17 +71,17 @@ def multi_IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verb
     timeInit = dt.now()
     wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
     # We need to calculate the FWHM at this value in order to set the starting point for the convolution
+
+    # Make sure they are numpy arrays
+    wav = np.asarray(wav, dtype='float64')
+    flux = np.asarray(flux, dtype='float64')
+
     FWHM_min = wav_chip[0] / R  # FWHM at the extremes of vector
     FWHM_max = wav_chip[-1] / R
 
     # Wide wavelength bin for the resolution_convolution
     wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0] - FWHM_lim * FWHM_min,
                                                     wav_chip[-1] + FWHM_lim * FWHM_max, verbose=False)
-    # isinstance check is ~100*faster then arraying the array again.
-    if not isinstance(wav_extended, np.ndarray):
-        wav_extended = np.array(wav_extended, dtype="float64")
-    if not isinstance(flux_extended, np.ndarray):
-        flux_extended = np.array(flux_extended, dtype="float64")
 
     print("Starting the Resolution convolution...")
     # Predefine array space
@@ -124,17 +124,16 @@ def single_IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, ver
 
     wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
     # We need to calculate the FWHM at this value in order to set the starting point for the convolution
+    # Make sure they are numpy arrays
+    wav = np.asarray(wav, dtype='float64')
+    flux = np.asarray(flux, dtype='float64')
+
     FWHM_min = wav_chip[0] / R  # FWHM at the extremes of vector
     FWHM_max = wav_chip[-1] / R
 
     # Wide wavelength bin for the resolution_convolution
     wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0] - FWHM_lim * FWHM_min,
                                                     wav_chip[-1] + FWHM_lim * FWHM_max, verbose=False)
-    # isinstance check is ~100*faster then arraying the array again.
-    if not isinstance(wav_extended, np.ndarray):
-        wav_extended = np.array(wav_extended, dtype="float64")
-    if not isinstance(flux_extended, np.ndarray):
-        flux_extended = np.array(flux_extended, dtype="float64")
 
     print("Starting the Resolution convolution...")
     # Predefine array space
