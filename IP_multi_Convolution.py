@@ -28,38 +28,44 @@ def fast_wav_selector(wav, flux, wav_min, wav_max, verbose=False):
     flux_sel = flux[mask]
     return [wav_sel, flux_sel]
 
+
 def unitary_Gauss(x, center, FWHM):
     """
     Gaussian_function of area=1
-    
+
     p[0] = A;
     p[1] = mean;
     p[2] = FWHM;
     """
-    
-    sigma = np.abs(FWHM) / ( 2 * np.sqrt(2 * np.log(2)) );
-    Amp = 1.0 / (sigma*np.sqrt(2*np.pi))
-    tau = -((x - center)**2) / (2*(sigma**2))
-    result = Amp * np.exp( tau );
-    
-    return result
 
+    sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)));
+    Amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
+    tau = -((x - center) ** 2) / (2 * (sigma ** 2))
+    result = Amp * np.exp(tau);
+
+    return result
 
 def fast_convolve(wav_val, R, wav_extended, flux_extended, FWHM_lim):
     """IP convolution multiplication step for a single wavelength value"""
     FWHM = wav_val / R
     # Mask of wavelength range within 5 FWHM of wav
-    index_mask = (wav_extended > (wav_val - FWHM_lim*FWHM)) & (wav_extended < (wav_val + FWHM_lim*FWHM))
-    
+    index_mask = (wav_extended > (wav_val - FWHM_lim * FWHM)) & (wav_extended < (wav_val + FWHM_lim * FWHM))
+
     flux_2convolve = flux_extended[index_mask]
     # Gausian Instrument Profile for given resolution and wavelength
     IP = unitary_Gauss(wav_extended[index_mask], wav_val, FWHM)
-    
-    sum_val = np.sum(IP*flux_2convolve) 
+
+    sum_val = np.sum(IP * flux_2convolve)
     # Correct for the effect of convolution with non-equidistant postions
-    unitary_val = np.sum(IP*np.ones_like(flux_2convolve))  
-        
-    return sum_val/unitary_val
+    unitary_val = np.sum(IP * np.ones_like(flux_2convolve))
+
+    return sum_val / unitary_val
+
+def wrapper_fast_convolve(args):
+    """ Wrapper for fast_convolve needed to unpack the arguments for fast_convolve
+    as multiprocess.Pool.map does not accept multiple arguments"""
+
+    return fast_convolve(*args)
 
 def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True):
     """Spectral convolution which allows non-equidistance step values"""
@@ -69,7 +75,7 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=Tr
     FWHM_min = wav_chip[0]/R    # FWHM at the extremes of vector
     FWHM_max = wav_chip[-1]/R       
     
-    #Wide wavelength bin for the resolution_convolution
+    # Wide wavelength bin for the resolution_convolution
     wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0]-FWHM_lim*FWHM_min, wav_chip[-1]+FWHM_lim*FWHM_max, verbose=False) 
     # isinstance check is ~100*faster then arraying the array again.
     if not isinstance(wav_extended, np.ndarray):
