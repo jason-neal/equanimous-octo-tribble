@@ -6,6 +6,7 @@
 from __future__ import division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime as dt
 
 def fast_wav_selector(wav, flux, wav_min, wav_max, verbose=False):
     """ Faster Wavelenght selector
