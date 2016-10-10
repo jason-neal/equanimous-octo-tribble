@@ -41,18 +41,20 @@ def unitary_Gauss(x, center, FWHM):
     p[2] = FWHM;
     """
 
-    sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)));
+    sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)))
     Amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
     tau = -((x - center) ** 2) / (2 * (sigma ** 2))
-    result = Amp * np.exp(tau);
+    result = Amp * np.exp(tau)
 
     return result
+
 
 def fast_convolve(wav_val, R, wav_extended, flux_extended, FWHM_lim):
     """IP convolution multiplication step for a single wavelength value"""
     FWHM = wav_val / R
     # Mask of wavelength range within 5 FWHM of wav
-    index_mask = (wav_extended > (wav_val - FWHM_lim * FWHM)) & (wav_extended < (wav_val + FWHM_lim * FWHM))
+    index_mask = ((wav_extended > (wav_val - FWHM_lim * FWHM)) &
+                  (wav_extended < (wav_val + FWHM_lim * FWHM)))
 
     flux_2convolve = flux_extended[index_mask]
     # Gausian Instrument Profile for given resolution and wavelength
@@ -64,13 +66,17 @@ def fast_convolve(wav_val, R, wav_extended, flux_extended, FWHM_lim):
 
     return sum_val / unitary_val
 
+
 def wrapper_fast_convolve(args):
-    """ Wrapper for fast_convolve needed to unpack the arguments for fast_convolve
-    as multiprocess.Pool.map does not accept multiple arguments"""
+    """ Wrapper for fast_convolve needed to unpack the arguments for
+    fast_convolve as multiprocess.Pool.map does not accept multiple
+    arguments"""
 
     return fast_convolve(*args)
 
-def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True, numProcs=None):
+
+def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
+                  verbose=True, numProcs=None):
     """Spectral convolution which allows non-equidistance step values"""
 
     # Turn into numpy arrays
@@ -78,11 +84,13 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=Tr
     flux = np.asarray(flux, dtype='float64')
 
     timeInit = dt.now()
-    wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
-    # We need to calculate the FWHM at this value in order to set the starting point for the convolution
-    FWHM_min = wav_chip[0]/R    # FWHM at the extremes of vector
-    FWHM_max = wav_chip[-1]/R       
-    
+    wav_chip, flux_chip = wav_selector(wav, flux, chip_limits[0],
+                                       chip_limits[1])
+    # We need to calculate the FWHM at this value in order to set the starting
+    # point for the convolution
+    FWHM_min = wav_chip[0] / R    # FWHM at the extremes of vector
+    FWHM_max = wav_chip[-1] / R
+
     # Wide wavelength bin for the resolution_convolution
     wav_min = wav_chip[0] - FWHM_lim * FWHM_min
     wav_max = wav_chip[-1] + FWHM_lim * FWHM_max
@@ -96,33 +104,41 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=Tr
 
     mprocPool = mprocess.Pool(processes=numProcs)
 
-    args_generator = tqdm([[wav, R, wav_extended, flux_extended, FWHM_lim] for wav in wav_chip])
+    args_generator = tqdm([[wav, R, wav_ext, flux_ext, FWHM_lim]
+                          for wav in wav_chip])
 
-    flux_conv_res = np.array(mprocPool.map(wrapper_fast_convolve, args_generator))
+    flux_conv_res = np.array(mprocPool.map(wrapper_fast_convolve,
+                                           args_generator))
 
     mprocPool.close()
     timeEnd = dt.now()
-    print("Multi-Proc convolution has been compelted in {} using {}/{} cores.\n".format(timeEnd-timeInit, numProcs, mprocess.cpu_count()))
+    print("Multi-Proc convolution has been compelted in "
+          "{} using {}/{} cores.\n".format(timeEnd-timeInit, numProcs,
+                                           mprocess.cpu_count()))
 
     if (plot):
-        fig=plt.figure(1)
+        plt.figure(1)
         plt.xlabel(r"wavelength [ nm ])")
         plt.ylabel(r"flux [counts] ")
-        plt.plot(wav_chip, flux_chip/np.max(flux_chip), color ='k', linestyle="-", label="Original spectra")
-        plt.plot(wav_chip, flux_conv_res/np.max(flux_conv_res), color ='r', linestyle="-", label="Spectrum observed at R={0}.".format(R))
+        plt.plot(wav_chip, flux_chip / np.max(flux_chip), color='k',
+                 linestyle="-", label="Original spectra")
+        plt.plot(wav_chip, flux_conv_res / np.max(flux_conv_res), color='r',
+                 linestyle="-", label="Spectrum observed at R={0}.".format(R))
         plt.legend(loc='best')
         plt.title(r"Convolution by an Instrument Profile ")
-        plt.show() 
+        plt.show()
     return [wav_chip, flux_conv_res]
 
 
 if __name__ == "__main__":
     # Example useage of this convolution
     wav = np.linspace(2040, 2050, 30000)
-    flux = np.ones_like(wav) - unitary_Gauss(wav, 2045, .6) - unitary_Gauss(wav, 2047, .9)
-   
-    
-    chip_limits = [2042, 2049]  # range in which to have the convoled values. Be careful of the edges! 
+    flux = (np.ones_like(wav) - unitary_Gauss(wav, 2045, .6) -
+            unitary_Gauss(wav, 2047, .9))
+    # Range in which to have the convoled values. Be careful of the edges!
+    chip_limits = [2042, 2049]
+
     R = 1000
-    convolved_wav, convolved_flux = IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True)
- 
+    convolved_wav, convolved_flux = IPconvolution(wav, flux, chip_limits, R,
+                                                  FWHM_lim=5.0, plot=True,
+                                                  verbose=True)
