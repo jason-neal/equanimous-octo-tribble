@@ -44,12 +44,14 @@ def main(star_name, companion_mass, stellar_age):
     Rcomp_Rstar = companion["R"] / Rstar
 
     # Print flux ratios using a generator
-    [print("{} band companion/star Flux ratio = {} ".format(key, val)) for key, val in Flux_ratios.items()]
+    print("Magnitude Calculation\n")
+    [print("{0} band star/companion Flux ratio = {1} >>> companion/star Flux ratio {2}".format(key, val[0], 1./val[0])) for key, val in Flux_ratios.items()]
     
-    print("Star radius      = {} R_sun".format(Rstar))
-    print("Planet radius    = {} R_sun".format(companion["R"]))
-    print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar))
-    print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar**2))
+    print("\nRadius Calculation")
+    print("Star radius      = {} R_sun".format(Rstar[0]))
+    print("Planet radius    = {} R_sun".format(np.round(companion["R"], 4)))
+    print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar[0]))
+    print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar[0]**2))
     
 
 ##############################################################################
@@ -64,7 +66,7 @@ def get_stellar_params(star_name):
     customSimbad = Simbad()
     # Can add more fluxes here if need to extend to more flux ranges. although K is the limit for simbad.
     # if want higher need to search for Wise band in VISIER probably.
-    customSimbad.add_votable_fields('parallax', 'sp', 'fluxdata(B)', 'fluxdata(V)', 'fluxdata(J)', 'fluxdata(K)')
+    customSimbad.add_votable_fields('parallax', 'sp', 'fluxdata(B)', 'fluxdata(V)', 'fluxdata(J)', 'fluxdata(K)', 'fe_h')
    
     result_table =  customSimbad.query_object(star_name)
 
@@ -100,19 +102,27 @@ def get_brown_dwarf_information(companion_mass, age):
 def get_sweet_cat_temp(star_name):
     sc = pyasl.SWEETCat()
     data = sc.data
-    print(data.head())
-    print(data.keys())
+    #print(data.head())
+    #print(data.keys())
 
     # Assuming given as hd******
     hd_number = star_name[2:]
-    star_entry = data[data.hd == hd_number]
-    print("star entry = ", star_entry)
-    #if star_entry is empty table: (star not found)
-    #    pass
-    #else:
-    star_temp = star_entry["teff"]
-    # Need to check for empty frames if the star is not in sweet-cat
-    return star_temp
+    #print("hd number ", hd_number)
+    if hd_number in sc.data.hd.values:
+        hd_entry = data[data.hd == hd_number]
+    
+        if hd_entry.empty:
+            return False
+        else:
+        # Sweet-cat has temperature of zero 
+        #if it does not have a temperature value for the star
+            return hd_entry.iloc[0]["teff"]
+    else:
+        print("This star not in SWEET-Cat")
+        return False
+  
+        
+    
 
 
 
@@ -131,45 +141,53 @@ def calculate_flux_ratios(star_params, companion_params):
     Flux_ratios["K"] = f ** (companion_params["Mk"]-star_params["FLUX_K"])
     return Flux_ratios
 
-def get_temp_value(star_name):
+def get_temperature(star_name, star_params):
     """ Try get temperature of star multiple ways
 
     1st - Try Fe_H_Teff param from Simbad.
     2nd - Try SweetCat but the star might not be there
     3rd - Calculate from B-V and interpolation"""
     good_temp = False
-
+    # This is not the best way to do this but work atm
     if "Fe_H_Teff" in star_params.keys(): # need table and interpolate to this B-V
-        print(star_params["Fe_H_Teff"])
+        #print("star_params['Fe_H_Teff'] =", star_params["Fe_H_Teff"])
         teff = star_params["Fe_H_Teff"][0]
         if teff == 0 or teff == [0]:
             # No teff given by Simbad 
+            print("Simbad Temperature was zero")
             teff = None
         else:
             good_temp = True
-
+            print("Temperature obtained from Fe_H_Teff", good_temp)
+            return teff
+        
     if not good_temp:
         try:
-            teff = get_sweet_cat_temp(star_params, star_name)
-            if teff == 0 or teff == [0]:  # temp from seet-cat
+            teff = get_sweet_cat_temp(star_name)
+            
+            if teff == 0 or np.isnan(teff):  # temp from sweet-cat
+                print("No SWEET-Cat temperature, teff was", teff)
                 teff = None
             else:
+                print("SWEET-Cat teff =", teff)
                 good_temp = True
+                return teff
         except:
+            print("Failed to get Sweetcat_temp")
             good_temp = False
+            raise
 
     if not good_temp:
         """Then use the B-V method as last resort"""
         BminusV = star_params["FLUX_B"] - star_params["FLUX_V"]
-        print(BminusV, "b-v")
+        #print(BminusV, "b-v")
         #Interpolate from B-V
-        bminusvs = [-0.31, -0.24, -0.20, -0.12, 0.0, 0.15, 0.29, 0.42, 0.58, 0.69, 0.85, 1.16, 1.42, 1.61] 
-        temps = [34000, 23000, 18500, 13000, 9500, 8500, 7300, 6600, 5900, 5600, 5100, 4200, 3700, 3000]
+        bminusvs = np.array([-0.31, -0.24, -0.20, -0.12, 0.0, 0.15, 0.29, 0.42, 0.58, 0.69, 0.85, 1.16, 1.42, 1.61])
+        temps = np.array([34000, 23000, 18500, 13000, 9500, 8500, 7300, 6600, 5900, 5600, 5100, 4200, 3700, 3000])
         #teff_star = (4200-5100)/(1.16-0.85) * (BminusV-0.85) + 5100    # Linear interpolation
-        teff_star = np.interp(BminusV, bminusvs, temps)
-        print("Temperature of star from b-v", teff_star)
-
-    return teff_star
+        teff = np.interp(BminusV, bminusvs, temps)[0]
+        print("Temperature of star was calculated from b-v = {} K".format(teff))
+    return teff
 
 
 def calculate_stellar_radius(star_name, star_params):
