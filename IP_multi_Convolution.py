@@ -71,7 +71,10 @@ def wrapper_fast_convolve(args):
 
 def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True, numProcs=None):
     """Spectral convolution which allows non-equidistance step values"""
-    
+
+    # Turn into numpy arrays
+    wav = np.asarray(wav, dtype='float64')
+    flux = np.asarray(flux, dtype='float64')
 
     timeInit = dt.now()
     wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
@@ -81,12 +84,6 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=Tr
     
     # Wide wavelength bin for the resolution_convolution
     wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0]-FWHM_lim*FWHM_min, wav_chip[-1]+FWHM_lim*FWHM_max, verbose=False) 
-    # isinstance check is ~100*faster then arraying the array again.
-    if not isinstance(wav_extended, np.ndarray):
-        wav_extended = np.array(wav_extended, dtype="float64") 
-    if not isinstance(flux_extended, np.ndarray):
-        flux_extended = np.array(flux_extended, dtype="float64")
-    
     print("Starting the Resolution convolution...")
 
     # multiprocessing part
