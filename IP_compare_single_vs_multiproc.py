@@ -10,24 +10,20 @@ from datetime import datetime as dt
 import multiprocess as mprocess
 from tqdm import tqdm
 
-#
-def fast_wav_selector(wav, flux, wav_min, wav_max, verbose=False):
+
+def wav_selector(wav, flux, wav_min, wav_max):
     """ Faster Wavelenght selector
 
     If passed lists it will return lists.
     If passed np arrays it will return arrays
+
     """
-    if isinstance(wav, list):
-        # if passed lists use comprehension lists
-        wav_sel = [wav_val for wav_val in wav if (wav_min < wav_val < wav_max)]
-        flux_sel = [flux_val for wav_val, flux_val in zip(wav, flux) if (wav_min < wav_val < wav_max)]
-    elif isinstance(wav, np.ndarray):
-        # Super Fast masking with numpy
-        mask = (wav > wav_min) & (wav < wav_max)
-        wav_sel = wav[mask]
-        flux_sel = flux[mask]
-    else:
-        raise TypeError("Unsupported input wav type")
+    wav = np.asarray(wav)
+    flux = np.asarray(flux)
+    # Super Fast masking with numpy
+    mask = (wav > wav_min) & (wav < wav_max)
+    wav_sel = wav[mask]
+    flux_sel = flux[mask]
     return [wav_sel, flux_sel]
 
 

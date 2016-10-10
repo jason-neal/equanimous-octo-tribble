@@ -15,9 +15,10 @@ from datetime import datetime as dt
 import multiprocess as mprocess
 from tqdm import tqdm
 
-def fast_wav_selector(wav, flux, wav_min, wav_max, verbose=False):
+
+def wav_selector(wav, flux, wav_min, wav_max):
     """ Faster Wavelenght selector
-    
+
     If passed lists it will return lists.
     If passed np arrays it will return arrays
 
