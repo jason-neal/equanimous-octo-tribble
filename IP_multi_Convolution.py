@@ -84,7 +84,10 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=Tr
     FWHM_max = wav_chip[-1]/R       
     
     # Wide wavelength bin for the resolution_convolution
-    wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0]-FWHM_lim*FWHM_min, wav_chip[-1]+FWHM_lim*FWHM_max, verbose=False) 
+    wav_min = wav_chip[0] - FWHM_lim * FWHM_min
+    wav_max = wav_chip[-1] + FWHM_lim * FWHM_max
+    wav_ext, flux_ext = wav_selector(wav, flux, wav_min, wav_max)
+
     print("Starting the Resolution convolution...")
 
     # multiprocessing part

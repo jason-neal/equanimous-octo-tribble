@@ -70,8 +70,11 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=Tr
     FWHM_min = wav_chip[0]/R    # FWHM at the extremes of vector
     FWHM_max = wav_chip[-1]/R       
     
-    #Wide wavelength bin for the resolution_convolution
-    wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0]-FWHM_lim*FWHM_min, wav_chip[-1]+FWHM_lim*FWHM_max, verbose=False) 
+    # Wide wavelength bin for the resolution_convolution
+    wav_min = wav_chip[0] - FWHM_lim * FWHM_min
+    wav_max = wav_chip[-1] + FWHM_lim * FWHM_max
+    wav_ext, flux_ext = wav_selector(wav, flux, wav_min, wav_max)
+
     print("Starting the Resolution convolution...")
     # Predefine array space
     flux_conv_res = np.empty_like(wav_chip, dtype="float64")

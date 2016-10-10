@@ -80,8 +80,9 @@ def multi_IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verb
     FWHM_max = wav_chip[-1] / R
 
     # Wide wavelength bin for the resolution_convolution
-    wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0] - FWHM_lim * FWHM_min,
-                                                    wav_chip[-1] + FWHM_lim * FWHM_max, verbose=False)
+    wav_min = wav_chip[0] - FWHM_lim * FWHM_min
+    wav_max = wav_chip[-1] + FWHM_lim * FWHM_max
+    wav_ext, flux_ext = wav_selector(wav, flux, wav_min, wav_max)
 
     print("Starting the Resolution convolution...")
     # Predefine array space
@@ -96,44 +97,53 @@ def multi_IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verb
 
     mprocPool = mprocess.Pool(processes=numProcs)
 
-    args_generator = tqdm([[wav, R, wav_extended, flux_extended, FWHM_lim] for wav in wav_chip])
+    args_generator = tqdm([[wav, R, wav_ext, flux_ext, FWHM_lim]
+                          for wav in wav_chip])
 
-    flux_conv_res = np.array(mprocPool.map(wrapper_fast_convolve, args_generator))
+    flux_conv_res = np.array(mprocPool.map(wrapper_fast_convolve,
+                             args_generator))
 
     mprocPool.close()
+    timeEnd = dt.now()
+    print("Multi-Proc convolution has been compelted in "
+          "{} using {}/{} cores.\n".format(timeEnd-timeInit, numProcs,
+                                           mprocess.cpu_count()))
 
-    if (plot):
-        fig = plt.figure(1)
+    if plot:
+        plt.figure(1)
         plt.xlabel(r"wavelength [ nm ])")
         plt.ylabel(r"flux [counts] ")
-        plt.plot(wav_chip, flux_chip / np.max(flux_chip), color='k', linestyle="-", label="Original spectra")
-        plt.plot(wav_chip, flux_conv_res / np.max(flux_conv_res),'ro',
-                     label="Spectrum observed at R={0}.".format(R))
+        plt.plot(wav_chip, flux_chip / np.max(flux_chip), color='k',
+                 linestyle="-", label="Original spectra")
+        plt.plot(wav_chip, flux_conv_res / np.max(flux_conv_res), 'ro',
+                 label="Spectrum observed at R={0}.".format(R))
         plt.legend(loc='best')
         plt.title(r"Convolution by an Instrument Profile ")
         plt.show()
 
-    timeEnd = dt.now()
-    print("Multi-Proc convolution has been compelted in {} using {}/{} cores.\n".format(timeEnd-timeInit, numProcs, mprocess.cpu_count()))
     return [wav_chip, flux_conv_res]
 
 
-def single_IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True):
+def single_IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0,
+                         plot=True, verbose=True):
     """Spectral convolution which allows non-equidistance step values"""
     timeInit = dt.now()
 
-    wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
-    # We need to calculate the FWHM at this value in order to set the starting point for the convolution
     # Make sure they are numpy arrays
     wav = np.asarray(wav, dtype='float64')
     flux = np.asarray(flux, dtype='float64')
 
+    wav_chip, flux_chip = wav_selector(wav, flux, chip_limits[0],
+                                       chip_limits[1])
+    # We need to calculate the FWHM at this value in order to set the starting
+    # point for the convolution
     FWHM_min = wav_chip[0] / R  # FWHM at the extremes of vector
     FWHM_max = wav_chip[-1] / R
 
     # Wide wavelength bin for the resolution_convolution
-    wav_extended, flux_extended = fast_wav_selector(wav, flux, wav_chip[0] - FWHM_lim * FWHM_min,
-                                                    wav_chip[-1] + FWHM_lim * FWHM_max, verbose=False)
+    wav_min = wav_chip[0] - FWHM_lim * FWHM_min
+    wav_max = wav_chip[-1] + FWHM_lim * FWHM_max
+    wav_ext, flux_ext = wav_selector(wav, flux, wav_min, wav_max)
 
     print("Starting the Resolution convolution...")
     # Predefine array space
