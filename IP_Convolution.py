@@ -7,7 +7,6 @@ from __future__ import division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def fast_wav_selector(wav, flux, wav_min, wav_max, verbose=False):
     """ Faster Wavelenght selector
     
@@ -58,7 +57,7 @@ def fast_convolve(wav_val, R, wav_extended, flux_extended, FWHM_lim):
 
 def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True):
     """Spectral convolution which allows non-equidistance step values"""
-    
+    timeInit = dt.now()
     wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
     # We need to calculate the FWHM at this value in order to set the starting point for the convolution
     FWHM_min = wav_chip[0]/R    # FWHM at the extremes of vector
@@ -85,7 +84,9 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=Tr
             counter = counter + 5  # And ajust here to change % between reports
             print("Resolution Convolution at {}%%...".format(counter))
         
-    print("Convolution is finished.\n")
+    timeEnd = dt.now()
+    print("Single-Process convolution has been completed in {}.\n".format(timeEnd-timeInit))
+
     
     if(plot):
         fig=plt.figure(1)
