@@ -72,6 +72,8 @@ def wrapper_fast_convolve(args):
 def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True, numProcs=None):
     """Spectral convolution which allows non-equidistance step values"""
     
+
+    timeInit = dt.now()
     wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
     # We need to calculate the FWHM at this value in order to set the starting point for the convolution
     FWHM_min = wav_chip[0]/R    # FWHM at the extremes of vector
@@ -98,6 +100,8 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=Tr
     flux_conv_res = np.array(mprocPool.map(wrapper_fast_convolve, args_generator))
 
     mprocPool.close()
+    timeEnd = dt.now()
+    print("Multi-Proc convolution has been compelted in {} using {}/{} cores.\n".format(timeEnd-timeInit, numProcs, mprocess.cpu_count()))
 
     if (plot):
         fig=plt.figure(1)
