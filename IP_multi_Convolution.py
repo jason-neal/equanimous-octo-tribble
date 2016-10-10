@@ -11,7 +11,9 @@
 from __future__ import division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
-
+from datetime import datetime as dt
+import multiprocess as mprocess
+from tqdm import tqdm
 
 def fast_wav_selector(wav, flux, wav_min, wav_max, verbose=False):
     """ Faster Wavelenght selector
@@ -67,7 +69,7 @@ def wrapper_fast_convolve(args):
 
     return fast_convolve(*args)
 
-def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True):
+def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=True, numProcs=None):
     """Spectral convolution which allows non-equidistance step values"""
     
     wav_chip, flux_chip = fast_wav_selector(wav, flux, chip_limits[0], chip_limits[1])
@@ -84,21 +86,20 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True, verbose=Tr
         flux_extended = np.array(flux_extended, dtype="float64")
     
     print("Starting the Resolution convolution...")
-    # Predefine array space
-    flux_conv_res = np.empty_like(wav_chip, dtype="float64")
-    counter = 0 
-    base_val = len(wav_chip)//20   # Adjust here to change % between reports
-    
-    for n, wav in enumerate(wav_chip):
-        # Put convolution value directly into the array
-        flux_conv_res[n] = fast_convolve(wav, R, wav_extended, flux_extended, FWHM_lim)
-        if (n%base_val== 0) and verbose:
-            counter = counter + 5  # And ajust here to change % between reports
-            print("Resolution Convolution at {}%%...".format(counter))
-        
-    print("Convolution is finished.\n")
-    
-    if(plot):
+
+    # multiprocessing part
+    if numProcs is None:
+        numProcs = mprocess.cpu_count() - 1
+
+    mprocPool = mprocess.Pool(processes=numProcs)
+
+    args_generator = tqdm([[wav, R, wav_extended, flux_extended, FWHM_lim] for wav in wav_chip])
+
+    flux_conv_res = np.array(mprocPool.map(wrapper_fast_convolve, args_generator))
+
+    mprocPool.close()
+
+    if (plot):
         fig=plt.figure(1)
         plt.xlabel(r"wavelength [ nm ])")
         plt.ylabel(r"flux [counts] ")
