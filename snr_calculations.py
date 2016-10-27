@@ -114,10 +114,13 @@ def main(fname, binsize=5, interactive_mode=False, bin_range=None, limits=None, 
         I = np.array(I, dtype="float64")
     except:
         # Dracs reduction
-        I = data["Extracted_DRACS"]
-        print(type(I))
-        I = np.array(I, dtype="float64")
-        print(type(I))
+        try:
+            I = data["Extracted_DRACS"]
+            print(type(I))
+            I = np.array(I, dtype="float64")
+            print(type(I))
+        except:
+            I = data
     try:
         wl = data["Wavelength"]
         xscale = "nm"
