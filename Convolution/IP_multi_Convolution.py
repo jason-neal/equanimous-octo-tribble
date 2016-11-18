@@ -112,7 +112,7 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
 
     mprocPool.close()
     timeEnd = dt.now()
-    print("Multi-Proc convolution has been compelted in "
+    print("Multi-Proc convolution has been completed in "
           "{} using {}/{} cores.\n".format(timeEnd-timeInit, numProcs,
                                            mprocess.cpu_count()))
 
