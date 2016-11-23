@@ -28,34 +28,34 @@ def chi_squared(observed, expected, error=None):
     return chisqr
 
 
-def parallel_chisqr_1D(t, obs, model, iter_1, n_jobs=4):
-    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(t, a)) for a in iter_1)
+def parallel_chisqr_1D(iter_1, obs, model, model_params, n_jobs=4):
+    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(a, *model_params)) for a in iter_1)
     return grid
 
 
 # @memory.cache
-def parallel_chisqr_2D(t, obs, model, iter_1, iter_2, n_jobs=4):
-    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(t, a, b))
+def parallel_chisqr_2D(iter_1, iter_2, obs, model, model_params, n_jobs=4):
+    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(a, b, *model_params))
                                    for a in iter_1 for b in iter_2)
     return grid
 
 
 # @memory.cache
-def parallel_chisqr_3D(t, obs, model, iter_1, iter_2, iter_3, n_jobs=4):
-    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(t, a, b, c))
+def parallel_chisqr_3D(iter_1, iter_2, iter_3, t, obs, model, model_params, n_jobs=4):
+    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(a, b, c, *model_params))
                                    for a in iter_1 for b in iter_2 for c in iter_3)
     return grid
 
 
-def parallel_chisqr_4D(t, obs, model, iter_1, iter_2, iter_3, iter_4, n_jobs=4):
-    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(t, a, b, c, d))
+def parallel_chisqr_4D(iter_1, iter_2, iter_3, iter_4, obs, model, model_params, n_jobs=4):
+    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(a, b, c, d, *model_params))
                                    for a in iter_1 for b in iter_2 for c in iter_3 for d in iter_4)
     return grid
 
 
 # @memory.cache
-def model_func(t, a, b, c):
-    return a * np.exp(-(t-b)**2 / (2*c**2))
+def model_func(a, b, c, t):
+    return a * np.exp(-(t - b) ** 2 / (2 * c ** 2))
 
 
 if __name__ == "__main__":
@@ -66,9 +66,9 @@ if __name__ == "__main__":
     iterable_a = np.linspace(0.1, 20, 50)
     iterable_b = np.linspace(0.1, 20, 30)
     iterable_c = np.arange(1, 4)
-    simulation = model_func(t, a, b, c)
+    simulation = model_func(a, b, c, t)
 
-    chisqr_grid = parallel_chisqr_3D(t, simulation, model_func, iterable_a, iterable_b, iterable_c)
+    chisqr_grid = parallel_chisqr_3D(iterable_a, iterable_b, iterable_c, simulation, model_func, t)
 
     print(chisqr_grid)
     X, Y, Z = np.meshgrid(iterable_a, iterable_b, iterable_c, indexing="ij")
