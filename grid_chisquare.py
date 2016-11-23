@@ -41,7 +41,7 @@ def parallel_chisqr_2D(iter_1, iter_2, obs, model, model_params, n_jobs=4):
 
 
 # @memory.cache
-def parallel_chisqr_3D(iter_1, iter_2, iter_3, t, obs, model, model_params, n_jobs=4):
+def parallel_chisqr_3D(iter_1, iter_2, iter_3, obs, model, model_params, n_jobs=4):
     grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(a, b, c, *model_params))
                                    for a in iter_1 for b in iter_2 for c in iter_3)
     return grid
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     iterable_c = np.arange(1, 4)
     simulation = model_func(a, b, c, t)
 
-    chisqr_grid = parallel_chisqr_3D(iterable_a, iterable_b, iterable_c, simulation, model_func, t)
+    chisqr_grid = parallel_chisqr_3D(iterable_a, iterable_b, iterable_c, simulation, model_func, (t,))
 
     print(chisqr_grid)
     X, Y, Z = np.meshgrid(iterable_a, iterable_b, iterable_c, indexing="ij")
@@ -80,8 +80,9 @@ if __name__ == "__main__":
     b_sol = Y.ravel()[min_loc]
     c_sol = Z.ravel()[min_loc]
 
-    plt.plot(t, simulation, "x", label="sim")
-    plt.plot(t, model_func(t, a_sol, b_sol, c_sol), label="solution")
+    plt.plot(t, simulation, "x", label="Simulation")
+    plt.plot(t, model_func(t, a_sol, b_sol, c_sol), label="Solution")
+    plt.title("Comparing solution to inital")
     plt.legend()
     plt.show()
     print("Found Solution", a_sol, b_sol, c_sol)
