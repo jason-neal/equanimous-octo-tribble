@@ -47,28 +47,28 @@ if __name__ == "__main__":
     b = 5
     c = 2
     t = np.linspace(0, 5 * np.pi, 1000)
-    As = np.linspace(0.1, 20, 50)
-    Bs = np.linspace(0.1, 20, 30)
-    Cs = np.arange(1, 4)
+    iterable_a = np.linspace(0.1, 20, 50)
+    iterable_b = np.linspace(0.1, 20, 30)
+    iterable_c = np.arange(1, 4)
     simulation = model_func(t, a, b, c)
 
-    chisqr_grid = grid_chisqr(t, simulation, model_func, As, Bs, Cs)
+    chisqr_grid = parallel_chisqr_3D(t, simulation, model_func, iterable_a, iterable_b, iterable_c)
 
     print(chisqr_grid)
-    X, Y, Z = np.meshgrid(As, Bs, Cs, indexing="ij")
+    X, Y, Z = np.meshgrid(iterable_a, iterable_b, iterable_c, indexing="ij")
 
     min_loc = np.argmin(chisqr_grid)
     print("min location", min_loc)
 
-    A_sol = X.ravel()[min_loc]
-    B_sol = Y.ravel()[min_loc]
-    C_sol = Z.ravel()[min_loc]
+    a_sol = X.ravel()[min_loc]
+    b_sol = Y.ravel()[min_loc]
+    c_sol = Z.ravel()[min_loc]
 
     plt.plot(t, simulation, "x", label="sim")
-    plt.plot(t, model_func(t, A_sol, B_sol, C_sol), label="solution")
+    plt.plot(t, model_func(t, a_sol, b_sol, c_sol), label="solution")
     plt.legend()
     plt.show()
-    print("Found Solution", A_sol, B_sol, C_sol)
+    print("Found Solution", a_sol, b_sol, c_sol)
     # main()
 
     plt.contourf(X[:, :, 1], Y[:, :, 1],
