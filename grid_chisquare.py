@@ -30,8 +30,8 @@ def chi_squared(observed, expected, error=None):
 
 # @memory.cache
 def grid_chisqr(t, obs, model, As, Bs, Cs):
-    numProcs = 4
-    grid = Parallel(n_jobs=numProcs)(delayed(chi_squared)(obs,
+    n_jobs = 4
+    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs,
                                      model(t, a, b, c))
                                      for a in As for b in Bs for c in Cs)
     return grid
