@@ -1,6 +1,13 @@
 # equanimous-octo-tribble
 Useful scripts for astronomy and the like.
 
+## Convolution
+Convole a spectrum by a IP of a given Resolution
+
+There is a mulitprocessing version and a normal (slower) version.
+Calculates the IP for every pixel/wavelength value individually.
+Does not need a eqidistant wavelength axis.
+Assumes a gaussian IP profile
 
 
 ## tapas_xml_request_generator.py
