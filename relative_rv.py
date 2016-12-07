@@ -8,6 +8,7 @@
 # December 2016
 import argparse
 
+
 def relative_rv(wav_1, wav_2):
     """ Calculate the radial velocity difference between two wavelength values"""
     c = 299792.458   #  km / s
@@ -31,6 +32,7 @@ def _parser():
     args = parser.parse_args()
     return args
 
+
 def main(original_wavelength, new_wavelength, mode=False, unit="km"):  # unit, rounding
     """ Obtian RV offset between wavelengths and print to screen.
 
@@ -52,8 +54,6 @@ def main(original_wavelength, new_wavelength, mode=False, unit="km"):  # unit, r
         rv *= 1e0
     elif unit == "Mm":
         rv *= 1e-3
-
-
 
     print("\n" + "-" * 20 )
     print("Original   -->   New   |  RV ({0}/s)".format(unit) )
