@@ -26,12 +26,12 @@ def _parser():
     parser.add_argument('new_wavelength', help='THe new wavelength', type=float)
     parser.add_argument('-m', '--mode', choices=['normal','reverse', 'iterable'], default='normal', help='Output mode', type=str)   # reverse, both, (iteratorable input)
     # TODO: Add these extra modes
-    # parser.add_argument('-u', '--unit', help='Distance unit of measurement [km, m, cm]')
+    parser.add_argument('-u', '--unit', help='Distance unit of measurement [Mm, km, m, cm, mm]', choices=["Mm", "km","m","cm", "mm"], default="km")
     # parser.add_argument('-r', '--round', help='Rounding on ouput, e.g. ["2dp", "3sf"]')
     args = parser.parse_args()
     return args
 
-def main(original_wavelength, new_wavelength, mode=False):  # unit, rounding
+def main(original_wavelength, new_wavelength, mode=False, unit="km"):  # unit, rounding
     """ Obtian RV offset between wavelengths and print to screen.
 
     prints rv between the wavelength values.
@@ -41,8 +41,22 @@ def main(original_wavelength, new_wavelength, mode=False):  # unit, rounding
         original_wavelength, new_wavelength = new_wavelength, original_wavelength
 
     rv = relative_rv(original_wavelength, new_wavelength)
+
+    if unit == "mm":
+        rv *= 1e6
+    elif unit == "cm":
+        rv *= 1e5
+    elif unit == "m":
+        rv *= 1e3
+    elif unit == "km":
+        rv *= 1e0
+    elif unit == "Mm":
+        rv *= 1e-3
+
+
+
     print("\n" + "-" * 20 )
-    print("Original   -->   New   |  RV (km/s)" )
+    print("Original   -->   New   |  RV ({0}/s)".format(unit) )
     print("-" * 20 )
     print("{0}  -->  {1}  |  {2}".format(original_wavelength, new_wavelength, rv))
     print("-" * 20 )
