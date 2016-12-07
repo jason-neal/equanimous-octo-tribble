@@ -1,4 +1,4 @@
-#
+#!/usr/bin/env python
 
 # relative_rv.py
 
@@ -6,6 +6,7 @@
 
 # Jason Neal
 # December 2016
+import argparse
 
 def relative_rv(wav_1, wav_2):
 """ Calculate the radial velocity difference between two wavelength values"""
@@ -15,11 +16,23 @@ def relative_rv(wav_1, wav_2):
     return relative * c
 
 
-def parser():
-    pass
+def _parser():
+    """Take care of all the argparse stuff.
 
+    :returns: the args
+    """
+    parser = argparse.ArgumentParser(description='Calculate RV doppler shift between two wavelengths')
+    parser.add_argument('original_wavelength', help='The original wavelength', type=float)
+    parser.add_argument('new_wavelength', help='THe new wavelength', type=float)
+    parser.add_argument('-m', '--mode', help='Output mode', type=str)   # reverse, both, (iteratorable input)
+    # TODO: Add these extra modes
+    # parser.add_argument('-u', '--unit', help='Distance unit of measurement [km, m, cm]')
+    # parser.add_argument('-r', '--round', help='Rounding on ouput, e.g. ["2dp", "3sf"]')
+    args = parser.parse_args()
+    return args
 
-def main(wave_1, wave_2, both=False):
+def main(original_wavelength, new_wavelength, mode=False):  # unit, rounding
+    """ Obtian RV offset between wavelengths and print to screen.
 
     print(" The relative RV is ...")
     if both:
@@ -27,4 +40,9 @@ def main(wave_1, wave_2, both=False):
 
 
 if __name__ == "__main__":
-    pass
+    args = vars(_parser())
+    wave1 = args.pop('original_wavelength')
+    wave2 = args.pop('new_wavelength')
+    opts = {k: args[k] for k in args}
+
+    main(wave1, wave2, **opts)
