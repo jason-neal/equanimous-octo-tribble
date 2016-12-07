@@ -9,7 +9,7 @@
 import argparse
 
 def relative_rv(wav_1, wav_2):
-""" Calculate the radial velocity difference between two wavelength values"""
+    """ Calculate the radial velocity difference between two wavelength values"""
     c = 299792.458   #  km / s
     difference = wav_2 - wav_1
     relative = difference / wav_1
@@ -34,9 +34,14 @@ def _parser():
 def main(original_wavelength, new_wavelength, mode=False):  # unit, rounding
     """ Obtian RV offset between wavelengths and print to screen.
 
-    print(" The relative RV is ...")
-    if both:
-        print(" The reverse relative RV is ...")
+    prints rv between the wavelength values.
+    """
+    rv = relative_rv(original_wavelength, new_wavelength)
+    print("\n" + "-" * 20 )
+    print("Original   -->   New   |  RV (km/s)" )
+    print("-" * 20 )
+    print("{0}  -->  {1}  |  {2}".format(original_wavelength, new_wavelength, rv))
+    print("-" * 20 )
 
 
 if __name__ == "__main__":
