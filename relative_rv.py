@@ -36,15 +36,37 @@ def main(original_wavelength, new_wavelength, mode=False):  # unit, rounding
 
     prints rv between the wavelength values.
     """
+
+    print(original_wavelength, type(original_wavelength))
+    print(new_wavelength, type(original_wavelength))
+    if mode == "iterable":
+        # Some tests
+        if isinstance(original_wavelength, (str, dict, float, int)):
+            raise TypeError("Input 'original_wavelength' is not an iterable type for this mode")
+        elif isinstance(new_wavelength, (str, dict, float, int)):
+                raise TypeError("Input 'new_wavelength' is not an iterable type for this mode")
+
+        if len(original_wavelength) != len(new_wavelength):
+            raise ValueError("Length of observations are not equal")
+    else:
+        #if isinstance(float, int):
+        pass
     if mode == "reverse":
         # Switch direction of doppler shift
         original_wavelength, new_wavelength = new_wavelength, original_wavelength
 
-    rv = relative_rv(original_wavelength, new_wavelength)
-    print("\n" + "-" * 20 )
-    print("Original   -->   New   |  RV (km/s)" )
-    print("-" * 20 )
-    print("{0}  -->  {1}  |  {2}".format(original_wavelength, new_wavelength, rv))
+
+    print("\n" + "-" * 20)
+    print("Original  -->   New   |  RV (km/s)")
+    print("-" * 20)
+    if mode == "iterable":
+        for wav1, wav2 in zip(original_wavelength, new_wavelength):
+            rv = relative_rv(wav1, wav2)
+            print("{0}  -->  {1}  |  {2}".format(wav1, wav2, rv))
+    else:
+        rv = relative_rv(original_wavelength, new_wavelength)
+        print("{0}  -->  {1}  |  {2}".format(original_wavelength, new_wavelength, rv))
+
     print("-" * 20 )
 
 
