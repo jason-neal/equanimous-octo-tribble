@@ -8,6 +8,7 @@
 # December 2016
 import argparse
 
+
 def relative_rv(wav_1, wav_2):
     """ Calculate the radial velocity difference between two wavelength values"""
     c = 299792.458   #  km / s
