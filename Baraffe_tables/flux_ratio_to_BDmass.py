@@ -30,13 +30,13 @@ def _parser():
 
 def main(star_name, companion_mass, stellar_age):
     """Compute flux ratio of star to companion """
-    
+
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)    # returns a astroquesry result table
-    
-    # Get parameters for this mass and age 
+
+    # Get parameters for this mass and age
     companion = get_brown_dwarf_information(companion_mass, stellar_age)
-  
+
     Flux_ratios = calculate_flux_ratios(star_params, companion)
 
     # Compare to area ratio
@@ -46,13 +46,13 @@ def main(star_name, companion_mass, stellar_age):
     # Print flux ratios using a generator
     print("Magnitude Calculation\n")
     [print("{0} band star/companion Flux ratio = {1} >>> companion/star Flux ratio {2}".format(key, val[0], 1./val[0])) for key, val in Flux_ratios.items()]
-    
+
     print("\nRadius Calculation")
     print("Star radius      = {} R_sun".format(Rstar[0]))
     print("Planet radius    = {} R_sun".format(np.round(companion["R"], 4)))
     print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar[0]))
     print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar[0]**2))
-    
+
 
 ##############################################################################
 # Access Databases
@@ -67,11 +67,11 @@ def get_stellar_params(star_name):
     # Can add more fluxes here if need to extend to more flux ranges. although K is the limit for simbad.
     # if want higher need to search for Wise band in VISIER probably.
     customSimbad.add_votable_fields('parallax', 'sp', 'fluxdata(B)', 'fluxdata(V)', 'fluxdata(J)', 'fluxdata(K)', 'fe_h')
-   
+
     result_table =  customSimbad.query_object(star_name)
 
     #print("Table colums", result_table.colnames)
-    
+
     return result_table
 
 
@@ -81,13 +81,13 @@ def get_brown_dwarf_information(companion_mass, age):
 
     mass_solar = companion_mass / 1047.56   # covert to solar mass
     BD_parameters = dict()
-    
+
     # Find closest age model
     modelages = ["0.001", "0.005", "0.010", "0.050", "0.100", "0.120", "0.500", "1.000", "5.000", "10.000"]
     model_age = min(modelages, key=lambda x:abs(float(x)-age)) # Closest one
     model_id = "p".join(str(model_age).split("."))
 
-    model_name = "./data/Baraffe2003/BaraffeCOND2003-" +  model_id + "Gyr.dat"
+    model_name = "./Baraffe2003/BaraffeCOND2003-" +  model_id + "Gyr.dat"
     model_data = np.loadtxt(model_name, skiprows=18, unpack=False)
     model_data = model_data.T
 
@@ -110,19 +110,19 @@ def get_sweet_cat_temp(star_name):
     #print("hd number ", hd_number)
     if hd_number in sc.data.hd.values:
         hd_entry = data[data.hd == hd_number]
-    
+
         if hd_entry.empty:
             return False
         else:
-        # Sweet-cat has temperature of zero 
+        # Sweet-cat has temperature of zero
         #if it does not have a temperature value for the star
             return hd_entry.iloc[0]["teff"]
     else:
         print("This star not in SWEET-Cat")
         return False
-  
-        
-    
+
+
+
 
 
 
@@ -153,18 +153,18 @@ def get_temperature(star_name, star_params):
         #print("star_params['Fe_H_Teff'] =", star_params["Fe_H_Teff"])
         teff = star_params["Fe_H_Teff"][0]
         if teff == 0 or teff == [0]:
-            # No teff given by Simbad 
+            # No teff given by Simbad
             print("Simbad Temperature was zero")
             teff = None
         else:
             good_temp = True
             print("Temperature obtained from Fe_H_Teff", good_temp)
             return teff
-        
+
     if not good_temp:
         try:
             teff = get_sweet_cat_temp(star_name)
-            
+
             if teff == 0 or np.isnan(teff):  # temp from sweet-cat
                 print("No SWEET-Cat temperature, teff was", teff)
                 teff = None
