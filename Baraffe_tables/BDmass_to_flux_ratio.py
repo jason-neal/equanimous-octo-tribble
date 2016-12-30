@@ -1,10 +1,21 @@
 #!/usr/bin/python
-"""Brown Dwarf Flux ratio calculator:
 
-Inputs :
-Star name:
-Mass of companion in Jupiter masses
-Age of star: """
+""" Brown Dwarf Flux ratio calculator:
+
+    Uses stellar parameter databases to find host star parameters.
+    The companion mass provided is used to look up the band magnitudes of the
+    object in the Barraffe tables. The magnitudes are used to caluate the flux
+    ratio between the companion and the star.
+
+    Inputs
+    ------
+    Star name: str
+        Stellar idenification number. eg. HD30501
+    companion_mass: float
+        Mass of companion in Jupiter masses
+    age: float
+        Stellar Age. (Closest model is used)
+    """
 
 from __future__ import division, print_function
 import argparse
