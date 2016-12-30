@@ -35,14 +35,8 @@ def main(star_name, flux_ratio, stellar_age, band="K"):
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)    # returns a astroquesry result table
 
-    # Get parameters for this mass and age
-    companion = get_brown_dwarf_information(companion_mass, stellar_age)
-
-    Flux_ratios = calculate_flux_ratios(star_params, companion)
-
-    # Compare to area ratio
-    Rstar = calculate_stellar_radius(star_name, star_params)
-    Rcomp_Rstar = companion["R"] / Rstar
+    # Find companion parameters that match these magnitudes
+    companion_params = get_BD_from_flux_ratio(magnitudes, stellar_age, band=band)
 
     # Print flux ratios using a generator
     print("Magnitude Calculation\n")
@@ -96,6 +90,49 @@ def get_brown_dwarf_information(companion_mass, age):
     for col, data in zip(cols, model_data):
         # Interpolate columns to mass of companion
         BD_parameters[col] = np.interp(mass_solar, model_data[0], data)
+
+    return BD_parameters  # as a dictionary
+
+
+def get_BD_from_flux_ratio(magnitudes, age, band="K"):
+    """ Baraffe 2003 table search for given magnitude.
+    """
+    # mass_solar = companion_mass / 1047.56   # covert to solar mass
+    BD_parameters = dict()
+
+    # Find closest age model
+    modelages = ["0.001", "0.005", "0.010", "0.050", "0.100", "0.120", "0.500", "1.000", "5.000", "10.000"]
+    model_age = min(modelages, key=lambda x:abs(float(x)-age)) # Closest one
+    model_id = "p".join(str(model_age).split("."))
+
+    model_name = "./Baraffe2003/BaraffeCOND2003-" +  model_id + "Gyr.dat"
+    model_data = np.loadtxt(model_name, skiprows=18, unpack=False)
+    model_data = model_data.T
+
+    cols = ["M/Ms", "Teff", "L/Ls", "g", "R", "Mv", "Mr", "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
+
+    if "M"+band.lower() not in cols:
+        raise ValueError("Band {} is not in Baraffe tables.".format(band))
+    if band not in magnitudes.keys():
+        raise ValueError("The band {} given is not in the given magnitudes".format(band))
+
+    band_index = [i for i, c in enumerate(cols) if "M"+band.lower() == c][0]
+    # print("band_index", band_index)
+
+    print("Band mag", magnitudes[band])
+    print(model_data)
+    print("model data", model_data[band_index])
+    print("all data")
+    for col, data in zip(cols, model_data):
+        # Interpolate columns to magnitude of companion
+        print("\nThis col =", col)
+        print("Band mag", magnitudes[band])
+        #print(model_data)
+        print("model data", model_data[band_index])
+        print("this col data ", data)
+
+        BD_parameters[col] = np.interp(magnitudes[band], model_data[band_index], data)
+        print("This col interp value =", BD_parameters[col] )
 
     return  BD_parameters  # as a dictionary
 
