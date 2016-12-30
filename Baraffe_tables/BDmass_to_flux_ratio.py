@@ -125,9 +125,9 @@ def get_brown_dwarf_information(companion_mass, age, model="2003"):
         print(model_name)
         model_data = np.loadtxt(model_name, skiprows=22, unpack=False)
 
-        cols = ["M/Ms", "Teff", "L/Ls", "FIX FOR new models", "g", "R", "Mv",
-                "Mr", "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
-        raise ValueError("Fix cols above this line")
+        cols = ["M/Ms", "Teff", "L/Ls", "g", "R/Rs", "Li/Li0", "Mv", "Mr",
+                "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
+
     model_data = model_data.T
 
 
