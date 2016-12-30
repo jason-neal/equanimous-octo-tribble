@@ -31,7 +31,8 @@ def _parser():
 
 def main(star_name, flux_ratio, stellar_age, band="K"):
     """Compute flux ratio of star to companion """
-
+    Jup_mass = 1047.56   # covert to Solar to Jupiter mass
+    # test_mag_conversions()
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)    # returns a astroquesry result table
 
@@ -42,14 +43,8 @@ def main(star_name, flux_ratio, stellar_age, band="K"):
     companion_params = get_BD_from_flux_ratio(magnitudes, stellar_age, band=band)
 
     # Print flux ratios using a generator
-    print("Magnitude Calculation\n")
-    [print("{0} band star/companion Flux ratio = {1} >>> companion/star Flux ratio {2}".format(key, val[0], 1./val[0])) for key, val in Flux_ratios.items()]
-
-    print("\nRadius Calculation")
-    print("Star radius      = {} R_sun".format(Rstar[0]))
-    print("Planet radius    = {} R_sun".format(np.round(companion["R"], 4)))
-    print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar[0]))
-    print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar[0]**2))
+    print("Estimated Companion Mass from {} band Flux ratio\n".format(band.upper()))
+    print("M/M_S = {0} (M_star) = {1} (M_Jup), Temp = {2} K".format(companion_params["M/Ms"][0], Jup_mass * companion_params["M/Ms"][0], companion_params["Teff"][0]))
 
 
 ##############################################################################
