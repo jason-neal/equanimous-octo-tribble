@@ -24,11 +24,12 @@ def _parser():
     parser.add_argument('star_name', help='Input fits file to calibrate')
     parser.add_argument('companion_mass', help='Mass of companion (M_Jup)', type=float)
     parser.add_argument('age', help='Star age (Gyr)',type=float)
+    parser.add_argument("-b", "--band", help='Magnitude band of the flux ratio', choices=["J", "K"], default="K", type=str)
     args = parser.parse_args()
     return args
 
 
-def main(star_name, companion_mass, stellar_age):
+def main(star_name, flux_ratio, stellar_age, band="K"):
     """Compute flux ratio of star to companion """
 
     # Obtain Stellar parameters from astroquery
