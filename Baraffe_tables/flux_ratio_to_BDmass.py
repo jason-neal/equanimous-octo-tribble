@@ -35,6 +35,9 @@ def main(star_name, flux_ratio, stellar_age, band="K"):
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)    # returns a astroquesry result table
 
+    # Calculate Magnitude J and K band magnitude for this flux ratio
+    magnitudes = calculate_companion_magnitude(star_params, flux_ratio)
+    print("Magnitude calculate for companion", magnitudes)
     # Find companion parameters that match these magnitudes
     companion_params = get_BD_from_flux_ratio(magnitudes, stellar_age, band=band)
 
@@ -178,6 +181,35 @@ def calculate_flux_ratios(star_params, companion_params):
     #Flux_ratios["H"] = f ** (companion_params["Mh"]-star_params["Hmag"])
     Flux_ratios["K"] = f ** (companion_params["Mk"]-star_params["FLUX_K"])
     return Flux_ratios
+
+def calculate_companion_magnitude(star_params, flux_ratio, band="K"):
+    """ Calculte companion magnitude from flux ratio
+
+    Using the equation m - n = -2.5 * log_10(F_m / F_n)
+
+    Parameters
+    ----------
+    star_params: dict
+        Parameters for the host star.
+    flux_ratio: float
+        Flux ratio for the system (F_comp/F_host).
+    band: str
+        Band to use. default = "K"
+
+    Returns
+    -------
+    magnitudes: dict
+        Magnitudes of the companion in J and K bands.
+
+    """
+    magnitudes = dict()
+    band = band.upper()
+    if band in ["J", "K"]:
+        magnitudes[band] = star_params["FLUX_{}".format(band)] - 2.5 * np.log10(flux_ratio)
+    else:
+        return ValueError("Band is not available atm.")
+    return magnitudes
+
 
 def get_temperature(star_name, star_params):
     """ Try get temperature of star multiple ways
