@@ -21,8 +21,8 @@ def _parser():
     :returns: the args
     """
     parser = argparse.ArgumentParser(description='Determine flux ratio of stellar companion')
-    parser.add_argument('star_name', help='Input fits file to calibrate')
-    parser.add_argument('companion_mass', help='Mass of companion (M_Jup)', type=float)
+    parser.add_argument('star_name', help='Name of host star.', type=str)
+    parser.add_argument('flux_ratio', help='Flux ratio between host and companion - (F_comp/F_host)', type=float)
     parser.add_argument('age', help='Star age (Gyr)',type=float)
     parser.add_argument("-b", "--band", help='Magnitude band of the flux ratio', choices=["J", "K"], default="K", type=str)
     args = parser.parse_args()
@@ -207,8 +207,8 @@ def calculate_stellar_radius(star_name, star_params):
 if __name__ == '__main__':
     args = vars(_parser())
     star_name = args.pop('star_name')
-    companion_mass = args.pop('companion_mass')
+    flux_ratio = args.pop('flux_ratio')
     age = args.pop('age')
     opts = {k: args[k] for k in args}
 
-    main(star_name, companion_mass, age, **opts)
+    main(star_name, flux_ratio, age, **opts)
