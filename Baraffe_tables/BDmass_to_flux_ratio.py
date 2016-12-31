@@ -43,7 +43,19 @@ def _parser():
 
 
 def main(star_name, companion_mass, stellar_age, model="2003"):
-    """Compute flux ratio of star to companion """
+    """Compute flux ratio of star to companion
+
+    Parameters
+    ----------
+    star_name: str
+        Stellar idenification number. eg. HD30501
+    companion_mass: float
+        Mass of companion in Jupiter masses
+    stellar_age: float
+        Stellar Age. (Closest model is used)
+    model: int (optional)
+        Year of Barraffe model to use [2003 (default), 2015]
+    """
 
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)  # returns a astroquesry result table

@@ -42,9 +42,23 @@ def _parser():
 
 
 def main(star_name, flux_ratio, stellar_age, band="K", model="2003"):
-    """Compute companion mass from flux ratio value """
-    Jup_mass = 1047.56   # covert to Solar to Jupiter mass
-    # test_mag_conversions()
+    """Compute companion mass from flux ratio value
+
+    Parameters
+    ----------
+    star_name: str
+        Stellar idenification number. eg. HD30501
+    flux_ratio: float
+        Flux ratio for the system (F_companion/F_host).
+    stellar_age: float
+        Age of star/system (Gyr).
+    band: str
+        Wavelength band to use. (optional)
+    model: int (optional)
+       Year of Barraffe model to use [2003 (default), 2015].
+""""
+
+    Jup_mass = 1047.56  # Jupiters in 1 M_sol
 
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)  # returns a astroquesry result table
@@ -92,7 +106,7 @@ def mass_table_search(companion_mass, age, model="2003"):
         Age of star?system (Gyr).
     band: str
         Wavelength band to use.
-    model: int
+    model: int (optional)
        Year of Barraffe model to use [2003 (default), 2015].
 
     Returns
@@ -279,7 +293,7 @@ def calculate_companion_magnitude(star_params, flux_ratio, band="K"):
     star_params: dict
         Parameters for the host star.
     flux_ratio: float
-        Flux ratio for the system (F_comp/F_host).
+        Flux ratio for the system (F_companion/F_host).
     band: str
         Band to use. default = "K"
 
