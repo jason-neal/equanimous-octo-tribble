@@ -49,7 +49,7 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
     star_params = get_stellar_params(star_name)    # returns a astroquesry result table
 
     # Get parameters for this mass and age
-    companion = get_brown_dwarf_information(companion_mass, stellar_age, model)
+    companion = get_brown_dwarf_information(companion_mass, stellar_age, model=model)
 
     Flux_ratios = calculate_flux_ratios(star_params, companion)
 

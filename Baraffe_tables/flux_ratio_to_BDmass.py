@@ -34,12 +34,15 @@ def _parser():
     parser.add_argument('flux_ratio', help='Flux ratio between host and companion - (F_comp/F_host)', type=float)
     parser.add_argument('age', help='Star age (Gyr)',type=float)
     parser.add_argument("-b", "--band", help='Magnitude band of the flux ratio', choices=["J", "K"], default="K", type=str)
+    parser.add_argument('-m', '--model', choices=['03', '15', '2003', '2015'],
+                        help='Baraffe model to use [2003, 2015]',
+                        default='2003', type=str)
     args = parser.parse_args()
     return args
 
 
-def main(star_name, flux_ratio, stellar_age, band="K"):
-    """Compute flux ratio of star to companion """
+def main(star_name, flux_ratio, stellar_age, band="K", model="2003"):
+    """Compute companion mass from flux ratio value """
     Jup_mass = 1047.56   # covert to Solar to Jupiter mass
     # test_mag_conversions()
     # Obtain Stellar parameters from astroquery
@@ -49,7 +52,7 @@ def main(star_name, flux_ratio, stellar_age, band="K"):
     magnitudes = calculate_companion_magnitude(star_params, flux_ratio)
     print("Magnitude calculate for companion", magnitudes)
     # Find companion parameters that match these magnitudes
-    companion_params = get_BD_from_flux_ratio(magnitudes, stellar_age, band=band)
+    companion_params = get_BD_from_flux_ratio(magnitudes, stellar_age, band=band, model=model)
 
     # Print flux ratios using a generator
     print("Estimated Companion Mass from {} band Flux ratio\n".format(band.upper()))
@@ -84,16 +87,38 @@ def get_brown_dwarf_information(companion_mass, age):
     mass_solar = companion_mass / 1047.56   # covert to solar mass
     BD_parameters = dict()
 
-    # Find closest age model
-    modelages = ["0.001", "0.005", "0.010", "0.050", "0.100", "0.120", "0.500", "1.000", "5.000", "10.000"]
-    model_age = min(modelages, key=lambda x:abs(float(x)-age)) # Closest one
-    model_id = "p".join(str(model_age).split("."))
+    if model in '2003':
+        # Find closest age model
+        modelages = ["0.001", "0.005", "0.010", "0.050", "0.100", "0.120",
+                     "0.500", "1.000", "5.000", "10.000"]
+        model_age = min(modelages, key=lambda x: abs(float(x)-age))  # Closest one
+        model_id = "p".join(str(model_age).split("."))
 
-    model_name = "./Baraffe2003/BaraffeCOND2003-" +  model_id + "Gyr.dat"
-    model_data = np.loadtxt(model_name, skiprows=18, unpack=False)
+        model_name = "./Baraffe2003/BaraffeCOND2003-" + model_id + "Gyr.dat"
+
+        model_data = np.loadtxt(model_name, skiprows=18, unpack=False)
+
+        cols = ["M/Ms", "Teff", "L/Ls", "g", "R", "Mv",
+                "Mr", "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
+    else:
+        print("Using 2015 models")
+        modelages = ["0.0005", "0.001", "0.003", "0.004", "0.005", "0.008",
+                     "0.010", "0.015", "0.020", "0.025", "0.030", "0.040",
+                     "0.050", "0.080", "0.100", "0.120", "0.200", "0.300",
+                     "0.400", "0.500", "0.625", "0.800", "1.000", "2.000",
+                     "3.000", "4.000", "5.000", "8.000", "10.000"]
+        model_age = min(modelages, key=lambda x: abs(float(x)-age))  # Closest one
+        model_id = "p".join(str(model_age).split("."))
+
+        model_name = "./Baraffe2015/BaraffeBHAC15-" + model_id + "Gyr.dat"
+        print(model_name)
+        model_data = np.loadtxt(model_name, skiprows=22, unpack=False)
+
+        cols = ["M/Ms", "Teff", "L/Ls", "g", "R/Rs", "Li/Li0", "Mv", "Mr",
+                "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
+
     model_data = model_data.T
 
-    cols = ["M/Ms", "Teff", "L/Ls", "g", "R", "Mv", "Mr", "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
     for col, data in zip(cols, model_data):
         # Interpolate columns to mass of companion
         BD_parameters[col] = np.interp(mass_solar, model_data[0], data)
@@ -101,30 +126,51 @@ def get_brown_dwarf_information(companion_mass, age):
     return BD_parameters  # as a dictionary
 
 
-def get_BD_from_flux_ratio(magnitudes, age, band="K"):
+def get_BD_from_flux_ratio(magnitudes, age, band="K", model=2003):
     """ Baraffe 2003 table search for given magnitude.
     """
     # mass_solar = companion_mass / 1047.56   # covert to solar mass
     BD_parameters = dict()
 
-    # Find closest age model
-    modelages = ["0.001", "0.005", "0.010", "0.050", "0.100", "0.120", "0.500", "1.000", "5.000", "10.000"]
-    model_age = min(modelages, key=lambda x:abs(float(x)-age)) # Closest one
-    model_id = "p".join(str(model_age).split("."))
+    if model in '2003':
+        # Find closest age model
+        modelages = ["0.001", "0.005", "0.010", "0.050", "0.100", "0.120",
+                     "0.500", "1.000", "5.000", "10.000"]
+        model_age = min(modelages, key=lambda x: abs(float(x)-age))  # Closest one
+        model_id = "p".join(str(model_age).split("."))
 
-    model_name = "./Baraffe2003/BaraffeCOND2003-" +  model_id + "Gyr.dat"
-    model_data = np.loadtxt(model_name, skiprows=18, unpack=False)
+        model_name = "./Baraffe2003/BaraffeCOND2003-" + model_id + "Gyr.dat"
+
+        model_data = np.loadtxt(model_name, skiprows=18, unpack=False)
+
+        cols = ["M/Ms", "Teff", "L/Ls", "g", "R", "Mv",
+                "Mr", "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
+
+    else:
+        print("Using 2015 models")
+        modelages = ["0.0005", "0.001", "0.003", "0.004", "0.005", "0.008",
+                     "0.010", "0.015", "0.020", "0.025", "0.030", "0.040",
+                     "0.050", "0.080", "0.100", "0.120", "0.200", "0.300",
+                     "0.400", "0.500", "0.625", "0.800", "1.000", "2.000",
+                     "3.000", "4.000", "5.000", "8.000", "10.000"]
+        model_age = min(modelages, key=lambda x: abs(float(x)-age))  # Closest one
+        model_id = "p".join(str(model_age).split("."))
+
+        model_name = "./Baraffe2015/BaraffeBHAC15-" + model_id + "Gyr.dat"
+        print(model_name)
+        model_data = np.loadtxt(model_name, skiprows=22, unpack=False)
+
+        cols = ["M/Ms", "Teff", "L/Ls", "g", "R/Rs", "Li/Li0", "Mv", "Mr",
+                "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
+
     model_data = model_data.T
-
-    cols = ["M/Ms", "Teff", "L/Ls", "g", "R", "Mv", "Mr", "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
 
     if "M"+band.lower() not in cols:
         raise ValueError("Band {} is not in Baraffe tables.".format(band))
     if band not in magnitudes.keys():
         raise ValueError("The band {} given is not in the given magnitudes".format(band))
 
-    band_index = cols.index("M"+band.lower())
-    # print("band_index", band_index)
+    band_index = cols.index("M" + band.lower())
 
     print("Band mag", magnitudes[band])
     print(model_data)
