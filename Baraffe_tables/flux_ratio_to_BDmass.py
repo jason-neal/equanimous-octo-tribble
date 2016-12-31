@@ -123,7 +123,7 @@ def get_BD_from_flux_ratio(magnitudes, age, band="K"):
     if band not in magnitudes.keys():
         raise ValueError("The band {} given is not in the given magnitudes".format(band))
 
-    band_index = [i for i, c in enumerate(cols) if "M"+band.lower() == c][0]
+    band_index = cols.index("M"+band.lower())
     # print("band_index", band_index)
 
     print("Band mag", magnitudes[band])
