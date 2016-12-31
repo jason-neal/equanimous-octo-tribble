@@ -53,7 +53,7 @@ def main(star_name, flux_ratio, stellar_age, band="K", model="2003"):
     magnitudes = calculate_companion_magnitude(star_params, flux_ratio)
     print("Magnitude calculate for companion", magnitudes)
     # Find companion parameters that match these magnitudes
-    companion_params = get_BD_from_flux_ratio(magnitudes, stellar_age, band=band, model=model)
+    companion_params = magnitude_table_search(magnitudes, stellar_age, band=band, model=model)
 
     # Print flux ratios using a generator
     print("Estimated Companion Mass from {} band Flux ratio\n".format(band.upper()))
@@ -145,8 +145,26 @@ def mass_table_search(companion_mass, age, model="2003"):
     return companion_parameters  # as a dictionary
 
 
-def get_BD_from_flux_ratio(magnitudes, age, band="K", model=2003):
-    """ Baraffe 2003 table search for given magnitude.
+def magnitude_table_search(magnitudes, age, band="K", model=2003):
+    """ Search Baraffe tables to find the companion entry given a band magnitude value.
+
+    Parameters
+    ----------
+    magnitudes: dict
+        Dictionary of (band: magnitude value) pairs.
+    age: float
+        Age of star?system (Gyr).
+    band: str
+        Wavelength band to use.
+    model: int
+       Year of Barraffe model to use [2003 (default), 2015].
+
+    Returns
+    -------
+    companion_parameters: list
+        Companion parameters from barraffe table, interpolated between the
+        rows to the provided magnitude.
+
     """
     # mass_solar = companion_mass / 1047.56   # covert to solar mass
     companion_parameters = dict()
