@@ -96,7 +96,7 @@ def get_brown_dwarf_information(companion_mass, age, model="2003"):
     Need the tables in a file somewhere"""
 
     mass_solar = companion_mass / 1047.56   # covert to solar mass
-    BD_parameters = dict()
+    companion_parameters = dict()
 
     if model in '2003':
         # Find closest age model
@@ -133,9 +133,9 @@ def get_brown_dwarf_information(companion_mass, age, model="2003"):
 
     for col, data in zip(cols, model_data):
         # Interpolate columns to mass of companion
-        BD_parameters[col] = np.interp(mass_solar, model_data[0], data)
+        companion_parameters[col] = np.interp(mass_solar, model_data[0], data)
 
-    return BD_parameters  # as a dictionary
+    return companion_parameters  # as a dictionary
 
 
 def get_sweet_cat_temp(star_name):

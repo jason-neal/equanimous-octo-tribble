@@ -85,7 +85,7 @@ def get_brown_dwarf_information(companion_mass, age):
     Need the tables in a file somewhere"""
 
     mass_solar = companion_mass / 1047.56   # covert to solar mass
-    BD_parameters = dict()
+    companion_parameters = dict()
 
     if model in '2003':
         # Find closest age model
@@ -121,16 +121,16 @@ def get_brown_dwarf_information(companion_mass, age):
 
     for col, data in zip(cols, model_data):
         # Interpolate columns to mass of companion
-        BD_parameters[col] = np.interp(mass_solar, model_data[0], data)
+        companion_parameters[col] = np.interp(mass_solar, model_data[0], data)
 
-    return BD_parameters  # as a dictionary
+    return companion_parameters  # as a dictionary
 
 
 def get_BD_from_flux_ratio(magnitudes, age, band="K", model=2003):
     """ Baraffe 2003 table search for given magnitude.
     """
     # mass_solar = companion_mass / 1047.56   # covert to solar mass
-    BD_parameters = dict()
+    companion_parameters = dict()
 
     if model in '2003':
         # Find closest age model
@@ -184,10 +184,10 @@ def get_BD_from_flux_ratio(magnitudes, age, band="K", model=2003):
         print("model data", model_data[band_index])
         print("this col data ", data)
 
-        BD_parameters[col] = np.interp(magnitudes[band], model_data[band_index], data)
-        print("This col interp value =", BD_parameters[col] )
+        companion_parameters[col] = np.interp(magnitudes[band], model_data[band_index], data)
+        print("This col interp value =", companion_parameters[col])
 
-    return  BD_parameters  # as a dictionary
+    return companion_parameters  # as a dictionary
 
 
 def get_sweet_cat_temp(star_name):
