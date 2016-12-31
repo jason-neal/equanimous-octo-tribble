@@ -21,7 +21,7 @@ from __future__ import division, print_function
 import argparse
 import numpy as np
 from astroquery.simbad import Simbad
-import pandas as pd
+# import pandas as pd
 from PyAstronomy import pyasl
 # import matplotlib.pyplot as plt
 
@@ -71,7 +71,9 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
 
     # Print flux ratios using a generator
     print("Magnitude Calculation\n")
-    [print("{0} band star/companion Flux ratio = {1} >>> companion/star Flux ratio {2}".format(key, val[0], 1./val[0])) for key, val in Flux_ratios.items()]
+    [print("{0} band star/companion Flux ratio =".format(key) +
+           "{0} >>> companion/star Flux ratio {1}".format(val[0], 1./val[0]))
+     for key, val in Flux_ratios.items()]
 
     print("\nRadius Calculation")
     print("Star radius      = {} R_sun".format(Rstar[0]))
@@ -90,7 +92,7 @@ def get_stellar_params(star_name):
 
     # return Magnitudes, parralax, Temp
     customSimbad = Simbad()
-    # Can add more fluxes here if need to extend to more flux ranges. although K is the limit for simbad.
+    # Can add more fluxes here if need to extend flux ranges. Although K is the simbad limit.
     # if want higher need to search for Wise band in VISIER probably.
     customSimbad.add_votable_fields('parallax', 'sp', 'fluxdata(B)',
                                     'fluxdata(V)', 'fluxdata(J)', 'fluxdata(K)',
@@ -201,6 +203,7 @@ def calculate_flux_ratios(star_params, companion_params):
     # Flux_ratios["H"] = f ** (companion_params["Mh"]-star_params["Hmag"])
     Flux_ratios["K"] = f ** (companion_params["Mk"]-star_params["FLUX_K"])
     return Flux_ratios
+
 
 def get_temperature(star_name, star_params):
     """ Try get temperature of star multiple ways

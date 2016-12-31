@@ -20,20 +20,24 @@ from __future__ import division, print_function
 import argparse
 import numpy as np
 from astroquery.simbad import Simbad
-import pandas as pd
+# import pandas as pd
 from PyAstronomy import pyasl
 # import matplotlib.pyplot as plt
+
 
 def _parser():
     """Take care of all the argparse stuff.
 
     :returns: the args
     """
-    parser = argparse.ArgumentParser(description='Determine mass of stellar companion from a flux ratio')
+    parser = argparse.ArgumentParser(description='Determine mass of stellar ' +
+                                     'companion from a flux ratio')
     parser.add_argument('star_name', help='Name of host star.', type=str)
-    parser.add_argument('flux_ratio', help='Flux ratio between host and companion - (F_companion/F_host)', type=float)
+    parser.add_argument('flux_ratio', type=float, help='Flux ratio between host ' +
+                        'and companion - (F_companion/F_host)')
     parser.add_argument('age', help='Star age (Gyr)', type=float)
-    parser.add_argument("-b", "--band", help='Magnitude band for the flux ratio value', choices=["J", "K"], default="K", type=str)
+    parser.add_argument("-b", "--band", choices=["J", "K"], default="K",
+                        type=str, help='Magnitude band for the flux ratio value')
     parser.add_argument('-m', '--model', choices=['03', '15', '2003', '2015'],
                         help='Baraffe model to use [2003, 2015]',
                         default='2003', type=str)
@@ -56,7 +60,7 @@ def main(star_name, flux_ratio, stellar_age, band="K", model="2003"):
         Wavelength band to use. (optional)
     model: int (optional)
        Year of Barraffe model to use [2003 (default), 2015].
-""""
+"""
 
     Jup_mass = 1047.56  # Jupiters in 1 M_sol
 
@@ -67,11 +71,14 @@ def main(star_name, flux_ratio, stellar_age, band="K", model="2003"):
     magnitudes = calculate_companion_magnitude(star_params, flux_ratio)
     print("Magnitude calculate for companion", magnitudes)
     # Find companion parameters that match these magnitudes
-    companion_params = magnitude_table_search(magnitudes, stellar_age, band=band, model=model)
+    companion_params = magnitude_table_search(magnitudes, stellar_age,
+                                              band=band, model=model)
 
     # Print flux ratios using a generator
     print("Estimated Companion Mass from {} band Flux ratio\n".format(band.upper()))
-    print("M/M_S = {0} (M_star) = {1} (M_Jup), Temp = {2} K".format(companion_params["M/Ms"][0], Jup_mass * companion_params["M/Ms"][0], companion_params["Teff"][0]))
+    print("M/M_S = {0} (M_star)".format(companion_params["M/Ms"][0]) +
+          " = {} (M_Jup)".format(Jup_mass * companion_params["M/Ms"][0]) +
+          ", Temp = {} K".format(companion_params["Teff"][0]))
 
 
 ##############################################################################
@@ -82,15 +89,17 @@ def main(star_name, flux_ratio, stellar_age, band="K", model="2003"):
 def get_stellar_params(star_name):
     """ Astro query search """
 
-    #return Magnitudes, parralax, Temp
+    # return Magnitudes, parralax, Temp
     customSimbad = Simbad()
-    # Can add more fluxes here if need to extend to more flux ranges. although K is the limit for simbad.
+    # Can add more fluxes here if need to extend flux ranges. Although K is the simbad limit.
     # if want higher need to search for Wise band in VISIER probably.
-    customSimbad.add_votable_fields('parallax', 'sp', 'fluxdata(B)', 'fluxdata(V)', 'fluxdata(J)', 'fluxdata(K)', 'fe_h')
+    customSimbad.add_votable_fields('parallax', 'sp', 'fluxdata(B)',
+                                    'fluxdata(V)', 'fluxdata(J)',
+                                    'fluxdata(K)', 'fe_h')
 
-    result_table =  customSimbad.query_object(star_name)
+    result_table = customSimbad.query_object(star_name)
 
-    #print("Table colums", result_table.colnames)
+    # print("Table colums", result_table.colnames)
 
     return result_table
 
@@ -231,7 +240,7 @@ def magnitude_table_search(magnitudes, age, band="K", model=2003):
         # Interpolate columns to magnitude of companion
         print("\nThis col =", col)
         print("Band mag", magnitudes[band])
-        #print(model_data)
+        # print(model_data)
         print("model data", model_data[band_index])
         print("this col data ", data)
 
@@ -244,44 +253,40 @@ def magnitude_table_search(magnitudes, age, band="K", model=2003):
 def get_sweet_cat_temp(star_name):
     sc = pyasl.SWEETCat()
     data = sc.data
-    #print(data.head())
-    #print(data.keys())
+    # print(data.head())
+    # print(data.keys())
 
     # Assuming given as hd******
     hd_number = star_name[2:]
-    #print("hd number ", hd_number)
+    # print("hd number ", hd_number)
     if hd_number in sc.data.hd.values:
         hd_entry = data[data.hd == hd_number]
 
         if hd_entry.empty:
             return False
         else:
-        # Sweet-cat has temperature of zero
-        #if it does not have a temperature value for the star
+            # Sweet-cat has temperature of zero
+            # if it does not have a temperature value for the star
             return hd_entry.iloc[0]["teff"]
     else:
         print("This star not in SWEET-Cat")
         return False
 
 
-
-
-
-
-
-
-
 ##############################################################################
 # Calculations
 ##############################################################################
+
+
 def calculate_flux_ratios(star_params, companion_params):
     """ Flux ratios for the different bands """
     f = 2.512
     Flux_ratios = dict()
     Flux_ratios["J"] = f ** (companion_params["Mj"]-star_params["FLUX_J"])
-    #Flux_ratios["H"] = f ** (companion_params["Mh"]-star_params["Hmag"])
+    # Flux_ratios["H"] = f ** (companion_params["Mh"]-star_params["Hmag"])
     Flux_ratios["K"] = f ** (companion_params["Mk"]-star_params["FLUX_K"])
     return Flux_ratios
+
 
 def calculate_companion_magnitude(star_params, flux_ratio, band="K"):
     """ Calculte companion magnitude from flux ratio
@@ -316,8 +321,8 @@ def test_mag_conversions():
     """ Test converting from flux ratio to magnitude back to flux ratio etc.
     Tests show the conversion goes back and forward."""
 
-    vals=dict()
-    star=dict()
+    vals = dict()
+    star = dict()
     vals["Mj"] = 4
     vals["Mk"] = 6
     star["FLUX_J"] = 3
@@ -338,8 +343,8 @@ def get_temperature(star_name, star_params):
     3rd - Calculate from B-V and interpolation"""
     good_temp = False
     # This is not the best way to do this but work atm
-    if "Fe_H_Teff" in star_params.keys(): # need table and interpolate to this B-V
-        #print("star_params['Fe_H_Teff'] =", star_params["Fe_H_Teff"])
+    if "Fe_H_Teff" in star_params.keys():  # need table and interpolate to this B-V
+        # print("star_params['Fe_H_Teff'] =", star_params["Fe_H_Teff"])
         teff = star_params["Fe_H_Teff"][0]
         if teff == 0 or teff == [0]:
             # No teff given by Simbad
@@ -369,11 +374,13 @@ def get_temperature(star_name, star_params):
     if not good_temp:
         """Then use the B-V method as last resort"""
         BminusV = star_params["FLUX_B"] - star_params["FLUX_V"]
-        #print(BminusV, "b-v")
-        #Interpolate from B-V
-        bminusvs = np.array([-0.31, -0.24, -0.20, -0.12, 0.0, 0.15, 0.29, 0.42, 0.58, 0.69, 0.85, 1.16, 1.42, 1.61])
-        temps = np.array([34000, 23000, 18500, 13000, 9500, 8500, 7300, 6600, 5900, 5600, 5100, 4200, 3700, 3000])
-        #teff_star = (4200-5100)/(1.16-0.85) * (BminusV-0.85) + 5100    # Linear interpolation
+        # print(BminusV, "b-v")
+        # Interpolate from B-V
+        bminusvs = np.array([-0.31, -0.24, -0.20, -0.12, 0.0, 0.15, 0.29, 0.42,
+                             0.58, 0.69, 0.85, 1.16, 1.42, 1.61])
+        temps = np.array([34000, 23000, 18500, 13000, 9500, 8500, 7300, 6600,
+                          5900, 5600, 5100, 4200, 3700, 3000])
+        # teff_star = (4200-5100)/(1.16-0.85) * (BminusV-0.85) + 5100  # Linear interpolation
         teff = np.interp(BminusV, bminusvs, temps)[0]
         print("Temperature of star was calculated from b-v = {} K".format(teff))
     return teff
@@ -385,7 +392,7 @@ def calculate_stellar_radius(star_name, star_params):
     teff_star = get_temperature(star_name, star_params)
 
     Ts_T = 5800. / teff_star              # Temperature ratio
-    Dm =   4.83 - star_params["FLUX_V"]   # Differnce of aboslute magnitude
+    Dm = 4.83 - star_params["FLUX_V"]   # Differnce of aboslute magnitude
     L_Ls = 2.51 ** Dm                     # Luminosity ratio
     R_Rs = (Ts_T)**2 * np.sqrt(L_Ls)      # Raidus of Star in Solar Radii
 
