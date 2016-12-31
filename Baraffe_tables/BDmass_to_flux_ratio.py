@@ -46,7 +46,7 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
     """Compute flux ratio of star to companion """
 
     # Obtain Stellar parameters from astroquery
-    star_params = get_stellar_params(star_name)    # returns a astroquesry result table
+    star_params = get_stellar_params(star_name)  # returns a astroquesry result table
 
     # Get parameters for this mass and age
     companion = get_brown_dwarf_information(companion_mass, stellar_age, model=model)
@@ -129,7 +129,6 @@ def get_brown_dwarf_information(companion_mass, age, model="2003"):
                 "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
 
     model_data = model_data.T
-
 
     for col, data in zip(cols, model_data):
         # Interpolate columns to mass of companion

@@ -29,11 +29,11 @@ def _parser():
 
     :returns: the args
     """
-    parser = argparse.ArgumentParser(description='Determine flux ratio of stellar companion')
+    parser = argparse.ArgumentParser(description='Determine mass of stellar companion from a flux ratio')
     parser.add_argument('star_name', help='Name of host star.', type=str)
-    parser.add_argument('flux_ratio', help='Flux ratio between host and companion - (F_comp/F_host)', type=float)
-    parser.add_argument('age', help='Star age (Gyr)',type=float)
-    parser.add_argument("-b", "--band", help='Magnitude band of the flux ratio', choices=["J", "K"], default="K", type=str)
+    parser.add_argument('flux_ratio', help='Flux ratio between host and companion - (F_companion/F_host)', type=float)
+    parser.add_argument('age', help='Star age (Gyr)', type=float)
+    parser.add_argument("-b", "--band", help='Magnitude band for the flux ratio value', choices=["J", "K"], default="K", type=str)
     parser.add_argument('-m', '--model', choices=['03', '15', '2003', '2015'],
                         help='Baraffe model to use [2003, 2015]',
                         default='2003', type=str)
@@ -45,8 +45,9 @@ def main(star_name, flux_ratio, stellar_age, band="K", model="2003"):
     """Compute companion mass from flux ratio value """
     Jup_mass = 1047.56   # covert to Solar to Jupiter mass
     # test_mag_conversions()
+
     # Obtain Stellar parameters from astroquery
-    star_params = get_stellar_params(star_name)    # returns a astroquesry result table
+    star_params = get_stellar_params(star_name)  # returns a astroquesry result table
 
     # Calculate Magnitude J and K band magnitude for this flux ratio
     magnitudes = calculate_companion_magnitude(star_params, flux_ratio)
