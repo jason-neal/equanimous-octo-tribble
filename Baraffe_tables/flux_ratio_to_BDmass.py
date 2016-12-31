@@ -81,9 +81,27 @@ def get_stellar_params(star_name):
     return result_table
 
 
-def get_brown_dwarf_information(companion_mass, age):
-    """ baraffe 2003 table search
-    Need the tables in a file somewhere"""
+def mass_table_search(companion_mass, age, model="2003"):
+    """ Search Baraffe tables to find the companion entry given a mass value.
+
+    Parameters
+    ----------
+    companion_mass: float
+        Companion Mass (Mjup)
+    age: float
+        Age of star?system (Gyr).
+    band: str
+        Wavelength band to use.
+    model: int
+       Year of Barraffe model to use [2003 (default), 2015].
+
+    Returns
+    -------
+    companion_parameters: list
+        Companion parameters from barraffe table, interpolated between the
+        rows to the provided mass.
+
+    """
 
     mass_solar = companion_mass / 1047.56   # covert to solar mass
     companion_parameters = dict()
