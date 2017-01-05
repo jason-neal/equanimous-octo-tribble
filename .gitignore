@@ -1,4 +1,8 @@
-cache/*
+.cache/
+__pycache__/
+requests/
+cache/
+
 #### GIT IGNORE ###
 
 ### Backup files ###
