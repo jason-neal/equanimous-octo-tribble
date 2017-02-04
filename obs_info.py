@@ -61,11 +61,11 @@ def main(fname, output=False, separator=":", verbose=True):
             fitsname = line[:-1] + ".fits"
             v_print("The fits file to open is" , fitsname)
             try:
-                v_print("Trying location = {}".format(path + "../Raw_files/" + fitsname))
+                v_print("Trying location = {0}".format(path + "../Raw_files/" + fitsname))
                 header = fits.getheader(path + "../Raw_files/" + fitsname)
             except:
                 try:
-                    v_print("Trying location = {}".format(path + "Raw_files/" + fitsname))
+                    v_print("Trying location = {0}".format(path + "Raw_files/" + fitsname))
                     header = fits.getheader(path + "Raw_files/" + fitsname)
                 except:
                     try:
@@ -92,10 +92,10 @@ def main(fname, output=False, separator=":", verbose=True):
 
         
     v_print("Values obtained from the list files")
-    v_print("The nod date-obs = {} ".format(nod_dates))
-    v_print("The nod Slit Widths = {}".format(nod_slits))
-    v_print("The nod Exposure times = {} seconds".format(nod_exptimes))
-    v_print("The listed Instruments = {} ".format(nod_instruments))
+    v_print("The nod date-obs = {0} ".format(nod_dates))
+    v_print("The nod Slit Widths = {0}".format(nod_slits))
+    v_print("The nod Exposure times = {0} seconds".format(nod_exptimes))
+    v_print("The listed Instruments = {0} ".format(nod_instruments))
         
        
     if len(set(nod_instruments)) == 1:
@@ -133,7 +133,7 @@ def main(fname, output=False, separator=":", verbose=True):
         t = Time(nod_date, format="fits") + TimeDelta(exptime/2, format="sec")
         t.format= 'jd'
         jd_days.append(t.value)
-    v_print("Nod dates converted into JD {}".format(jd_days))
+    v_print("Nod dates converted into JD {0}".format(jd_days))
     if max(jd_days)-min(jd_days) > len(jd_days)*2*exptime/86400.:
         raise NodError("Issue with time for the nod observations took longer " \
             "then twice exposure time for each exposure (maybe need to add a lower" \
@@ -163,10 +163,10 @@ def main(fname, output=False, separator=":", verbose=True):
     Middle_obs2 = Time(Middle_obs)
     Middle_obs2.format = "jd"
 
-    v_print("Mean obs time averged in JD {}".format(mean_obs_time))
-    v_print("Median obs time in JD {}".format(median_obs_time))
-    v_print("Begin obs time in JD {}".format(obs_begin_time))
-    v_print("End obs time in JD {}".format(obs_end_time))
+    v_print("Mean obs time averged in JD {0}".format(mean_obs_time))
+    v_print("Median obs time in JD {0}".format(median_obs_time))
+    v_print("Begin obs time in JD {0}".format(obs_begin_time))
+    v_print("End obs time in JD {0}".format(obs_end_time))
 
     
     target_ra = header["RA"]   # of the last observation in the list
@@ -222,7 +222,7 @@ def main(fname, output=False, separator=":", verbose=True):
     R = 100000*0.2 / slit_width
             
     resolving_power = int(R)
-    print("Resolving Power = {}".format(resolving_power))
+    print("Resolving Power = {0}".format(resolving_power))
 
     
 
@@ -238,58 +238,58 @@ def main(fname, output=False, separator=":", verbose=True):
             #Put the useful parameters I need to know here
             
             out.write("KEY CRIRES OBSERVATION PARAMETERS:\n------------------\n")
-            out.write("Target Name           = {}\n".format(Object))
-            out.write("Observation Name      = {}\n".format(Obs_name))
-            out.write("RA                    = {}, {} \n".format(ra_angle, ra_j2000))
-            out.write("DEC                   = {}, {} \n".format(dec_angle, dec_j2000))
+            out.write("Target Name           = {0}\n".format(Object))
+            out.write("Observation Name      = {0}\n".format(Obs_name))
+            out.write("RA                    = {0}, {1} \n".format(ra_angle, ra_j2000))
+            out.write("DEC                   = {0}, {1} \n".format(dec_angle, dec_j2000))
             
             out.write("\nOBS IDs:\n------------------\n")
-            out.write("Proposal ID           = {}\n".format(prosal_id))
-            out.write("PI-COI ID             = {}\n".format(obs_pi_id))
-            out.write("Obs Template ID       = {}\n".format(tpl_id))
-            out.write("AO State(OPEN=noAo)   = {}\n".format(ao_loop_state))
+            out.write("Proposal ID           = {0}\n".format(prosal_id))
+            out.write("PI-COI ID             = {0}\n".format(obs_pi_id))
+            out.write("Obs Template ID       = {0}\n".format(tpl_id))
+            out.write("AO State(OPEN=noAo)   = {0}\n".format(ao_loop_state))
 
             out.write("\nDetector Setup:\n------------------\n")
-            out.write("Telescope             = {}\n".format(telescope))
-            out.write("Instrument            = {}\n".format(instrument))
-            out.write("Spec Filter           = {}\n".format(nod_filter))
-            out.write("Min wavelength        = {} nm\n".format(obs_wl_min))
-            out.write("Max Wavelength        = {} nm\n".format(obs_wl_max))
-            out.write("Slit width            = {} \n".format(slit_width))
-            out.write("Resolving Power       = {}\n".format(resolving_power))
-            out.write("Exposure time         = {}\n".format(exptime))   
-            out.write("Number AB cycles      = {}\n".format(Nabcycles))
-            out.write("Number of Exposures   = {}\n".format(NEXP))
+            out.write("Telescope             = {0}\n".format(telescope))
+            out.write("Instrument            = {0}\n".format(instrument))
+            out.write("Spec Filter           = {0}\n".format(nod_filter))
+            out.write("Min wavelength        = {0} nm\n".format(obs_wl_min))
+            out.write("Max Wavelength        = {0} nm\n".format(obs_wl_max))
+            out.write("Slit width            = {0} \n".format(slit_width))
+            out.write("Resolving Power       = {0}\n".format(resolving_power))
+            out.write("Exposure time         = {0}\n".format(exptime))   
+            out.write("Number AB cycles      = {0}\n".format(Nabcycles))
+            out.write("Number of Exposures   = {0}\n".format(NEXP))
                  
             out.write("\nTime Calculations:\n------------------\n")
             # FITS Format
             out.write("## FITS format\n")
-            out.write("Obs Start time        = {}\n".format(obs_begin_time))
-            out.write("Average obs time      = {}\n".format(mean_obs_t))
-            out.write("Median obs time       = {}\n".format(med_obs_t))
+            out.write("Obs Start time        = {0}\n".format(obs_begin_time))
+            out.write("Average obs time      = {0}\n".format(mean_obs_t))
+            out.write("Median obs time       = {0}\n".format(med_obs_t))
             #out.write("Middle of obs         = {} \n".format(Middle_obs))
-            out.write("Obs End time          = {}\n".format(obs_end_time))
+            out.write("Obs End time          = {0}\n".format(obs_end_time))
             obs_begin_time.format = "jd"
             obs_end_time.format = "jd"
             # JD Format
             out.write("## JD format\n")
-            out.write("Obs start time (JD)   = {}\n".format(obs_begin_time2))
-            out.write("Average obs time (JD) = {}\n".format(mean_obs_time))      
-            out.write("Medaian obs time (JD) = {}\n".format(median_obs_time))
+            out.write("Obs start time (JD)   = {0}\n".format(obs_begin_time2))
+            out.write("Average obs time (JD) = {0}\n".format(mean_obs_time))      
+            out.write("Medaian obs time (JD) = {0}\n".format(median_obs_time))
             #out.write("Middle of obs (JD)    = {}\n".format(Middle_obs2))
-            out.write("Obs End time (JD)     = {}\n".format(obs_end_time2))
+            out.write("Obs End time (JD)     = {0}\n".format(obs_end_time2))
             
-            out.write("Total observation time  [inc. exptime] (JD)  = {} \n".format(obs_total))
-            out.write("Total observation time  [inc. exptime] (min) = {} \n".format(obs_total_minutes))
-            out.write("Total intergration time [NEXP*exptime] (min) = {} \n".format(exptime*NEXP/60))
+            out.write("Total observation time  [inc. exptime] (JD)  = {0} \n".format(obs_total))
+            out.write("Total observation time  [inc. exptime] (min) = {0} \n".format(obs_total_minutes))
+            out.write("Total intergration time [NEXP*exptime] (min) = {0} \n".format(exptime*NEXP/60))
       
             out.write("\nAirmass values:\n------------------\n")
-            out.write("Nod airmasses = {}\n".format(nod_airmass))
-            out.write("Mean airmass valu       = {}\n".format(mean_airmass))
-            out.write("Airmass range [max-min] = {}\n".format(airmass_range))
+            out.write("Nod airmasses = {0}\n".format(nod_airmass))
+            out.write("Mean airmass valu       = {0}\n".format(mean_airmass))
+            out.write("Airmass range [max-min] = {0}\n".format(airmass_range))
             
             # DATE CREATED
-            out.write("\n\nThis file was generated on {}\n".format(datetime.datetime.now()))
+            out.write("\n\nThis file was generated on {0}\n".format(datetime.datetime.now()))
             
 
 #############################################################

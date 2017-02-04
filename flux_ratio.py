@@ -48,10 +48,10 @@ def main(star_name, companion_mass, stellar_age):
     [print("{0} band star/companion Flux ratio = {1} >>> companion/star Flux ratio {2}".format(key, val[0], 1./val[0])) for key, val in Flux_ratios.items()]
     
     print("\nRadius Calculation")
-    print("Star radius      = {} R_sun".format(Rstar[0]))
-    print("Planet radius    = {} R_sun".format(np.round(companion["R"], 4)))
-    print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar[0]))
-    print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar[0]**2))
+    print("Star radius      = {0} R_sun".format(Rstar[0]))
+    print("Planet radius    = {0} R_sun".format(np.round(companion["R"], 4)))
+    print("Radius Ratio of companion/star    = {0} ".format(Rcomp_Rstar[0]))
+    print("Area Ratio of companion/star      = {0} ".format(Rcomp_Rstar[0]**2))
     
 
 ##############################################################################
@@ -186,7 +186,7 @@ def get_temperature(star_name, star_params):
         temps = np.array([34000, 23000, 18500, 13000, 9500, 8500, 7300, 6600, 5900, 5600, 5100, 4200, 3700, 3000])
         #teff_star = (4200-5100)/(1.16-0.85) * (BminusV-0.85) + 5100    # Linear interpolation
         teff = np.interp(BminusV, bminusvs, temps)[0]
-        print("Temperature of star was calculated from b-v = {} K".format(teff))
+        print("Temperature of star was calculated from b-v = {0} K".format(teff))
     return teff
 
 
