@@ -1,28 +1,32 @@
 #!/usr/bin/python
+"""Brown Dwarf Flux ratio calculator.
 
-""" Brown Dwarf Flux ratio calculator:
+Calculates the flux/contrast ratio between a host star and a brown dwarf of a specified mass.
 
-    Uses stellar parameter databases to find host star parameters.
-    The companion mass provided is used to look up the band magnitudes of the
-    object in the Barraffe tables. The magnitudes are used to caluate the flux
-    ratio between the companion and the star.
+This script uses the SIMBAD database to obtain the host star parameters, such as magnitude and age.
+The companion/brown dwarf mass is a given input (in Mjup) and  is used to obtain the band magnitudes
+of the companion from the Barraffe tables.
 
-    Inputs
-    ------
-    Star name: str
-        Stellar idenification number. eg. HD30501
-    companion_mass: float
-        Mass of companion in Jupiter masses
-    age: float
-        Stellar Age. (Closest model is used)
-    """
+The magnitude difference between the host and companion are used to caluate the flux/contrast ratio.
 
+Inputs
+------
+Star name: str
+    Stellar idenification number. eg. HD30501
+companion_mass: float
+    Mass of companion in Jupiter masses
+age: float
+    Stellar Age. (Closest model is used)
+model: str
+    Choose between the 2003 and 2015 Barraffe modeling.
+"""
+#TODO: Interpolate between tables?
 from __future__ import division, print_function
 import argparse
 import numpy as np
 from astroquery.simbad import Simbad
-# import pandas as pd
 from PyAstronomy import pyasl
+# import pandas as pd
 # import matplotlib.pyplot as plt
 
 
