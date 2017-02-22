@@ -199,6 +199,28 @@ def get_sweet_cat_temp(star_name):
 # ############################################################################
 # Calculations
 # ############################################################################
+def flux_mag_ratio(mag1, mag2):
+    """Calcualte the flux ratio between two magnitudes.
+
+    Using the equation f1/f2 \approx 2.512**(m2 - m1)  (check order).
+
+    Parameters
+    ----------
+    mag1 float
+        Magnitude of first object.
+    mag2: float
+        Magnitude of second object.
+
+    Returns
+    -------
+    flux_ratio: float
+        flux/contrast ratio between the two magnitudes.
+
+    """
+    # return 2.512**(mag2 - mag1)  # Approx relation
+    return 10**(-0.4 * (mag1 - mag2))
+
+
 def calculate_flux_ratios(star_params, companion_params):
     """ Flux ratios for the different bands """
     f = 2.512
