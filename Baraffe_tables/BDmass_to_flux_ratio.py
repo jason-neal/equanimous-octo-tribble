@@ -68,9 +68,10 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
     star_params = get_stellar_params(star_name)  # returns a astroquesry result table
 
     # Get parameters for this mass and age
-    companion = mass_table_search(companion_mass, stellar_age, model=model)
+    companion_params = mass_table_search(companion_mass, stellar_age, model=model)
 
-    Flux_ratios = calculate_flux_ratios(star_params, companion)
+    Flux_ratios = calculate_flux_ratios(star_params, companion_params)
+
 
 
     # Print flux ratios using a generator
