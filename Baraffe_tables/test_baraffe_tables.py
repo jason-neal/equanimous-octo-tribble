@@ -34,5 +34,14 @@ def test_calculate_flux_ratios():
     assert np.allclose(flux_ratios["K"], 100)
 
 
+@pytest.mark.xfail  # Query fails when offline
+def test_main():
+    from BDmass_to_flux_ratio import mass_main
+    # Check it returns 0 (Runs normally)
+    assert mass_main("HD30501", 90, 5) is 0
+
+
+
+
 
 # Test Flux ratio to Mass

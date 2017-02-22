@@ -93,6 +93,7 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
         print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar[0]))
         print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar[0]**2))
 
+    return 0
 
 ##############################################################################
 # Access Databases
@@ -304,4 +305,4 @@ if __name__ == '__main__':
     age = args.pop('age')
     opts = {k: args[k] for k in args}
 
-    main(star_name, companion_mass, age, **opts)
+    sys.exit(main(star_name, companion_mass, age, **opts))
