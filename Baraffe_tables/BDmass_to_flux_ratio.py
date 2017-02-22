@@ -17,6 +17,8 @@ companion_mass: float
     Mass of companion in Jupiter masses
 age: float
     Stellar Age. (Closest model is used)
+band: list of str
+    Spectral bands to obtain ratio.
 model: str
     Choose between the 2003 and 2015 Barraffe modeling.
 """
@@ -39,6 +41,8 @@ def _parser():
     parser.add_argument('star_name', help='Input fits file to calibrate')
     parser.add_argument('companion_mass', help='Mass of companion (M_Jup)', type=float)
     parser.add_argument('age', help='Star age (Gyr)', type=float)
+    parser.add_argument('-b', '--band', help='Spectral Band to measure. Options=["All", "K", ""]',
+                        choices=["All", "J", "H", "K"], default=["All"], nargs="+", type=str)
     parser.add_argument('-m', '--model', choices=['03', '15', '2003', '2015'],
                         help='Baraffe model to use [2003, 2015]',
                         default='2003', type=str)
@@ -47,7 +51,7 @@ def _parser():
     return args
 
 
-def main(star_name, companion_mass, stellar_age, model="2003"):
+def main(star_name, companion_mass, stellar_age, band=["All"], model="2003", area_ratio=False):
     """Compute flux ratio of star to companion
 
     Parameters
@@ -58,12 +62,18 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
         Mass of companion in Jupiter masses
     stellar_age: float
         Stellar Age. (Closest model is used)
-    model: int (optional)
-        Year of Barraffe model to use [2003 (default), 2015]
+        Stellar Age. (Closest model is used).
+    band: list of str
+        Spectral bands to obtain ratio.
+    model: str (optional)
+        Year of Barraffe model to use [2003 (default), 2015].
     area_ratio: bool default=False
         Perform simple radius and area comparions calculations.
 
     """
+    if "All" in band:
+        band = ["J", "H", "K"]
+
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)  # returns a astroquesry result table
 
@@ -75,11 +85,10 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
 
 
     # Print flux ratios using a generator
-    print("Magnitude Calculation\n")
-    [print("{0} band star/companion Flux ratio =".format(key) +
-           "{0} >>> companion/star Flux ratio {1}".format(val[0], 1./val[0]))
-     for key, val in Flux_ratios.items()]
-
+    print("\nFlux ratios:")
+    [print(("{0!s} band star/companion Flux ratio = {1:4.2f},"
+            " >>> companion/star Flux ratio ={2:0.4f}").format(key, val[0], 1. / val[0]))
+     for key, val in Flux_ratios.items() if key in band]
 
     if area_ratio:
         # Compare to area ratio
