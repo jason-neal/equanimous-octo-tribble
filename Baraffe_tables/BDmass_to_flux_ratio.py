@@ -222,12 +222,11 @@ def flux_mag_ratio(mag1, mag2):
 
 
 def calculate_flux_ratios(star_params, companion_params):
-    """ Flux ratios for the different bands """
-    f = 2.512
+    """Flux ratios for the different bands."""
     Flux_ratios = dict()
-    Flux_ratios["J"] = f ** (companion_params["Mj"]-star_params["FLUX_J"])
-    # Flux_ratios["H"] = f ** (companion_params["Mh"]-star_params["Hmag"])
-    Flux_ratios["K"] = f ** (companion_params["Mk"]-star_params["FLUX_K"])
+    Flux_ratios["J"] = flux_mag_ratio(star_params["FLUX_J"], companion_params["Mj"])
+    Flux_ratios["K"] = flux_mag_ratio(star_params["FLUX_K"], companion_params["Mk"])
+    Flux_ratios["H"] = flux_mag_ratio(star_params["FLUX_H"], companion_params["Mh"])
     return Flux_ratios
 
 
