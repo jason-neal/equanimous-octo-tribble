@@ -42,6 +42,7 @@ def _parser():
     parser.add_argument('-m', '--model', choices=['03', '15', '2003', '2015'],
                         help='Baraffe model to use [2003, 2015]',
                         default='2003', type=str)
+    parser.add_argument("-a", "--area_ratio", help="Calculate the area ratio.", default=False, action="store_true")
     args = parser.parse_args()
     return args
 
@@ -59,8 +60,10 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
         Stellar Age. (Closest model is used)
     model: int (optional)
         Year of Barraffe model to use [2003 (default), 2015]
-    """
+    area_ratio: bool default=False
+        Perform simple radius and area comparions calculations.
 
+    """
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)  # returns a astroquesry result table
 
@@ -69,9 +72,6 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
 
     Flux_ratios = calculate_flux_ratios(star_params, companion)
 
-    # Compare to area ratio
-    Rstar = calculate_stellar_radius(star_name, star_params)
-    Rcomp_Rstar = companion["R"] / Rstar
 
     # Print flux ratios using a generator
     print("Magnitude Calculation\n")
@@ -79,11 +79,18 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
            "{0} >>> companion/star Flux ratio {1}".format(val[0], 1./val[0]))
      for key, val in Flux_ratios.items()]
 
-    print("\nRadius Calculation")
-    print("Star radius      = {} R_sun".format(Rstar[0]))
-    print("Planet radius    = {} R_sun".format(np.round(companion["R"], 4)))
-    print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar[0]))
-    print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar[0]**2))
+
+    if area_ratio:
+        # Compare to area ratio
+        Rstar = calculate_stellar_radius(star_name, star_params)
+        print(Rstar)
+        Rcomp_Rstar = companion_params["R"] / Rstar
+
+        print("\nRadius Calculation")
+        print("Host radius         = {} R_sun".format(Rstar[0]))
+        print("companion radius    = {} R_sun".format(np.round(companion["R"], 4)))
+        print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar[0]))
+        print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar[0]**2))
 
 
 ##############################################################################
