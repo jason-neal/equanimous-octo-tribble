@@ -89,8 +89,6 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
 ##############################################################################
 # Access Databases
 ##############################################################################
-
-
 def get_stellar_params(star_name):
     """ Astro query search """
 
@@ -117,20 +115,16 @@ def mass_table_search(companion_mass, age, model="2003"):
     companion_mass: float
         Companion Mass (Mjup)
     age: float
-        Age of star?system (Gyr).
-    band: str
-        Wavelength band to use.
+        Age of star/system (Gyr).
     model: int
        Year of Barraffe model to use [2003 (default), 2015].
 
     Returns
     -------
     companion_parameters: list
-        Companion parameters from barraffe table, interpolated between the
-        rows to the provided mass.
+        Companion parameters from barraffe table, interpolated to the provided mass.
 
     """
-
     mass_solar = companion_mass / 1047.56   # covert to solar mass
     companion_parameters = dict()
 
@@ -138,7 +132,7 @@ def mass_table_search(companion_mass, age, model="2003"):
         # Find closest age model
         modelages = ["0.001", "0.005", "0.010", "0.050", "0.100", "0.120",
                      "0.500", "1.000", "5.000", "10.000"]
-        model_age = min(modelages, key=lambda x: abs(float(x)-age))  # Closest one
+        model_age = min(modelages, key=lambda x: abs(float(x) - age))  # Closest one
         model_id = "p".join(str(model_age).split("."))
 
         model_name = "./Baraffe2003/BaraffeCOND2003-" + model_id + "Gyr.dat"
@@ -192,7 +186,7 @@ def get_sweet_cat_temp(star_name):
             # if it does not have a temperature value for the star
             return hd_entry.iloc[0]["teff"]
     else:
-        print("This star not in SWEET-Cat")
+        print("This star not in SWEET-Cat.")
         return False
 
 
