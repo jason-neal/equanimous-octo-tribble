@@ -93,15 +93,15 @@ def main(star_name, companion_mass, stellar_age, band=["All"], model="2003", are
 
     if area_ratio:
         # Compare to area ratio
-        Rstar = calculate_stellar_radius(star_name, star_params)
+        Rstar = calculate_stellar_radius(star_params)
         print(Rstar)
         Rcomp_Rstar = companion_params["R"] / Rstar
 
         print("\nRadius Calculation")
         print("Host radius         = {} R_sun".format(Rstar[0]))
-        print("companion radius    = {} R_sun".format(np.round(companion["R"], 4)))
-        print("Radius Ratio of companion/star    = {} ".format(Rcomp_Rstar[0]))
-        print("Area Ratio of companion/star      = {} ".format(Rcomp_Rstar[0]**2))
+        print("companion radius    = {} R_sun".format(np.round(companion_params["R"], 4)))
+        print("Radius Ratio of companion/star    = {}".format(Rcomp_Rstar[0]))
+        print("Area Ratio of companion/star      = {}".format(Rcomp_Rstar[0]**2))
 
     return 0
 
