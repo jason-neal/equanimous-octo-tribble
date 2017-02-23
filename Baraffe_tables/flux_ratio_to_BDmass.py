@@ -84,23 +84,6 @@ def main(star_name, flux_ratio, stellar_age, band=None, model="2003"):
           ", Temp = {} K".format(companion_params["Teff"][0]))
 
 
-
-def test_mag_conversions():
-    """ Test converting from flux ratio to magnitude back to flux ratio etc.
-    Tests show the conversion goes back and forward."""
-
-    vals = dict()
-    star = dict()
-    vals["Mj"] = 4
-    vals["Mk"] = 6
-    star["FLUX_J"] = 3
-    star["FLUX_K"] = 4
-    ratios = calculate_flux_ratios(star, vals)
-    print("Ratios from function", ratios)
-    magnitudes = calculate_companion_magnitude(star, 1./ratios["J"])
-    print("magnitudes from ratios", magnitudes)
-    new_ratios = calculate_flux_ratios(star, magnitudes)
-    print("new_ratios from mags", new_ratios)
 if __name__ == '__main__':
     args = vars(_parser())
     star_name = args.pop('star_name')
