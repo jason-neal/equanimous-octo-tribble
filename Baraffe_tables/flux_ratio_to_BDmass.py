@@ -36,8 +36,8 @@ def _parser():
     parser.add_argument('flux_ratio', type=float, help='Flux ratio between host ' +
                         'and companion - (F_companion/F_host)')
     parser.add_argument('age', help='Star age (Gyr)', type=float)
-    parser.add_argument("-b", "--band", choices=["J", "K"], default="K",
-                        type=str, help='Magnitude band for the flux ratio value')
+    parser.add_argument("-b", "--band", choices=["All", "J", "H", "K"], default="K",
+                        type=str, help='Magnitude band for the flux ratio value', nargs="+")
     parser.add_argument('-m', '--model', choices=['03', '15', '2003', '2015'],
                         help='Baraffe model to use [2003, 2015]',
                         default='2003', type=str)
@@ -45,8 +45,8 @@ def _parser():
     return args
 
 
-def main(star_name, flux_ratio, stellar_age, band="K", model="2003"):
-    """Compute companion mass from flux ratio value
+def main(star_name, flux_ratio, stellar_age, band=None, model="2003"):
+    """Compute companion mass from flux ratio value.
 
     Parameters
     ----------
@@ -64,10 +64,13 @@ def main(star_name, flux_ratio, stellar_age, band="K", model="2003"):
 
     Jup_mass = 1047.56  # Jupiters in 1 M_sol
 
+    if (band is None) or ("All" in band):
+        band = ["H", "J", "K"]
+
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)  # returns a astroquesry result table
 
-    # Calculate Magnitude J and K band magnitude for this flux ratio
+    # Calculate Magnitude J, H and K band magnitude for this flux ratio
     magnitudes = calculate_companion_magnitude(star_params, flux_ratio)
     print("Magnitude calculate for companion", magnitudes)
     # Find companion parameters that match these magnitudes
