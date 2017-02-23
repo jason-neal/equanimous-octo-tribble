@@ -1,9 +1,6 @@
 import pytest
 import numpy as np
-from BDmass_to_flux_ratio import flux_mag_ratio, calculate_flux_ratios
-
-
-
+from calculations import flux_mag_ratio, calculate_flux_ratios
 
 
 # Test Mass to flux ratio
