@@ -29,13 +29,31 @@ def flux_mag_ratio(mag1, mag2):
     return 10**(-0.4 * (mag1 - mag2))
 
 
-def calculate_flux_ratios(star_params, companion_params):
-    """Flux ratios for the different bands."""
-    Flux_ratios = dict()
-    Flux_ratios["J"] = flux_mag_ratio(star_params["FLUX_J"], companion_params["Mj"])
-    Flux_ratios["K"] = flux_mag_ratio(star_params["FLUX_K"], companion_params["Mk"])
-    Flux_ratios["H"] = flux_mag_ratio(star_params["FLUX_H"], companion_params["Mh"])
-    return Flux_ratios
+def calculate_flux_ratio(star_params, companion_params, bands):
+    """Flux ratios for the different bands in bands.
+
+    parameters
+    ----------
+    star_params: dict
+       Stellar parameters with stellar magnitude values like "FLUX_K".
+    companion_params: dict
+        Companion parameters with magnitude values like "Mk".
+    bands: list of str
+        Bands to return ratios for.
+
+    Returns
+    -------
+    flux_ratios: dict
+       Flux ratios for each given band.
+
+    """
+    flux_ratios = dict()
+    for band in bands:
+        flux_ratios[band] = flux_mag_ratio(star_params["FLUX_{0!s}".format(band)],
+                                           companion_params["M{}".format(band.lower())])
+
+    return flux_ratios
+
 
 def calculate_stellar_radius(star_params):
     """Based on R/Rs = (Ts/T)^2(L/Ls)^(1/2) equation.
