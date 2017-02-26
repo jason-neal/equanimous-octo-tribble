@@ -1,9 +1,10 @@
 
 import numpy as np
 from astropy.constants import M_jup, M_sun
+from typing import Tuple, List, Dict
 
 
-def age_table(age, model="2003"):
+def age_table(age: float, model: str="2003") -> Tuple[Dict[str, List[float]], List[str]]:
     """Determine the correct Baraffe table to load.
 
     Parameters
@@ -15,9 +16,10 @@ def age_table(age, model="2003"):
 
     Returns
     -------
-    table_name: str
-
+    model_data: numpy.ndarray
+        The correct model table data.
     column_names: list of str
+        List of the colunms in the the table.
 
     """
     if not isinstance(model, str):
@@ -50,11 +52,17 @@ def age_table(age, model="2003"):
     model_name = base_name + model_id + "Gyr.dat"
 
     model_data = np.loadtxt(model_name, skiprows=skiprows, unpack=False)
+    model_data = model_data.T
 
-    return model_data.T, cols
+    # Turn into Dict of values
+    data_dict = {}
+    for i, col in enumerate(cols):
+        data_dict[col] = model_data[i]
+
+    return data_dict, cols
 
 
-def mass_table_search(companion_mass, age, model="2003"):
+def mass_table_search(companion_mass: float, age: float, model: str="2003") -> Dict[str, float]:
     """Search Baraffe tables to find the companion entry given a mass value.
 
     Parameters
@@ -77,20 +85,17 @@ def mass_table_search(companion_mass, age, model="2003"):
 
     model_data, cols = age_table(age, model=model)
 
-    mass_index = cols.index("M/Ms")  # Column of mass
 
-    companion_parameters = dict()
-    for col, data in zip(cols, model_data):
-        # Interpolate columns to mass of companion
-        # The xp column needs to be sorted, increasingly.
-        # assert np.all(model_data[mass_index].sort() == model_data[mass_index])
-        companion_parameters[col] = np.interp(mass_solar, model_data[mass_index], data)
 
+    ref_val = companion_mass
+    ref_col = "M/Ms"
+    companion_parameters = table_interpolation(model_data, ref_val, ref_col, age, model)
     return companion_parameters  # as a dictionary
 
 
-def magnitude_table_search(magnitudes, age, band="K", model="2003"):
-    """ Search Baraffe tables to find the companion entry given a band magnitude value.
+def magnitude_table_search(magnitudes: Dict[str, float], age: float, band: str="K",
+                           model: str="2003") -> Dict[str, float]:
+    """Search Baraffe tables to find the companion entry given a band magnitude value.
 
     Parameters
     ----------
@@ -128,25 +133,28 @@ def magnitude_table_search(magnitudes, age, band="K", model="2003"):
         print("magnitudes", magnitudes)
         raise ValueError("The band '{0!s}' given is not in the given magnitudes".format(band))
 
-    band_index = cols.index("M{}".format(band.lower()))
+    ref_col = "M{}".format(band.lower())
+    ref_val = magnitudes[band]
 
-    print("Band mag", magnitudes[band])
-    # print("Mk", model_data)
-    print("model band data", model_data[band_index])
-
-    for col, data in zip(cols, model_data):
-        # Interpolate columns to magnitude of companion
-        # print("\nThis col =", col, "this col data ", data)
-        # print("Band mag", magnitudes[band])
-        # print("model data", model_data[band_index])
-
-        # Needs reversing to be increasing in x.
-        x_data = model_data[band_index][::-1]
-        y_data = data[::-1]
-        # print("x_data", x_data, "y_data", y_data)
-        companion_parameters[col] = np.interp(magnitudes[band], x_data, y_data)
-        if isinstance(companion_parameters[col], (np.ndarray, list)):
-            companion_parameters[col] = companion_parameters[col][0]
-        # print("{0!s} \tcol interp value = {1:.4f}".format(col, companion_parameters[col]))
-    print("comp params", companion_parameters)
+    companion_parameters = table_interpolation(model_data, ref_val, ref_col, age, model)
     return companion_parameters  # as a dictionary
+
+
+def table_interpolation(data: Dict[str, List[float]], ref_value: float, ref_col: str, age: float, model: str) -> Dict[str, float]:
+    """Interpolate lists from dictionary to reference value."""
+    result_parameters = {}
+    for key in data.keys():
+        x_data = data[ref_col][::-1]
+        y_data = data[key][::-1]
+
+        if x_data[-1] < x_data[0]:
+            # Reverse data if not increaseing.
+            x_data = x_data[::-1]
+            y_data = y_data[::-1]
+
+        result_parameters[key] = np.interp(ref_value, x_data, y_data)
+
+        if isinstance(result_parameters[key], (np.ndarray, list)):
+            result_parameters[key] = result_parameters[key][0]
+
+    return result_parameters

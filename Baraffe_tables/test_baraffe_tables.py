@@ -121,10 +121,14 @@ def test_age_table(age, model):
 
     model_15, cols_15 = age_table(5, "2015")
 
-    assert isinstance(model_03, np.ndarray)
+    assert isinstance(model_03, dict)
     assert isinstance(cols_03, list)
-    assert isinstance(model_15, np.ndarray)
+    assert isinstance(model_15, dict)
     assert isinstance(cols_15, list)
+    for key in model_03:
+        assert isinstance(model_03[key], np.ndarray)
+    for key in model_15:
+        assert isinstance(model_15[key], np.ndarray)
 
     # Assert actually different
     assert np.all(cols_15 != cols_03)
