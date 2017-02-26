@@ -53,7 +53,8 @@ def _parser() -> object:
     return args
 
 
-def main(star_name: str, companion_mass: float, stellar_age: float, bands: Optional[List[str]]=None, model: str="2003", area_ratio: bool=False) -> int:
+def main(star_name: str, companion_mass: float, stellar_age: float, bands: Optional[List[str]]=None,
+         model: str="2003", area_ratio: bool=False) -> int:
     """Compute flux/contrast ratio between a stellar host and companion.
 
     Parameters
@@ -85,9 +86,12 @@ def main(star_name: str, companion_mass: float, stellar_age: float, bands: Optio
 
     # Print flux ratios using a generator
     print("\nFlux ratios:")
-    [print(("{0!s} band star/companion Flux ratio = {1:4.2f},"
-            " >>> companion/star Flux ratio = {2:0.4f}").format(key, val[0], 1. / val[0]))
-     for key, val in flux_ratios.items() if key in bands]
+    print_generator = (("{0!s} band star/companion Flux ratio = {1:4.2f},"
+                       " >>> companion/star Flux ratio = {2:0.4f}").format(key, val[0], 1. / val[0])
+                      for key, val in flux_ratios.items() if key in bands)
+
+    for print_string in print_generator:
+        print(print_string)
 
     if area_ratio:
         # Compare to area ratio

@@ -46,7 +46,7 @@ def get_sweet_cat_temp(star_name: str) -> Union[bool, float, int]:
     sc = pyasl.SWEETCat()
     data = sc.data
 
-    if star_name[0:2].lower != "hd":
+    if star_name[0:2].lower() != "hd":
         # only accept HD numbers atm
         raise NotImplementedError
 
