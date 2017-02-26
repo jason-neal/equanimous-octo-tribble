@@ -1,13 +1,11 @@
-
-# ############################################################################
-# Calculations for flux ratios.
-# ############################################################################
+"""Calculations for flux ratios."""
 import numpy as np
 from db_queries import get_temperature
+from typing import Dict, List, Any
 
 
-def flux_mag_ratio(mag1, mag2):
-    """Calcualte the flux ratio between two magnitudes.
+def flux_mag_ratio(mag1: float, mag2: float) -> float:
+    r"""Calculate the flux ratio between two magnitudes.
 
     Using the equation f1/f2 = 10**(-0.4 * (mag1 - mag2)).
     A common approximation is the equation f1/f2 \approx 2.512**(m2 - m1), but is not here.
@@ -29,10 +27,10 @@ def flux_mag_ratio(mag1, mag2):
     return 10**(-0.4 * (mag1 - mag2))
 
 
-def calculate_flux_ratio(star_params, companion_params, bands):
+def calculate_flux_ratio(star_params: Any, companion_params: Dict[str, float], bands: List[str]) -> Dict[str, float]:
     """Flux ratios for the different bands in bands.
 
-    parameters
+    Parameters
     ----------
     star_params: dict
        Stellar parameters with stellar magnitude values like "FLUX_K".
@@ -56,7 +54,7 @@ def calculate_flux_ratio(star_params, companion_params, bands):
     return flux_ratios
 
 
-def calculate_stellar_radius(star_params):
+def calculate_stellar_radius(star_params: Any) -> float:
     """Based on R/Rs = (Ts/T)^2(L/Ls)^(1/2) equation.
 
     Parameters
@@ -81,7 +79,7 @@ def calculate_stellar_radius(star_params):
     return R_Rs   # Radius of star in solar radii
 
 
-def calculate_companion_magnitude(star_params, flux_ratio, bands=["K"]):
+def calculate_companion_magnitude(star_params: Any, flux_ratio: float, bands: List[str]=["K"]) -> Dict[str, float]:
     """Calculate companion magnitude from flux ratio.
 
     Using the equation m - n = -2.5 * log_10(F_m / F_n).
@@ -113,7 +111,7 @@ def calculate_companion_magnitude(star_params, flux_ratio, bands=["K"]):
         if band in ["J", "H", "K"]:
             magnitudes[band] = star_params["FLUX_{0!s}".format(band)] - 2.5 * np.log10(flux_ratio)
         else:
-            return ValueError("Magnitude band {0!s} was not in parameter dictionaries.".format(band))
+            raise ValueError("Magnitude band {0!s} was not in parameter dictionaries.".format(band))
         print("Band in calc magnitude ", band, "mags", magnitudes)
 
     return magnitudes
