@@ -14,8 +14,7 @@ def test_flux_mag_ratio():
     assert np.allclose(flux_mag_ratio(1, 6), 100)
 
     # negative 5 magnitude difference
-    assert np.allclose(flux_mag_ratio(7, 2), 1/100)
-
+    assert np.allclose(flux_mag_ratio(7, 2), 1. / 100)
 
 
 def test_calculate_flux_ratios():

@@ -49,6 +49,7 @@ def calculate_flux_ratio(star_params, companion_params, bands):
     """
     flux_ratios = dict()
     for band in bands:
+        band = band.upper()
         flux_ratios[band] = flux_mag_ratio(star_params["FLUX_{0!s}".format(band)],
                                            companion_params["M{}".format(band.lower())])
 
@@ -80,10 +81,10 @@ def calculate_stellar_radius(star_params):
     return R_Rs   # Radius of star in solar radii
 
 
-def calculate_companion_magnitude(star_params, flux_ratio, band="K"):
-    """ Calculte companion magnitude from flux ratio
+def calculate_companion_magnitude(star_params, flux_ratio, bands=["K"]):
+    """Calculate companion magnitude from flux ratio.
 
-    Using the equation m - n = -2.5 * log_10(F_m / F_n)
+    Using the equation m - n = -2.5 * log_10(F_m / F_n).
 
     Parameters
     ----------
@@ -92,18 +93,27 @@ def calculate_companion_magnitude(star_params, flux_ratio, band="K"):
     flux_ratio: float
         Flux ratio for the system (F_companion/F_host).
     band: str
-        Band to use. default = "K"
+        Bands to use. default = "K"
 
     Returns
     -------
     magnitudes: dict
-        Magnitudes of the companion in J, H, and K bands.
+        Magnitudes for the companion in the J, H, and K bands.
+
+    Note
+    ----
+    This is possibly not quite the correct implemenation as we are
+    only using a single flux_ratio value.
 
     """
     magnitudes = dict()
-    band = band.upper()
-    if band in ["J", "H", "K"]:
-        magnitudes[band] = star_params["FLUX_{}".format(band)] - 2.5 * np.log10(flux_ratio)
-    else:
-        return ValueError("Band is not available atm.")
+
+    for band in bands:
+        band = band.upper()
+        if band in ["J", "H", "K"]:
+            magnitudes[band] = star_params["FLUX_{0!s}".format(band)] - 2.5 * np.log10(flux_ratio)
+        else:
+            return ValueError("Magnitude band {0!s} was not in parameter dictionaries.".format(band))
+        print("Band in calc magnitude ", band, "mags", magnitudes)
+
     return magnitudes
