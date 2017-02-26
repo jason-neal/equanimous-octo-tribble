@@ -1,14 +1,12 @@
-
-##############################################################################
-# Access Databases
-##############################################################################
+"""Access Databases."""
 import numpy as np
 from astroquery.simbad import Simbad
 from PyAstronomy import pyasl
+from typing import Any, Union, Optional
 
 
-def get_stellar_params(star_name):
-    """Astroquery SIMBAD search for stellar parameters.
+def get_stellar_params(star_name: str) -> Any:
+    """"Astroquery SIMBAD search for stellar parameters.
 
     Parameters
     ----------
@@ -18,8 +16,8 @@ def get_stellar_params(star_name):
     Returns
     -------
     result_table: votable, dict-like
-    """
 
+    """
     # return Magnitudes, parralax, Temp
     customSimbad = Simbad()
     # Can add more fluxes here if need to extend flux ranges. Although K is the simbad limit.
@@ -36,14 +34,15 @@ def get_stellar_params(star_name):
     return result_table
 
 
-
-def get_sweet_cat_temp(star_name):
+def get_sweet_cat_temp(star_name: str) -> Union[bool, float, int]:
     """Obtain spectroscopic temperature from SWEET-Cat.
 
     Parameters
     ----------
     star_name: str
-        Star identifier. HD# only accepted currently."""
+        Star identifier. HD number only accepted currently.
+
+    """
     sc = pyasl.SWEETCat()
     data = sc.data
 
@@ -69,7 +68,7 @@ def get_sweet_cat_temp(star_name):
         return False
 
 
-def get_temperature(star_name, star_params=None):
+def get_temperature(star_name: str, star_params: Optional[Any]=None) -> float:
     """Find temperature of the star multiple ways.
 
     1st - Try Fe_H_Teff param from Simbad.

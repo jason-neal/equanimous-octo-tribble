@@ -5,10 +5,10 @@ from typing import Dict, List, Any
 
 
 def flux_mag_ratio(mag1: float, mag2: float) -> float:
-    r"""Calculate the flux ratio between two magnitudes.
+    """Calculate the flux ratio between two magnitudes.
 
     Using the equation f1/f2 = 10**(-0.4 * (mag1 - mag2)).
-    A common approximation is the equation f1/f2 \approx 2.512**(m2 - m1), but is not here.
+    A common approximation is the equation f1/f2 approx 2.512**(m2 - m1), but is not here.
 
     Parameters
     ----------
