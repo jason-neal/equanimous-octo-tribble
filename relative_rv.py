@@ -6,12 +6,13 @@
 
 # Jason Neal
 # December 2016
+from __future__ import division, print_function
 import argparse
 
 
 def relative_rv(wav_1, wav_2):
     """ Calculate the radial velocity difference between two wavelength values"""
-    c = 299792.458   #  km / s
+    c = 299792.458   # km / s
     difference = wav_2 - wav_1
     relative = difference / wav_1
     return relative * c
