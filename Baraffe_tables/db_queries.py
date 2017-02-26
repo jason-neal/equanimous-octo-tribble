@@ -112,25 +112,27 @@ def get_temperature(star_name, star_params=None):
 
     if not good_temp:
         print("Using the B-V method as last resort.")
-        teff = bv_temp(star_params)
+        teff = calculate_bv_temp(star_params["FLUX_B"], star_params["FLUX_V"])
         print("Temperature of star was calculated from b-v ~= {} K".format(teff))
     return teff
 
 
-def bv_temp(star_params):
-    """Stellar Temperature from B-V magnitudes.
+def calculate_bv_temp(b_mag: float, v_mag: float) -> float:
+    """Calcualte Stellar Temperature from B-V magnitudes.
 
     Parameters
     ----------
-    star_params: dict-like
-        Simbad votable with FLUX_B and FLUX_V parameters.
-
+    b_mag: float
+        Stellar B magnitude.
+    v_mag: float
+        Stellar V magnitude.
     Returns
     -------
     temp: float
        Temperature value in Kelvin.
+
     """
-    BminusV = star_params["FLUX_B"] - star_params["FLUX_V"]
+    b_v = b_mag - v_mag
 
     # Interpolate from B-V
     bminusvs = np.array([-0.31, -0.24, -0.20, -0.12, 0.0, 0.15, 0.29,
@@ -138,29 +140,4 @@ def bv_temp(star_params):
     temps = np.array([34000, 23000, 18500, 13000, 9500, 8500, 7300,
                       6600, 5900, 5600, 5100, 4200, 3700, 3000])
 
-    return np.interp(BminusV, bminusvs, temps)[0]
-
-
-def calculate_stellar_radius(star_params):
-    """Based on R/Rs = (Ts/T)^2(L/Ls)^(1/2) equation.
-
-    Parameters
-    ----------
-    star_params: votable, dict
-        Table of Stellar parameters.
-
-    Returns
-    -------
-    R_Rs: float
-        Esitmated Stellar Radius in solar radii.
-
-    """
-    star_name = star_params['name'][0]
-    teff_star = get_temperature(star_name, star_params)
-
-    Ts_T = 5800. / teff_star              # Temperature ratio
-    Dm = 4.83 - star_params["FLUX_V"]     # Differnce of aboslute magnitude
-    L_Ls = 2.51 ** Dm                     # Luminosity ratio
-    R_Rs = (Ts_T)**2 * np.sqrt(L_Ls)      # Raidus of Star in Solar Radii
-
-    return R_Rs   # Radius of star in solar radii
+    return np.interp(b_v, bminusvs, temps)[0]
