@@ -109,7 +109,7 @@ def test_table_searches(mass_model, age, band):
     found_mass = mag_params["M/Ms"]
     print("found_mass", found_mass, "start_mass", start_sol_mass)
 
-    assert np.allclose(found_mass, start_sol_mass, rtol=-2)
+    assert np.allclose(found_mass, start_sol_mass)
     assert np.allclose(found_mass * M_sun / M_jup, starting_mass)  # back int M_jup
 
 
@@ -171,7 +171,7 @@ def test_mag_table_search_band():
 
 def test_mass_table_search_03():
     """That a value from the table returns the correct row."""
-    mass = 0.09 / (M_jup / M_sun).value
+    mass = 0.09
     comp_params = mass_table_search(mass, 5, model="2003")
     print(comp_params)
     assert comp_params["M/Ms"] == 0.09
@@ -181,7 +181,7 @@ def test_mass_table_search_03():
 
 
 def test_mass_table_search_15():
-    mass = 0.09 / (M_jup / M_sun).value
+    mass = 0.09
     comp_params_15 = mass_table_search(mass, 5, model="2015")
     print(comp_params_15)
     assert comp_params_15["M/Ms"] == 0.09

@@ -60,7 +60,7 @@ def mass_table_search(companion_mass, age, model="2003"):
     Parameters
     ----------
     companion_mass: float
-        Companion Mass (Mjup)
+        Companion Mass (Msun)
     age: float
         Age of star/system (Gyr).
     model: int
@@ -73,7 +73,7 @@ def mass_table_search(companion_mass, age, model="2003"):
 
     """
     # mass_solar = companion_mass / 1047.56   # covert to solar mass
-    mass_solar = companion_mass * (M_jup / M_sun).value   # covert to solar mass
+    # mass_solar = companion_mass * (M_jup / M_sun).value   # covert to solar mass
 
     model_data, cols = age_table(age, model=model)
 

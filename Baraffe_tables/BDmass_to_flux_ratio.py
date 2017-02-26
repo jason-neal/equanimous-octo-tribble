@@ -78,8 +78,9 @@ def main(star_name: str, companion_mass: float, stellar_age: float, bands: Optio
     # Obtain Stellar parameters from astroquery
     star_params = get_stellar_params(star_name)  # returns a astroquesry result table
 
+    companion_mass_solar = companion_mass * (Mjup / Msun).value    # transform to solar mass for table search
     # Get parameters for this mass and age
-    companion_params = mass_table_search(companion_mass, stellar_age, model=model)
+    companion_params = mass_table_search(companion_mass_solar, stellar_age, model=model)
     flux_ratios = calculate_flux_ratio(star_params, companion_params, bands)
 
     # Print flux ratios using a generator
