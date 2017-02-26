@@ -37,26 +37,36 @@ def get_stellar_params(star_name):
 
 
 
-    def get_sweet_cat_temp(star_name):
-        """Obtain spectroscopic temperature from SWEET-Cat."""
-        sc = pyasl.SWEETCat()
-        data = sc.data
+def get_sweet_cat_temp(star_name):
+    """Obtain spectroscopic temperature from SWEET-Cat.
 
-        # Assuming given as hd******
-        hd_number = star_name[2:]
-        # print("hd number ", hd_number)
-        if hd_number in sc.data.hd.values:
-            hd_entry = data[data.hd == hd_number]
+    Parameters
+    ----------
+    star_name: str
+        Star identifier. HD# only accepted currently."""
+    sc = pyasl.SWEETCat()
+    data = sc.data
 
-            if hd_entry.empty:
-                return False
-            else:
-                # Sweet-cat has temperature of zero
-                # if it does not have a temperature value for the star
-                return hd_entry.iloc[0]["teff"]
-        else:
-            print("This star not in SWEET-Cat.")
+    if star_name[0:2].lower != "hd":
+        # only accept HD numbers atm
+        raise NotImplementedError
+
+    # Assuming given as hd******
+    hd_number = star_name[2:]
+    # print("hd number ", hd_number)
+    if hd_number in sc.data.hd.values:
+        hd_entry = data[data.hd == hd_number]
+
+        if hd_entry.empty:
             return False
+        elif hd_entry.iloc[0]["teff"] != 0:
+            # Temp = 0 when doesn't exist
+            return hd_entry.iloc[0]["teff"]
+        else:
+            return False
+    else:
+        print("{!s} was not in SWEET-Cat.".format(star_name))
+        return False
 
 
 def get_temperature(star_name, star_params=None):
