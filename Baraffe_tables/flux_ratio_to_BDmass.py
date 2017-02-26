@@ -20,13 +20,14 @@ from __future__ import division, print_function
 import sys
 import argparse
 from astropy.constants import M_sun, M_jup
+from typing import List, Optional
 
 from db_queries import get_stellar_params
 from calculations import calculate_companion_magnitude
 from table_search import magnitude_table_search
 
 
-def _parser():
+def _parser() -> object:
     """Take care of all the argparse stuff.
 
     :returns: the args
@@ -46,7 +47,7 @@ def _parser():
     return args
 
 
-def main(star_name, flux_ratio, stellar_age, bands=None, model="2003"):
+def main(star_name: str, flux_ratio: float, stellar_age: float, bands: Optional[List[str]]=None, model: str="2003") -> int:
     """Compute companion mass from flux ratio value.
 
     Parameters

@@ -28,13 +28,14 @@ from __future__ import division, print_function
 import sys
 import argparse
 import numpy as np
+from typing import List, Optional
 
-from db_queries import get_stellar_params
 from calculations import calculate_flux_ratio, calculate_stellar_radius
 from table_search import mass_table_search
+from db_queries import get_stellar_params
 
 
-def _parser():
+def _parser() -> object:
     """Take care of all the argparse stuff.
 
     :returns: the args
@@ -52,7 +53,7 @@ def _parser():
     return args
 
 
-def main(star_name, companion_mass, stellar_age, bands=None, model="2003", area_ratio=False):
+def main(star_name: str, companion_mass: float, stellar_age: float, bands: Optional[List[str]]=None, model: str="2003", area_ratio: bool=False) -> int:
     """Compute flux/contrast ratio between a stellar host and companion.
 
     Parameters
@@ -80,7 +81,6 @@ def main(star_name, companion_mass, stellar_age, bands=None, model="2003", area_
     # Get parameters for this mass and age
     companion_params = mass_table_search(companion_mass, stellar_age, model=model)
     flux_ratios = calculate_flux_ratio(star_params, companion_params, bands)
-
 
     # Print flux ratios using a generator
     print("\nFlux ratios:")
