@@ -171,15 +171,18 @@ def test_mag_table_search_band():
 
 def test_mass_table_search_03():
     """That a value from the table returns the correct row."""
-    comp_params = mass_table_search(0.09, 5, model="2003")
+    mass = 0.09 / (M_jup / M_sun).value
+    comp_params = mass_table_search(mass, 5, model="2003")
     print(comp_params)
     assert comp_params["M/Ms"] == 0.09
     assert comp_params["Teff"] == 2622
     assert comp_params["R"] == 0.113
     assert comp_params["Mk"] == 10.04
 
+
 def test_mass_table_search_15():
-    comp_params_15 = mass_table_search(0.09, 5, model="2015")
+    mass = 0.09 / (M_jup / M_sun).value
+    comp_params_15 = mass_table_search(mass, 5, model="2015")
     print(comp_params_15)
     assert comp_params_15["M/Ms"] == 0.09
     assert comp_params_15["Teff"] == 2644
@@ -189,7 +192,7 @@ def test_mass_table_search_15():
 
 def test_magnitude_table_search_03():
     """That a value from the table returns the correct row."""
-    mag_params = magnitude_table_search({"K": 9.91}, 5, band="K", model="2003")
+    mag_params = magnitude_table_search({"K": 10.04}, 5, band="K", model="2003")
     print("mag_params", mag_params)
     assert mag_params["M/Ms"] == 0.09
     assert mag_params["Teff"] == 2622
@@ -198,8 +201,9 @@ def test_magnitude_table_search_03():
 
 
 def test_magnitude_table_search_15():
-    mag_params_15 = magnitude_table_search({"K": 10.04}, 5, band="K", model="2015")
-    print("mag_params", mag_params_15)
+    print("Input value = magnitude_table_search({""K"": 9.91}, 5, band=""K"", model=""2015"")")
+    mag_params_15 = magnitude_table_search({"K": 9.91}, 5, band="K", model="2015")
+    print("mag_params returned", mag_params_15)
     assert mag_params_15["M/Ms"] == 0.09
     assert mag_params_15["Teff"] == 2644
     assert mag_params_15["R/Rs"] == 0.113
