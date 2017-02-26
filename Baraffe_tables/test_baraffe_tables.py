@@ -8,8 +8,26 @@ from BDmass_to_flux_ratio import main as mass_main
 from flux_ratio_to_BDmass import main as ratio_main
 from db_queries import get_sweet_cat_temp
 
+# Test two main functions.
+@pytest.mark.xfail  # Query fails when offline
+def test_main(raises=Exception):
+    """Check it returns 0 (Runs normally).
 
-# Test Mass to flux ratio
+    If there is no internet then an Exception is raised.
+        Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution',)).
+    """
+    assert mass_main("HD30501", 90, 5) is 0
+
+
+@pytest.mark.xfail  # Query fails when offline
+def test_ratio_main(raises=Exception):
+    """Check it returns 0 (Runs normally)
+    If there is no internet then an Exception is raised.
+        Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution',)).
+    """
+    assert ratio_main("HD30501", 0.01, 5) is 0
+
+
 def test_flux_mag_ratio():
     """Test flux-magnitude ratio.
 
@@ -36,13 +54,7 @@ def test_calculate_flux_ratio():
     assert np.allclose(flux_ratios["K"], 100)
 
 
-@pytest.mark.xfail  # Query fails when offline
-def test_main():
-    # Check it returns 0 (Runs normally)
-    assert mass_main("HD30501", 90, 5) is 0
-
-
-@pytest.mark.xfail
+#@pytest.mark.xfail
 def test_get_sweet_cat_temp():
     """Test getting from sweet-cat."""
     # hd number in SweetCat
@@ -58,11 +70,6 @@ def test_get_sweet_cat_temp():
 
 
 # Test Flux ratio to Mass
-@pytest.mark.xfail  # Query fails when offline
-def test_ratio_main():
-    # Check it returns 0 (Runs normally)
-    assert ratio_main("HD30501", 0.01, 5) is 0
-
 
 @pytest.mark.parametrize("band", ["H", "J", "K"])
 def test_mag_conversions(band):
@@ -163,7 +170,6 @@ def test_calculate_comp_magnitude():
         assert band in magnitudes.keys()
 
 
-@pytest.mark.xfail
 def test_mag_table_search_band():
     """One one band value is allowed."""
     age = 5
