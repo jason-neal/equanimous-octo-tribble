@@ -32,7 +32,7 @@ def test_resampler():
 
     detector = 1
     folder = "/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/"
-    file_names = get_filenames(folder, "C*_{}.nod.*".format(detector), "*wavecal.fits")
+    file_names = get_filenames(folder, "C*_{0}.nod.*".format(detector), "*wavecal.fits")
 
     print("file names", file_names)
 
