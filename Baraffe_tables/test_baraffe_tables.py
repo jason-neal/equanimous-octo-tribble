@@ -70,7 +70,6 @@ def test_get_sweet_cat_temp():
 
 
 # Test Flux ratio to Mass
-
 @pytest.mark.parametrize("band", ["H", "J", "K"])
 def test_mag_conversions(band):
     """ Test converting from flux ratio to magnitude back to flux ratio etc.

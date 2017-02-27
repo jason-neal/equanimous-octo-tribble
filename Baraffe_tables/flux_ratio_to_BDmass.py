@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-"""Brown Dwarf Mass calculator:
+"""Brown Dwarf Mass calculator.
 
     Uses stellar parameter databases to find host star parameters. The
     magnitude of the low mass companion from the provided flux ratio and the
@@ -47,7 +47,8 @@ def _parser() -> object:
     return args
 
 
-def main(star_name: str, flux_ratio: float, stellar_age: float, bands: Optional[List[str]]=None, model: str="2003") -> int:
+def main(star_name: str, flux_ratio: float, stellar_age: float,
+         bands: Optional[List[str]]=None, model: str="2003") -> int:
     """Compute companion mass from flux ratio value.
 
     Parameters
