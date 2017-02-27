@@ -1,4 +1,3 @@
-
 """ Phoenix Utilities.
 
 Some functions to deal with phoenix models
@@ -6,7 +5,6 @@ i.e. searching for models with certian parameters
 
 Jason Neal, Janurary 2017
 """
-
 import glob
 import numpy as np
 import itertools
