@@ -21,7 +21,7 @@ def _download_spec(fout):
     """
     import requests
     spec = fout.rpartition('/')[-1]
-    url = 'http://www.astro.up.pt/~dandreasen/%s' % spec
+    url = 'http://www.astro.up.pt/~dandreasen/{0!s}'.format(spec)
     spectrum = requests.get(url)
     with open(fout, 'w') as file:
         file.write(spectrum.content)
@@ -343,7 +343,7 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
             urllib.urlretrieve(url, pathwave)
     else:
         os.mkdir(path)
-        print('%s Created' % path)
+        print('{0!s} Created'.format(path))
         print('Downloading solar spectrum...')
         _download_spec(pathsun)
         print('Downloading telluric spectrum...')
@@ -608,21 +608,21 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
         ax3.set_xlabel('RV [km/s]')
 
     if rv:
-        ax1.set_title('%s\nRV correction: %s km/s' % (fname, rv))
+        ax1.set_title('{0!s}\nRV correction: {1!s} km/s'.format(fname, rv))
     elif rv1 and rv2:
-        ax1.set_title('%s\nSun/model: %s km/s, telluric: %s km/s' % (fname, rv1, rv2))
+        ax1.set_title('{0!s}\nSun/model: {1!s} km/s, telluric: {2!s} km/s'.format(fname, rv1, rv2))
     elif rv1 and not rv2:
-        ax1.set_title('%s\nSun/model: %s km/s' % (fname, rv1))
+        ax1.set_title('{0!s}\nSun/model: {1!s} km/s'.format(fname, rv1))
     elif not rv1 and rv2:
-        ax1.set_title('%s\nTelluric: %s km/s' % (fname, rv2))
+        ax1.set_title('{0!s}\nTelluric: {1!s} km/s'.format(fname, rv2))
     elif ccf == 'model':
-        ax1.set_title('%s\nModel(CCF): %s km/s' % (fname, rv1))
+        ax1.set_title('{0!s}\nModel(CCF): {1!s} km/s'.format(fname, rv1))
     elif ccf == 'sun':
-        ax1.set_title('%s\nSun(CCF): %s km/s' % (fname, rv1))
+        ax1.set_title('{0!s}\nSun(CCF): {1!s} km/s'.format(fname, rv1))
     elif ccf == 'telluric':
-        ax1.set_title('%s\nTelluric(CCF): %s km/s' % (fname, rv2))
+        ax1.set_title('{0!s}\nTelluric(CCF): {1!s} km/s'.format(fname, rv2))
     elif ccf == 'both':
-        ax1.set_title('%s\nSun/model(CCF): %s km/s, telluric(CCF): %s km/s' % (fname, rv1, rv2))
+        ax1.set_title('{0!s}\nSun/model(CCF): {1!s} km/s, telluric(CCF): {2!s} km/s'.format(fname, rv1, rv2))
     else:
         ax1.set_title(fname)
     if sun or telluric or model:
