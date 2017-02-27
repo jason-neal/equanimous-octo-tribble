@@ -23,8 +23,12 @@ def flux_mag_ratio(mag1: float, mag2: float) -> float:
         flux/contrast ratio between the two magnitudes.
 
     """
-    # return 2.512**(mag2 - mag1)  # Approximation
-    return 10**(-0.4 * (mag1 - mag2))
+    if isinstance(mag1, float) and isinstance(mag2, float):
+        # return 2.512**(mag2 - mag1)  # Approximation
+        return 10**(-0.4 * (mag1 - mag2))
+    else:
+        print(type(mag1), type(mag2))
+        raise ValueError("Magnitudes given were not floats. Mag1 = {}, Mag2 = {}".format(mag1, mag2))
 
 
 def calculate_flux_ratio(star_params: Any, companion_params: Dict[str, float], bands: List[str]) -> Dict[str, float]:
@@ -48,7 +52,7 @@ def calculate_flux_ratio(star_params: Any, companion_params: Dict[str, float], b
     flux_ratios = dict()
     for band in bands:
         band = band.upper()
-        flux_ratios[band] = flux_mag_ratio(star_params["FLUX_{0!s}".format(band)],
+        flux_ratios[band] = flux_mag_ratio(float(star_params["FLUX_{0!s}".format(band)][0]),
                                            companion_params["M{}".format(band.lower())])
 
     return flux_ratios
@@ -72,7 +76,7 @@ def calculate_stellar_radius(star_params: Any) -> float:
     teff_star = get_temperature(star_name, star_params)
 
     Ts_T = 5800. / teff_star              # Temperature ratio
-    Dm = 4.83 - star_params["FLUX_V"]     # Differnce of aboslute magnitude
+    Dm = 4.83 - star_params["FLUX_V"][0]     # Differnce of aboslute magnitude
     L_Ls = 2.51 ** Dm                     # Luminosity ratio
     R_Rs = (Ts_T)**2 * np.sqrt(L_Ls)      # Raidus of Star in Solar Radii
 

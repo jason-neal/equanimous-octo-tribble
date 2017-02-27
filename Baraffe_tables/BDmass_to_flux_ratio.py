@@ -89,7 +89,7 @@ def main(star_name: str, companion_mass: float, stellar_age: float, bands: Optio
     # Print flux ratios using a generator
     print("\nFlux ratios:")
     print_generator = (("{0!s} band star/companion Flux ratio = {1:4.2f},"
-                       " >>> companion/star Flux ratio = {2:0.4f}").format(key, val[0], 1. / val[0])
+                       " >>> companion/star Flux ratio = {2:0.4f}").format(key, val, 1. / val)
                        for key, val in flux_ratios.items() if key in bands)
 
     for print_string in print_generator:
@@ -102,10 +102,12 @@ def main(star_name: str, companion_mass: float, stellar_age: float, bands: Optio
         Rcomp_Rstar = companion_params["R"] / Rstar
 
         print("\nRadius Calculation")
-        print("Host radius         = {} R_sun".format(Rstar[0]))
+        print("Host radius         = {} R_sun".format(Rstar))
         print("companion radius    = {} R_sun".format(np.round(companion_params["R"], 4)))
-        print("Radius Ratio of companion/star    = {}".format(Rcomp_Rstar[0]))
-        print("Area Ratio of companion/star      = {}".format(Rcomp_Rstar[0]**2))
+        print("Radius Ratio of companion/star    = {}".format(Rcomp_Rstar))
+        print("Area Ratio of companion/star      = {}".format(Rcomp_Rstar**2))
+
+    if paper:
 
     return 0
 
