@@ -218,3 +218,27 @@ def test_magnitude_table_search_15():
     assert mag_params_15["Teff"] == 2644
     assert mag_params_15["R/Rs"] == 0.113
     assert mag_params_15["Mk"] == 9.91
+
+
+def test_magnitude_table_search_errors():
+    """Test only takes one band as a str."""
+    # Check single band as list is ok.
+    with pytest.raises(ValueError):
+        # More than one band not allowed
+        magnitude_table_search({"K": 9.91, "H": 9.91}, 5, band=["H", "K"], model="2015")
+
+    with pytest.raises(ValueError):
+        # More than one band not allowed
+        magnitude_table_search({"K": 9.91, "H": 9.91}, 5, band=("K",), model="2015")
+
+    with pytest.raises(ValueError):
+        # More then one band not allowed
+        magnitude_table_search({"K": 9.91, "H": 9.91}, 5, band=["K"], model="2015")
+
+    with pytest.raises(ValueError):
+        # Bad band (Not present on cols)
+        magnitude_table_search({"K": 9.91, "H": 9.91}, 5, band="Z", model="2015")
+
+    with pytest.raises(ValueError):
+        # Band not in magnitudes given
+        magnitude_table_search({"K": 9.91, "H": 9.91}, 5, band="J", model="2015")

@@ -1,6 +1,5 @@
 
 import numpy as np
-from astropy.constants import M_jup, M_sun
 from typing import Tuple, List, Dict
 
 
@@ -80,12 +79,7 @@ def mass_table_search(companion_mass: float, age: float, model: str="2003") -> D
         Companion parameters from barraffe table, interpolated to the provided mass.
 
     """
-    # mass_solar = companion_mass / 1047.56   # covert to solar mass
-    # mass_solar = companion_mass * (M_jup / M_sun).value   # covert to solar mass
-
     model_data, cols = age_table(age, model=model)
-
-
 
     ref_val = companion_mass
     ref_col = "M/Ms"
@@ -115,14 +109,8 @@ def magnitude_table_search(magnitudes: Dict[str, float], age: float, band: str="
         rows to the provided magnitude.
 
     """
-    if isinstance(band, list):
-        if len(band) != 1:
-            raise ValueError('More than one band was given, when only one required.')
-        else:
-            band = band[0]
-
-    # mass_solar = companion_mass / 1047.56   # covert to solar mass
-    companion_parameters = dict()
+    if not isinstance(band, str):
+        raise ValueError('Band {0} was given, when onlnot given as a single string.'.format(band))
 
     model_data, cols = age_table(age, model=model)
 
@@ -134,14 +122,37 @@ def magnitude_table_search(magnitudes: Dict[str, float], age: float, band: str="
         raise ValueError("The band '{0!s}' given is not in the given magnitudes".format(band))
 
     ref_col = "M{}".format(band.lower())
+
     ref_val = magnitudes[band]
 
     companion_parameters = table_interpolation(model_data, ref_val, ref_col, age, model)
+
     return companion_parameters  # as a dictionary
 
 
-def table_interpolation(data: Dict[str, List[float]], ref_value: float, ref_col: str, age: float, model: str) -> Dict[str, float]:
-    """Interpolate lists from dictionary to reference value."""
+def table_interpolation(data: Dict[str, List[float]], ref_value: float, ref_col: str,
+                        age: float, model: str) -> Dict[str, float]:
+    """Interpolate table data from dictionary to the reference value.
+
+    Parameters
+    ----------
+    data: dict
+        Dictionary of table data. keys are the colunm headers.
+    ref_value: float
+        Value of reference parameter interpolating to.
+    ref_col: str
+        Colunm name string.
+    age: float
+        Age of star?system (Gyr).
+    model: int
+       Year of Barraffe model to use [2003 (default), 2015].
+
+    Returns
+    -------
+    result_parameters: dict(str, float)
+        Result from interpolation of each dict item to the reference.
+
+    """
     result_parameters = {}
     for key in data.keys():
         x_data = data[ref_col][::-1]
