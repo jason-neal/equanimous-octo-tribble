@@ -22,6 +22,7 @@ def test_main(raises=Exception):
         Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution',)).
     """
     assert mass_main("HD30501", 90, 5) is 0
+    assert mass_main("HD30501", 90, 5, area_ratio=True) is 0
 
 
 @pytest.mark.xfail  # Query fails when offline
