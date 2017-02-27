@@ -1,21 +1,20 @@
 #!/usr/bin/python
-
 """Brown Dwarf Mass calculator.
 
-    Uses stellar parameter databases to find host star parameters. The
-    magnitude of the low mass companion from the provided flux ratio and the
-    coresponding mass is looked up in the Barraffe evolutionary models.
+Uses stellar parameter databases to find host star parameters. The
+magnitude of the low mass companion from the provided flux ratio and the
+coresponding mass is looked up in the Barraffe evolutionary models.
 
-    Inputs
-    ------
-    Star name: str
-        Stellar idenification number. eg. HD30501
-    flux_ratio: float
-        Flux ratio between host and companion.
-    age: float
-        Stellar Age. (Closest model is used)
+Inputs
+------
+Star name: str
+    Stellar idenification number. eg. HD30501
+flux_ratio: float
+    Flux ratio between host and companion.
+age: float
+    Stellar Age. (Closest model is used)
 
-    """
+"""
 from __future__ import division, print_function
 import sys
 import argparse

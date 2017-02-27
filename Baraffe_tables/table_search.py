@@ -1,4 +1,4 @@
-
+"""Code to obtain and find row in Baraffe tables."""
 import numpy as np
 from typing import Tuple, List, Dict
 

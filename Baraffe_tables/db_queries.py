@@ -58,7 +58,7 @@ def get_sweet_cat_temp(star_name: str) -> Union[bool, float, int]:
 
         if hd_entry.empty:
             return False
-        elif hd_entry.iloc[0]["teff"] != 0:
+        elif (hd_entry.iloc[0]["teff"] != 0) and (not np.isnan(hd_entry.iloc[0]["teff"])):
             # Temp = 0 when doesn't exist
             return hd_entry.iloc[0]["teff"]
         else:
@@ -94,20 +94,15 @@ def get_temperature(star_name: str, star_params: Optional[Any]=None) -> float:
             return teff
 
     if not good_temp:
-        try:
-            teff = get_sweet_cat_temp(star_name)
+        teff = get_sweet_cat_temp(star_name)
 
-            if teff == 0 or np.isnan(teff):  # temp from sweet-cat
-                print("No SWEET-Cat temperature, teff was {0} K".format(teff))
-                teff = None
-            else:
-                print("SWEET-Cat teff = {0:.0f} K".format(teff))
-                good_temp = True
-                return teff
-        except:
-            print("Failed to get temperature from SweetCat.")
-            good_temp = False
-            # raise
+        if (teff is False) or (teff == 0) or (np.isnan(teff)):  # temp from sweet-cat
+            print("No SWEET-Cat temperature, teff was {0} K".format(teff))
+            teff = None
+        else:
+            print("SWEET-Cat teff = {0:.0f} K".format(teff))
+            good_temp = True
+            return teff
 
     if not good_temp:
         print("Using the B-V method as last resort.")

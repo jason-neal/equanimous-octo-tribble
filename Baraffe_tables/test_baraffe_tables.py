@@ -1,7 +1,7 @@
+"""Test companion/flux ratio codes with baraffe tables."""
 import sys
 import pytest
 import numpy as np
-import argparse
 from astropy.constants import M_jup, M_sun
 
 from calculations import flux_mag_ratio, calculate_flux_ratio, calculate_companion_magnitude
@@ -13,13 +13,18 @@ from .BDmass_to_flux_ratio import _parser as mass_parser
 from .flux_ratio_to_BDmass import _parser as ratio_parser
 
 org_sysargv = sys.argv
+
+
 # Test two main functions.
 @pytest.mark.xfail  # Query fails when offline
 def test_main(raises=Exception):
     """Check it returns 0 (Runs normally).
 
     If there is no internet then an Exception is raised.
-        Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution',)).
+        Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
+        url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
+        object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
+        resolution',)).
     """
     assert mass_main("HD30501", 90, 5) is 0
     assert mass_main("HD30501", 90, 5, area_ratio=True) is 0
@@ -27,9 +32,13 @@ def test_main(raises=Exception):
 
 @pytest.mark.xfail  # Query fails when offline
 def test_ratio_main(raises=Exception):
-    """Check it returns 0 (Runs normally)
+    """Check it returns 0 (Runs normally).
+
     If there is no internet then an Exception is raised.
-        Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution',)).
+        Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
+        url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
+        object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
+        resolution',)).
     """
     assert ratio_main("HD30501", 0.01, 5) is 0
 
@@ -48,7 +57,7 @@ def test_flux_mag_ratio():
 
 
 def test_calculate_flux_ratio():
-    """Returns a dict with the 3 overlapping values."""
+    """Test return of a dict with the 3 overlapping values."""
     star_params = {"FLUX_J": 1, "FLUX_H": 1, "FLUX_K": 2}   # Names from simbad
     companion_params = {"Mj": 6, "Mh": 11, "Mk": 7}      # Names from Baraffe
 
@@ -60,7 +69,7 @@ def test_calculate_flux_ratio():
     assert np.allclose(flux_ratios["K"], 100)
 
 
-#@pytest.mark.xfail
+# @pytest.mark.xfail
 def test_get_sweet_cat_temp():
     """Test getting from sweet-cat."""
     # hd number in SweetCat
@@ -68,7 +77,7 @@ def test_get_sweet_cat_temp():
     assert isinstance(a, float)
     assert a == 4830
     # hd number not in sweet
-    b = get_sweet_cat_temp("HD1")
+    b = get_sweet_cat_temp("HD10")
     assert b is False
     # non hd id
     with pytest.raises(NotImplementedError):
@@ -78,7 +87,7 @@ def test_get_sweet_cat_temp():
 # Test Flux ratio to Mass
 @pytest.mark.parametrize("band", ["H", "J", "K"])
 def test_mag_conversions(band):
-    """ Test converting from flux ratio to magnitude back to flux ratio etc.
+    """Test converting from flux ratio to magnitude back to flux ratio etc.
 
     Tests show the conversion goes back and forward.
     """
@@ -167,6 +176,7 @@ def test_calculate_comp_magnitude():
     with pytest.raises(ValueError):
         calculate_companion_magnitude(star_vals, 0.001, bands)
 
+
 def test_mag_table_search_band():
     """One one band value is allowed."""
     age = 5
@@ -188,6 +198,7 @@ def test_mass_table_search_03():
 
 
 def test_mass_table_search_15():
+    """Manual test of a 2015 table mass search."""
     mass = 0.09
     comp_params_15 = mass_table_search(mass, 5, model="2015")
     print(comp_params_15)
@@ -208,9 +219,8 @@ def test_magnitude_table_search_03():
 
 
 def test_magnitude_table_search_15():
-    print("Input value = magnitude_table_search({""K"": 9.91}, 5, band=""K"", model=""2015"")")
+    """Manual test of a 2015 table magnitude search."""
     mag_params_15 = magnitude_table_search({"K": 9.91}, 5, band="K", model="2015")
-    print("mag_params returned", mag_params_15)
     assert mag_params_15["M/Ms"] == 0.09
     assert mag_params_15["Teff"] == 2644
     assert mag_params_15["R/Rs"] == 0.113
@@ -324,7 +334,7 @@ def test_failing_ratio_parsers():
 
 
 # Need sys.argv fixture with teardown
-#@pytest.mark.xfail
+# @pytest.mark.xfail
 def test_failing_mass_parsers():
     """Test argparse function using sys.argv."""
     sys.argv = []
