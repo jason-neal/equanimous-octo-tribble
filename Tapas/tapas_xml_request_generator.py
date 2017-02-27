@@ -53,10 +53,10 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     
     ############### Observation Settings
     ospath = os.getcwd() + "/"
-    v_print("OS path {}".format(ospath))
+    v_print("OS path {0}".format(ospath))
 
     path = "/".join(fname.split("/")[:-1]) + "/"
-    v_print("Path obtained from fname = {}".format(path))
+    v_print("Path obtained from fname = {0}".format(path))
 
     if listspectra:
         nod_dates = []
@@ -68,11 +68,11 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
                 fitsname = line[:-1] + ".fits"
                 v_print("The fits file to open is" ,fitsname)
                 try:
-                    v_print("Trying location{}".format(path + "../Raw_files/" + fitsname))
+                    v_print("Trying location{0}".format(path + "../Raw_files/" + fitsname))
                     header = fits.getheader(path + "../Raw_files/" + fitsname)
                 except:
                     try:
-                        v_print("Trying location  = {}".format(path + "Raw_files/" + fitsname))
+                        v_print("Trying location  = {0}".format(path + "Raw_files/" + fitsname))
                         header = fits.getheader(path + "Raw_files/" + fitsname)
                     except:
                         try:
@@ -87,10 +87,10 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
                 nod_exptimes.append(header["EXPTIME"])
                 nod_instruments.append(header["INSTRUME"])
             v_print("Values obtained from the list files")
-            v_print("The nod date-obs = {} ".format(nod_dates))
-            v_print("The nod Slit Widths = {}".format( nod_slits))
-            v_print("The nod Exposure times = {} seconds".format(nod_exptimes))
-            v_print("The listed Instruments = {} ".format(nod_instruments))
+            v_print("The nod date-obs = {0} ".format(nod_dates))
+            v_print("The nod Slit Widths = {0}".format( nod_slits))
+            v_print("The nod Exposure times = {0} seconds".format(nod_exptimes))
+            v_print("The listed Instruments = {0} ".format(nod_instruments))
             
             if len(set(nod_instruments)) == 1:
                 instrument = nod_instruments[0]
@@ -113,12 +113,12 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
                 t = Time(nod_date, format="fits") + TimeDelta(exptime/2, format="sec")
                 t.format= 'jd'
                 jd_days.append(t.value)
-            v_print("Nod dates converted into JD {}".format(jd_days))
+            v_print("Nod dates converted into JD {0}".format(jd_days))
             if max(jd_days)-min(jd_days) > len(jd_days)*2*exptime/86400.:
                 raise NodError("Issue with time for the nod observations took longer then twice exposure time for each exposure (maybe need to add a lower limit for quick observations) ")
             mean_obs_time = np.mean(jd_days)
-            v_print("Mean obs time averged in JD {}".format(mean_obs_time))
-            v_print("Median obs time in JD {}".format(np.median(jd_days)))
+            v_print("Mean obs time averged in JD {0}".format(mean_obs_time))
+            v_print("Median obs time in JD {0}".format(np.median(jd_days)))
             date = Time(mean_obs_time, format="jd")
             date.format = "fits"  # Turn back into fits format
             date = date.value[:-5] + "Z"    # Going from Time object back to string and adding Z to end for Tapas
@@ -169,16 +169,16 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     # Check for TAPAS consistency    
     #Tapas wavelength range is from 350 to 2500 nm in vacuum.
     if spec_range_min < 350:
-        v_print("Lower wavelength bound of {} was below tapas minimum. Setting to tapas minimum of 350 nm".format(spec_range_min))
+        v_print("Lower wavelength bound of {0} was below tapas minimum. Setting to tapas minimum of 350 nm".format(spec_range_min))
         spec_range_min = 350
     elif spec_range_min > 2500:
-        v_print("Wavelength Lower bound of {} is above Tapas maximum wavelength of 2500 nm. Check your wavelength units".format(spec_range_min))
+        v_print("Wavelength Lower bound of {0} is above Tapas maximum wavelength of 2500 nm. Check your wavelength units".format(spec_range_min))
         raise("Wavelength bounds Error")
     if spec_range_max > 2500:
-        v_print("Upper wavelength bound of {} was above tapas maximum. Setting to tapas maximum of 2500 nm".format(spec_range_max))
+        v_print("Upper wavelength bound of {0} was above tapas maximum. Setting to tapas maximum of 2500 nm".format(spec_range_max))
         spec_range_max = 2500
     elif spec_range_max < 350:
-        v_print("Wavelength Upper bound of {} is below Tapas minimum wavelength of 350 nm. Check your wavelength units".format(spec_range_max))
+        v_print("Wavelength Upper bound of {0} is below Tapas minimum wavelength of 350 nm. Check your wavelength units".format(spec_range_max))
         raise("Wavelength bounds Error")
 
     ########### Tapas Specifications
@@ -199,9 +199,9 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
         try:
             with open(dot_file, "r") as req:
                 old_number = req.readline().split("=")[1]
-                v_print("Previous request_number = {}".format(old_number))
+                v_print("Previous request_number = {0}".format(old_number))
                 request_number = int(old_number) + 1
-                v_print("New request_number number = {}".format(request_number))
+                v_print("New request_number number = {0}".format(request_number))
         except:
             request_number = 0
             print("Could not read request number from previous request in {0}. The default value of {1} will need to be manually changed when submitting the request.".format(dot_file, request_number))
@@ -298,7 +298,7 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
 
     if resolvpower:
        resolving_power = int(resolvpower)
-       v_print("Resolving power manually specified at {}".format(resolving_power))
+       v_print("Resolving power manually specified at {0}".format(resolving_power))
     else:
         if "CRIRES" in instrument:
             v_print("Resolving Power\nUsing the rule of thumb equation from the CRIRES manual. \nWarning! The use of adpative optics is not checked for!!")
@@ -409,7 +409,7 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     from string import Template
     s = Template(template)
 
-    v_print("Xml Template object = {}".format(s))
+    v_print("Xml Template object = {0}".format(s))
     
     sub = s.substitute(d)
     #print(sub)
@@ -420,12 +420,12 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
     #output_file = "/home/jneal/Phd/Codes/UsefulModules/Tapas_xml_request_file.xml"
 
     if not output_file:
-        output_file = "tapas_request_{}.xml".format(request_number)
+        output_file = "tapas_request_{0}.xml".format(request_number)
     else:
         # Add request number
         split = output_file.split(".")
         if len(split) == 2:
-            output_file = split[0] + "_{}.".format(request_number) + split[1]
+            output_file = split[0] + "_{0}.".format(request_number) + split[1]
         else:
             print("Warning output filename may not be the expected format 'some_name.xml'")
         print("Split output file", split)
@@ -437,7 +437,7 @@ def main(fname="/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/CR
         print("Saved tapas xml request to \t {0}".format(output_file))
     except:
         print("Failed to save xml request to \t {0}. \nHere is a printed version.".format(output_file))
-        print("\n{}\n".format(sub))
+        print("\n{0}\n".format(sub))
 
     try:
         with open(dot_file, "w") as req:

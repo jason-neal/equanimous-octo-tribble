@@ -93,7 +93,7 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
                                          FWHM_lim)
         if (n % base_val == 0) and verbose:
             counter = counter + 5  # And ajust here to change % between reports
-            print("Resolution Convolution at {}%%...".format(counter))
+            print("Resolution Convolution at {0}%%...".format(counter))
 
     timeEnd = dt.now()
     print("Single-Process convolution has been completed in"

@@ -82,14 +82,14 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
 
     if sampling is -1 and respower is -1:
         if species:
-            new_name = "{}_ReqId_{}_No_Ifunction_barydone-{}_species-{}".format(date, req_id, berv, species)
+            new_name = "{0}_ReqId_{1}_No_Ifunction_barydone-{2}_species-{3}".format(date, req_id, berv, species)
         else:
-            new_name = "{}_ReqId_{}_No_Ifunction_barydone-{}".format(date, req_id, berv)
+            new_name = "{0}_ReqId_{1}_No_Ifunction_barydone-{2}".format(date, req_id, berv)
     else:
         if species:
-            new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}_species-{}".format(date, req_id, respower, sampling, berv, species)
+            new_name = "{0}_ReqId_{1}_R-{2}_sratio-{3}_barydone-{4}_species-{5}".format(date, req_id, respower, sampling, berv, species)
         else:
-            new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}".format(date, req_id, respower, sampling, berv)
+            new_name = "{0}_ReqId_{1}_R-{2}_sratio-{3}_barydone-{4}".format(date, req_id, respower, sampling, berv)
   
     if prefix:
         new_name = path + "tapas_" + prefix + "_" + new_name + "." + ext
@@ -100,7 +100,7 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
     subprocess.call(["mv", filename, new_name])
     #print("Renamed {} to {}".format(filename, new_name))
     
-    print("Changed '{}' into  '{}'".format(fname, new_name))
+    print("Changed '{0}' into  '{1}'".format(fname, new_name))
 
 
 if __name__ == "__main__":
