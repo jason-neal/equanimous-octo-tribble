@@ -1,5 +1,7 @@
+import sys
 import pytest
 import numpy as np
+import argparse
 from astropy.constants import M_jup, M_sun
 
 from calculations import flux_mag_ratio, calculate_flux_ratio, calculate_companion_magnitude
@@ -7,7 +9,10 @@ from table_search import mass_table_search, magnitude_table_search, age_table
 from BDmass_to_flux_ratio import main as mass_main
 from flux_ratio_to_BDmass import main as ratio_main
 from db_queries import get_sweet_cat_temp
+from .BDmass_to_flux_ratio import _parser as mass_parser
+from .flux_ratio_to_BDmass import _parser as ratio_parser
 
+org_sysargv = sys.argv
 # Test two main functions.
 @pytest.mark.xfail  # Query fails when offline
 def test_main(raises=Exception):
@@ -245,3 +250,117 @@ def test_magnitude_table_search_errors():
     with pytest.raises(ValueError):
         # Band not in magnitudes given
         magnitude_table_search({"K": 9.91, "H": 9.91}, 5, band="J", model="2015")
+
+
+# Need sys.argv fixture with teardown
+def test_BDmass_parser():
+    """Test argparse function using sys.argv."""
+    sys.argv = []
+    test_args = "pytest HD30501 90 5 -a".split()
+    for arg in test_args:
+        sys.argv.append(arg)
+    args = mass_parser()
+    assert args.star_name == "HD30501"
+    assert args.companion_mass == 90
+    assert args.age == 5
+    assert args.bands == ["All"]
+    assert args.model == "2003"
+    assert args.area_ratio is True
+    # Not the correct way for teardown
+    sys.argv = org_sysargv
+
+
+# Need sys.argv fixture with teardown
+def test_ratio_parser():
+    """Test argparse function using sys.argv."""
+    sys.argv = []
+    test_args = "pytest HD30501 0.001 5 -b H -m 2015".split()
+    for arg in test_args:
+        sys.argv.append(arg)
+
+    args = ratio_parser()
+    assert args.star_name == "HD30501"
+    assert args.flux_ratio == 0.001
+    assert args.bands == ["H"]
+    assert args.age == 5
+    assert args.model == "2015"
+    sys.argv = org_sysargv
+
+
+def test_ratio_parser2():
+    """Test argparse function using sys.argv more than one band."""
+    sys.argv = []
+    test_args = "pytest HD30501 0.001 5 -m 2015 -b H K".split()
+    for arg in test_args:
+        sys.argv.append(arg)
+
+    args = ratio_parser()
+    assert args.star_name == "HD30501"
+    assert args.flux_ratio == 0.001
+    assert args.bands == ["H", "K"]
+    assert args.age == 5
+    assert args.model == "2015"
+    sys.argv = org_sysargv
+
+
+# Need sys.argv fixture with teardown
+def test_failing_ratio_parsers():
+    """Test argparse function using sys.argv."""
+    sys.argv = []
+    test_args = "pytest HD30501 ratio 5 -b H K -m 2015".split()
+    for arg in test_args:
+        sys.argv.append(arg)
+
+    with pytest.raises(SystemExit):
+        ratio_parser()   # ratio is not a number
+
+    sys.argv = []
+    test_args = "pytest HD30501 0.001 5 -b H K -m 2015 -z 4".split()  # unknown parameter -z
+    for arg in test_args:
+        sys.argv.append(arg)
+
+    with pytest.raises(SystemExit):
+        ratio_parser()   # unknown parameter -z
+
+    # Invalid choice of band
+    sys.argv = []
+    test_args = "pytest HD305010 0.01 5 -b Q".split()  # invlaid choice Q
+    for arg in test_args:
+        sys.argv.append(arg)
+
+    with pytest.raises(SystemExit):
+        ratio_parser()   # SystemExit
+
+    sys.argv = org_sysargv
+
+
+# Need sys.argv fixture with teardown
+#@pytest.mark.xfail
+def test_failing_mass_parsers():
+    """Test argparse function using sys.argv."""
+    sys.argv = []
+    test_args = "pytest HD30501 mass 5 -b H K -m 2015".split()
+    for arg in test_args:
+        sys.argv.append(arg)
+
+    with pytest.raises(SystemExit):
+        mass_parser()   # ratio is not a number
+
+    sys.argv = []
+    test_args = "pytest HD30501 mass 5 -b H K -m 2003-z 4".split()  # unknown parameter -z
+    for arg in test_args:
+        sys.argv.append(arg)
+
+    with pytest.raises(SystemExit):
+        mass_parser()   # unknown parameter -z
+
+    # Invalid choice of band
+    sys.argv = []
+    test_args = "pytest HD305010 100 5 -b Q".split()  # invlaid choice Q
+    for arg in test_args:
+        sys.argv.append(arg)
+
+    with pytest.raises(SystemExit):
+        mass_parser()   # SystemExit
+
+    sys.argv = org_sysargv
