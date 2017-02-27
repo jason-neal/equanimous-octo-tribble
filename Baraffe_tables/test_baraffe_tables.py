@@ -168,6 +168,10 @@ def test_calculate_comp_magnitude():
     for band in bands:
         assert band in magnitudes.keys()
 
+    # Test error
+    bands = ["H", "P"]
+    with pytest.raises(ValueError):
+        calculate_companion_magnitude(star_vals, 0.001, bands)
 
 def test_mag_table_search_band():
     """One one band value is allowed."""
