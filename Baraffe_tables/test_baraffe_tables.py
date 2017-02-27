@@ -91,6 +91,68 @@ def test_get_sweet_cat_temp():
     assert d is False
 
 
+@pytest.mark.xfail(raises=Exception)
+def test_get_temperature_without_params_input():
+    """Test it calls for params itself, if needed.
+
+    If there is no internet then an Exception is raised.
+        Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
+        url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
+        object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
+        resolution',)).
+    """
+    name = "HD30501"
+    params = get_stellar_params(name)
+    assert get_temperature(name, star_params=None) == get_temperature(name, star_params=params)
+
+
+@pytest.mark.xfail(raises=Exception)
+def test_get_temerature_examples():
+    """Test some temperatures.
+
+    If there is no internet then an Exception is raised.
+        Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
+        url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
+        object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
+        resolution',)).
+    """
+    star = "HD12116"   # Has zero temp in simbad (Check this is not used)
+    assert get_temperature(star) != 0
+
+    star_simbad = "HD215909"    # has a temperature in simbad
+    simbad_temp = 4328
+    assert get_temperature(star_simbad) == simbad_temp
+
+    # Sweet_cat temperaute and NO Simbad temperature!
+    sweet_name = "HD343246"
+    sweet_temp = 5754
+    assert get_temperature(sweet_name) == sweet_temp
+
+
+@pytest.mark.xfail(raises=Exception)
+def test_get_stellar_params():
+    """Test some values from simbad database reult.
+
+    If there is no internet then an Exception is raised.
+        Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
+        url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
+        object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
+        resolution',)).
+    """
+    name = "HD219828"
+    params = get_stellar_params(name)
+
+    # Check Name put into params
+    assert params["name"] == name
+    # Check some values
+    assert params["Fe_H_Teff"][0] == 5842
+    assert params["FLUX_B"] == 8.68
+    assert params["FLUX_V"] == 8.01
+    assert params["FLUX_K"] == 6.530
+    assert params["PLX_VALUE"][0] == 13.83  # parallax
+    assert params['Fe_H_log_g'] == 4.19     # log g
+    assert params['Fe_H_Fe_H'] == 0.16      # metalicity
+
 
 # Test Flux ratio to Mass
 @pytest.mark.parametrize("band", ["H", "J", "K"])
