@@ -126,34 +126,22 @@ def test_table_searches(mass_model, age, band):
 
 
 @pytest.mark.parametrize("age", [0.1, 1, 10])
-@pytest.mark.parametrize("model", ["2003", "2015", pytest.mark.xfail("2016")])
+@pytest.mark.parametrize("model", ["2003", "2015"])
 def test_age_table(age, model):
-    """Selects a baraffe table of certian age and model."""
-    model_03, cols_03 = age_table(5, "2003")
+    """Select a baraffe table of certian age and model."""
+    model_table, cols = age_table(age, model=model)
 
-    model_15, cols_15 = age_table(5, "2015")
+    assert isinstance(model_table, dict)
+    assert isinstance(cols, list)
 
-    assert isinstance(model_03, dict)
-    assert isinstance(cols_03, list)
-    assert isinstance(model_15, dict)
-    assert isinstance(cols_15, list)
-    for key in model_03:
-        assert isinstance(model_03[key], np.ndarray)
-    for key in model_15:
-        assert isinstance(model_15[key], np.ndarray)
-
-    # Assert actually different
-    assert np.all(cols_15 != cols_03)
-    assert np.all(model_15 != model_03)
-    assert len(cols_15) != len(cols_03)
-    assert len(model_15) != len(model_03)
+    for key in model_table:
+        assert isinstance(model_table[key], np.ndarray)
 
     # check common columns are present
     common_cols = ["M/Ms", "Teff", "L/Ls", "g", "Mv",
                    "Mr", "Mi", "Mj", "Mh", "Mk", "Mll", "Mm"]
     for header in common_cols:
-        assert header in cols_15
-        assert header in cols_03
+        assert header in cols
 
 
 @pytest.mark.parametrize("model", ["2016", "", 2003, 15, "word"])
