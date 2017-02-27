@@ -83,6 +83,14 @@ def test_get_sweet_cat_temp():
     with pytest.raises(NotImplementedError):
         get_sweet_cat_temp("GJ 422")  # in sweetcat but not an hd number
 
+    # 2 tries that line in sweetcat that has no temperature
+    # These are the only two that have hd numbers
+    c = get_sweet_cat_temp("HD145934")  # This may change if sweetcat is updated
+    assert c is False
+    d = get_sweet_cat_temp("HD41004B")  # This may change if sweetcat is updated
+    assert d is False
+
+
 
 # Test Flux ratio to Mass
 @pytest.mark.parametrize("band", ["H", "J", "K"])
