@@ -1,18 +1,19 @@
 #/usr/bin/python
+"""Motivation: Replace : with _ in fits files for use in windows.
 
-# Motivation: Replace : with _ in fits files for use in windows
 # Author: Jason J. Neal <jason.neal@astro.up.pt>
-
+"""
 from __future__ import division, print_function
 import argparse
 import os
-import subprocess
+
 
 def _parser():
     """Take care of all the argparse stuff.
+
     :returns: the args
     """
-    #parser = GooeyParser(description='Remove : from data files')
+    # parser = GooeyParser(description='Remove : from data files')
     parser = argparse.ArgumentParser(description='Rename fits files')
     parser.add_argument('filenames', nargs='+', type=str, help='List of Filenames')
     parser.add_argument("-x", "--cut", type=str, default=":", help="Character to Remove (cut)")
@@ -20,11 +21,12 @@ def _parser():
     args = parser.parse_args()
     return args
 
+
 def char_replace(fname, remove_char, replace_char=""):
     """Replace all of one character from a given string.
-       
+
        inputs:
-       fname: String of filename to replace characters from 
+       fname: String of filename to replace characters from
        remove_char: Character to remove
     Keyword Arguments:
 
@@ -50,31 +52,31 @@ def char_replace(fname, remove_char, replace_char=""):
 
 
 def main(filenames, cut=":", paste=""):
-    """ Replace characters in filenames.
-     
+    """Replace characters in filenames.
+
     This script can be run from command line as
     python fits_renamer.py "test_filename.txt" -x "_" -v "-"
-    
-    ##TO DO: Could maybe exend this to take pairs to characters to replace. 
-    ## e.g. -x -,:,+ -v _,_,- 
+
+    ##TO DO: Could maybe exend this to take pairs to characters to replace.
+    ## e.g. -x -,:,+ -v _,_,-
     ## -x and -v would need to be same length
+
     """
-    
     if isinstance(filenames, list):
         for fname in filenames:
             new_name = char_replace(fname, cut, paste)
             os.rename(fname, new_name)
-            
+
     elif isinstance(filenames, str):
         new_name = char_replace(filenames, cut, paste)
         os.rename(filenames, new_name)
     return new_name
 
-    
+
 if __name__ == '__main__':
     args = vars(_parser())
-    #fname = args.pop('fname')
+    # fname = args.pop('fname')
     opts = {k: args[k] for k in args}
 
-    #main(fname, **opts)
+    # main(fname, **opts)
     main(**opts)

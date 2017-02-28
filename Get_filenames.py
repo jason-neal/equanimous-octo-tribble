@@ -8,11 +8,12 @@ import os
 
 
 def get_filenames(path, regexp, regexp2=False):
-    """ regexp must be a regular expression as a string
-            eg '*.ms.*', '*_2.*', '*.ms.norm.fits*'
+    """Regexp must be a regular expression as a string.
 
-        resexp2 is if want to match two expressions such as
-            '*_1*' and '*.ms.fits*'
+    eg '*.ms.*', '*_2.*', '*.ms.norm.fits*'
+
+    resexp2 is if want to match two expressions such as
+    '*_1*' and '*.ms.fits*'
     """
     os.chdir(path)
     filelist = []
@@ -28,6 +29,7 @@ def get_filenames(path, regexp, regexp2=False):
 
 
 def main():
+    """Some test examples."""
     path = "/home/jneal/data/BrownDwarfs-PedrosCode/HD30501-1/"
 
     list1 = get_filenames(path, "*.ms.*")
