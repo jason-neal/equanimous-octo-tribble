@@ -37,7 +37,7 @@ def inside_loop(newatm, models, layer, column, gridpoints, teff_logg_feh):
     for inx, model in enumerate(models):
         tlayer[indx] = model[layer, column]
     #print(" for layer = {0}, column = {1}".format(layer, column))
-    print("[Worker %d] Layer %d and Column %d is about to griddata" % (os.getpid(), layer, column))
+    print("[Worker {0:d}] Layer {1:d} and Column {2:d} is about to griddata".format(os.getpid(), layer, column))
     newatm[layer,column] = griddata(gridpoints, tlayer, teff_logg_feh, method='linear', rescale=True)
     
 
@@ -134,7 +134,7 @@ finally:
 def sum_row(input, output, i):
     """Compute the sum of a row in input and store it in output"""
     sum_ = input[i, :].sum()
-    print("[Worker %d] Sum for row %d is %f" % (os.getpid(), i, sum_))
+    print("[Worker {0:d}] Sum for row {1:d} is {2:f}".format(os.getpid(), i, sum_))
     output[i] = sum_
 
 if __name__ == "__main__":
