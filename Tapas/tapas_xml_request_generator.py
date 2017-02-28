@@ -55,7 +55,7 @@ def main(fname=("/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/"
          listspectra=False, resolvpower=False, unit="vacuum", instrument_function="gaussian",
          sampling=10, berv=False, tapas_format="ASCII", constituents="all", output_file=False,
          request_id=10, wl_min=False, wl_max=False, request_number=None, verbose=False):
-
+    """Fill out tapas template."""
     # verbose printing on flag raise
     v_print = print if verbose else lambda *a, **k: None
 
@@ -338,13 +338,13 @@ def main(fname=("/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/"
     # hours(date[11:13]) only seem to work if multiple of 06 hours
     # assuming 00 is for 00->06 hours
     hour = int(date[11:13])
-    if hour >= 0 and hour < 6:
+    if 0 <= hour < 6:
         hour_out = "00"
-    elif hour >= 6 and hour < 12:
+    elif 6 <= hour < 12:
         hour_out = "06"
-    elif hour >= 12 and hour < 18:
+    elif 12 <= hour < 18:
         hour_out = "12"
-    elif hour >= 18 and hour < 24:
+    elif 18 <= hour < 24:
         hour_out = "18"
     else:
         raise HourError("Error with the arletty timing. The request will fail")
