@@ -1,4 +1,4 @@
-#obs_info.py
+# obs_info.py
 
 # script to extract observational info from the raw nod files.
 # e.g. start time, end time, exposure time, # obs
@@ -24,8 +24,8 @@ def _parser():
     """
     parser = argparse.ArgumentParser(description='Xml generator for tapas submission')
     parser.add_argument("obslist", help='Input file name', type=str)
-    parser.add_argument("-o","--output",help="Specify output filename", default=False)
-    parser.add_argument("-s","--separator",help="Separator for time section of fits", default=":")
+    parser.add_argument("-o", "--output", help="Specify output filename", default=False)
+    parser.add_argument("-s", "--separator", help="Separator for time section of fits", default=":")
 
     args = parser.parse_args()
     return args
@@ -36,11 +36,11 @@ def main(fname, output=False, separator=":", verbose=True):
     # verbose printing on flag raise
     v_print = print if verbose else lambda *a, **k: None
 
-    ############### Observation Settings
+    # # # # # # # ######## Observation Settings
     ospath = os.getcwd() + "/"
-    
-    path = "/".join(fname.split("/")[:-1]) #+ "/"
-    print("Path = {}",path)
+
+    path = "/".join(fname.split("/")[:-1])  # + "/"
+    print("Path = {}", path)
 
     nod_dates = []
     nod_slits = []
@@ -53,13 +53,13 @@ def main(fname, output=False, separator=":", verbose=True):
     with open(fname, "r") as f:
         for line in f:
 
-            #Replace ":"" in list file with "-"
+            # Replace ":"" in list file with "-"
             if separator != ":":
                 line_parts = line.split(":")
                 line = separator.join(line_parts)
 
             fitsname = line[:-1] + ".fits"
-            v_print("The fits file to open is" , fitsname)
+            v_print("The fits file to open is", fitsname)
             try:
                 v_print("Trying location = {0}".format(path + "../Raw_files/" + fitsname))
                 header = fits.getheader(path + "../Raw_files/" + fitsname)
@@ -85,67 +85,63 @@ def main(fname, output=False, separator=":", verbose=True):
             # AIRMASS values
             airmass_start = header["HIERARCH ESO TEL AIRM START"]
             airmass_end = header["HIERARCH ESO TEL AIRM END"]
-            nod_mean_airmass = round((airmass_start + airmass_end) / 2 , 4)
+            nod_mean_airmass = round((airmass_start + airmass_end) / 2, 4)
             nod_airmass.append(nod_mean_airmass)
-            #ESO TEL AIRM END: 1.204
-            #ESO TEL AIRM START: 1.214
+            # ESO TEL AIRM END: 1.204
+            # ESO TEL AIRM START: 1.214
 
-        
     v_print("Values obtained from the list files")
     v_print("The nod date-obs = {0} ".format(nod_dates))
     v_print("The nod Slit Widths = {0}".format(nod_slits))
     v_print("The nod Exposure times = {0} seconds".format(nod_exptimes))
     v_print("The listed Instruments = {0} ".format(nod_instruments))
-        
-       
+
     if len(set(nod_instruments)) == 1:
         instrument = nod_instruments[0]
     else:
-        #raise error as list intruments are not unique
+        # raise error as list intruments are not unique
         raise NodError("Nods in list were not taken on the same instrument")
     if len(set(nod_exptimes)) == 1:
         exptime = nod_exptimes[0]
     else:
-        #raise error as list exptime are not unique
+        # raise error as list exptime are not unique
         raise NodError("Nods in the list do not have same exposure times")
     if len(set(nod_slits)) == 1:
         slit_width = nod_slits[0]
     else:
-        #raise error as list exptime are not unique
+        # raise error as list exptime are not unique
         raise NodError("Nods in list do not have same slit widths")
     # Get average time of observation (adding exposure time)
     if len(set(nod_object)) == 1:
         Object = nod_object[0]
     else:
-        #raise error as list exptime are not unique
+        # raise error as list exptime are not unique
         raise NodError("Nods in list are not of the Object")
-    
+
     if len(set(nod_filter)) == 1:
         nod_filter = nod_filter[0]
     else:
-        #raise error as list exptime are not unique
+        # raise error as list exptime are not unique
         raise NodError("Nods in list are not of the Object")
-  
-    
 
     jd_days = []
     for nod_date in nod_dates:
-        t = Time(nod_date, format="fits") + TimeDelta(exptime/2, format="sec")
-        t.format= 'jd'
+        t = Time(nod_date, format="fits") + TimeDelta(exptime / 2, format="sec")
+        t.format = 'jd'
         jd_days.append(t.value)
     v_print("Nod dates converted into JD {0}".format(jd_days))
-    if max(jd_days)-min(jd_days) > len(jd_days)*2*exptime/86400.:
-        raise NodError("Issue with time for the nod observations took longer " \
-            "then twice exposure time for each exposure (maybe need to add a lower" \
-            " limit for quick observations) ")
-    
+    if max(jd_days) - min(jd_days) > len(jd_days) * 2 * exptime / 86400.:
+        raise NodError("Issue with time for the nod observations took longer "
+                       "then twice exposure time for each exposure (maybe need to add a lower"
+                       " limit for quick observations) ")
+
     mean_obs_time = np.mean(jd_days)
     median_obs_time = np.median(jd_days)
 
     obs_begin_time = Time(nod_dates[0], format="fits")
-    print(" obs_begin_time",  obs_begin_time, "nod_dates[0]", nod_dates[0])
+    print(" obs_begin_time", obs_begin_time, "nod_dates[0]", nod_dates[0])
     obs_end_time = Time(nod_dates[-1], format="fits") + TimeDelta(exptime, format="sec")
-    
+
     mean_obs_t = Time(mean_obs_time, format="jd")
     mean_obs_t.format = "fits"
     med_obs_t = Time(median_obs_time, format="jd")
@@ -155,10 +151,10 @@ def main(fname, output=False, separator=":", verbose=True):
     obs_end_time2 = Time(obs_end_time)
     obs_begin_time2.format = "jd"
     obs_end_time2.format = "jd"
-    obs_total = obs_end_time2-obs_begin_time2         
-    obs_total_minutes = obs_total * 24*60
-   
-    Middle_obs = obs_begin_time2 + TimeDelta(60*obs_total_minutes/2, format="sec")
+    obs_total = obs_end_time2 - obs_begin_time2
+    obs_total_minutes = obs_total * 24 * 60
+
+    Middle_obs = obs_begin_time2 + TimeDelta(60 * obs_total_minutes / 2, format="sec")
     Middle_obs.format = "fits"
     Middle_obs2 = Time(Middle_obs)
     Middle_obs2.format = "jd"
@@ -168,35 +164,32 @@ def main(fname, output=False, separator=":", verbose=True):
     v_print("Begin obs time in JD {0}".format(obs_begin_time))
     v_print("End obs time in JD {0}".format(obs_end_time))
 
-    
     target_ra = header["RA"]   # of the last observation in the list
     target_dec = header["DEC"]
 
     obs_wl_min = header["HIERARCH ESO INS WLEN MIN"]
-    obs_wl_max = header["HIERARCH ESO INS WLEN MAX"] 
+    obs_wl_max = header["HIERARCH ESO INS WLEN MAX"]
 
     # Print header values to find the ones most interested in.
-    ##for key in header:
-        #print(str(key) + ": " + str(header[key]))
-    
-    
+    # # for key in header:
+    #     print(str(key) + ": " + str(header[key]))
+
     Obs_name = header["ESO OBS NAME"]
-    
-    Nabcycles = header["ESO SEQ NABCYCLES"] # ESO SEQ NABCYCLES: 4
-    NEXP = header["ESO TPL NEXP"] # ESO TPL NEXP: 8
-    
+
+    Nabcycles = header["ESO SEQ NABCYCLES"]  # ESO SEQ NABCYCLES: 4
+    NEXP = header["ESO TPL NEXP"]  # ESO TPL NEXP: 8
+
     # Observation IDs
-    obs_pi_id= header["ESO OBS PI-COI ID"]
-    prosal_id= header["ESO OBS PROG ID"]
-    tpl_id = header["ESO TPL ID"]  #CRIRES_spec_obs_AutoNodOnSlit
+    obs_pi_id = header["ESO OBS PI-COI ID"]
+    prosal_id = header["ESO OBS PROG ID"]
+    tpl_id = header["ESO TPL ID"]  # CRIRES_spec_obs_AutoNodOnSlit
     ao_loop_state = header["ESO AOS RTC LOOP STATE"]
 
-
-    #Airmass calculation
+    # Airmass calculation
     mean_airmass = np.mean(nod_airmass)
-    airmass_range = np.max(nod_airmass)-np.min(nod_airmass)
+    airmass_range = np.max(nod_airmass) - np.min(nod_airmass)
 
-    ####### Observatory Settings 
+    # # # # # # # Observatory Settings
     instrument = header["INSTRUME"]
     telescope = header["TELESCOP"]
     if "VLT" in telescope:
@@ -209,40 +202,35 @@ def main(fname, output=False, separator=":", verbose=True):
     obs_lat = header["HIERARCH ESO TEL GEOLAT"]
     obs_alt = header["HIERARCH ESO TEL GEOELEV"]
 
-    ####### Target Settings
+    # ###### Target Settings
     ra_angle = Angle(target_ra, u.degree)
-    ra_j2000 = str(ra_angle.to_string(unit=u.hour, sep=':', precision=0, pad=True))  # Extra str to get rid of u"string" which failed in template
+    ra_j2000 = str(ra_angle.to_string(unit=u.hour, sep=':', precision=0, pad=True))  # To get rid of u"string"
     dec_angle = Angle(target_dec, u.deg)
-    dec_j2000 = str(dec_angle.to_string(unit=u.degree, sep=':', precision=0, pad=True)) # Extra str to get rid of u"string" which failed in template
+    dec_j2000 = str(dec_angle.to_string(unit=u.degree, sep=':', precision=0, pad=True))  # get rid of u"string"
     v_print("RA degrees = {0}, RA Angle = {1}, RA for tapas = {2}".format(target_ra, ra_angle, ra_j2000))
     v_print("DEC degrees = {0}, DEC Angle = {1}, DEC for tapas = {2}".format(target_dec, dec_angle, dec_j2000))
 
-        
     # Resolving power rule of thumb
-    R = 100000*0.2 / slit_width
-            
+    R = 100000 * 0.2 / slit_width
+
     resolving_power = int(R)
     print("Resolving Power = {0}".format(resolving_power))
 
-    
-
-
-
     if output:
-       output_file = output
-    else: 
+        output_file = output
+    else:
         output_file = "key_observation_values.txt"
     try:
         with open(output_file, "w") as out:
-############################################################
-            #Put the useful parameters I need to know here
-            
+            # ###########################################################
+            # Put the useful parameters I need to know here
+
             out.write("KEY CRIRES OBSERVATION PARAMETERS:\n------------------\n")
             out.write("Target Name           = {0}\n".format(Object))
             out.write("Observation Name      = {0}\n".format(Obs_name))
             out.write("RA                    = {0}, {1} \n".format(ra_angle, ra_j2000))
             out.write("DEC                   = {0}, {1} \n".format(dec_angle, dec_j2000))
-            
+
             out.write("\nOBS IDs:\n------------------\n")
             out.write("Proposal ID           = {0}\n".format(prosal_id))
             out.write("PI-COI ID             = {0}\n".format(obs_pi_id))
@@ -257,46 +245,52 @@ def main(fname, output=False, separator=":", verbose=True):
             out.write("Max Wavelength        = {0} nm\n".format(obs_wl_max))
             out.write("Slit width            = {0} \n".format(slit_width))
             out.write("Resolving Power       = {0}\n".format(resolving_power))
-            out.write("Exposure time         = {0}\n".format(exptime))   
+            out.write("Exposure time         = {0}\n".format(exptime))
             out.write("Number AB cycles      = {0}\n".format(Nabcycles))
             out.write("Number of Exposures   = {0}\n".format(NEXP))
-                 
+
             out.write("\nTime Calculations:\n------------------\n")
             # FITS Format
             out.write("## FITS format\n")
             out.write("Obs Start time        = {0}\n".format(obs_begin_time))
             out.write("Average obs time      = {0}\n".format(mean_obs_t))
             out.write("Median obs time       = {0}\n".format(med_obs_t))
-            #out.write("Middle of obs         = {} \n".format(Middle_obs))
+            # out.write("Middle of obs         = {} \n".format(Middle_obs))
             out.write("Obs End time          = {0}\n".format(obs_end_time))
             obs_begin_time.format = "jd"
             obs_end_time.format = "jd"
             # JD Format
             out.write("## JD format\n")
             out.write("Obs start time (JD)   = {0}\n".format(obs_begin_time2))
-            out.write("Average obs time (JD) = {0}\n".format(mean_obs_time))      
+            out.write("Average obs time (JD) = {0}\n".format(mean_obs_time))
             out.write("Medaian obs time (JD) = {0}\n".format(median_obs_time))
-            #out.write("Middle of obs (JD)    = {}\n".format(Middle_obs2))
+            # out.write("Middle of obs (JD)    = {}\n".format(Middle_obs2))
             out.write("Obs End time (JD)     = {0}\n".format(obs_end_time2))
-            
+
             out.write("Total observation time  [inc. exptime] (JD)  = {0} \n".format(obs_total))
             out.write("Total observation time  [inc. exptime] (min) = {0} \n".format(obs_total_minutes))
-            out.write("Total intergration time [NEXP*exptime] (min) = {0} \n".format(exptime*NEXP/60))
-      
+            out.write("Total intergration time [NEXP*exptime] (min) = {0} \n".format(exptime * NEXP / 60))
+
             out.write("\nAirmass values:\n------------------\n")
             out.write("Nod airmasses = {0}\n".format(nod_airmass))
             out.write("Mean airmass valu       = {0}\n".format(mean_airmass))
             out.write("Airmass range [max-min] = {0}\n".format(airmass_range))
-            
+
             # DATE CREATED
             out.write("\n\nThis file was generated on {0}\n".format(datetime.datetime.now()))
-            
 
 #############################################################
         print("Saved Observation information to \t {0}".format(output_file))
     except:
         print("Failed to save Observation information to \t {0}.".format(output_file))
         raise
+
+
+class NodError(Exception):
+    """A Error class for nod errors."""
+
+    pass
+
 
 if __name__ == '__main__':
     args = vars(_parser())

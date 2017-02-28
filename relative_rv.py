@@ -11,7 +11,7 @@ import argparse
 
 
 def relative_rv(wav_1, wav_2):
-    """ Calculate the radial velocity difference between two wavelength values"""
+    """Calculate the radial velocity difference between two wavelength values."""
     c = 299792.458   # km / s
     difference = wav_2 - wav_1
     relative = difference / wav_1
@@ -25,19 +25,21 @@ def _parser():
     """
     parser = argparse.ArgumentParser(description='Calculate RV doppler shift between two wavelengths')
     parser.add_argument('original_wavelength', help='The original wavelength', type=float)
-    parser.add_argument('new_wavelength', help='THe new wavelength', type=float)
-    parser.add_argument('-m', '--mode', choices=['normal','reverse', 'iterable'], default='normal', help='Output mode', type=str)   # reverse, both, (iteratorable input)
+    parser.add_argument('new_wavelength', help='The new wavelength', type=float)
+    parser.add_argument('-m', '--mode', choices=['normal', 'reverse', 'iterable'], default='normal',
+                        help='Output mode', type=str)   # reverse, both, (iteratorable input)
     # TODO: Add these extra modes
-    parser.add_argument('-u', '--unit', help='Distance unit of measurement [Mm, km, m, cm, mm]', choices=["Mm", "km","m","cm", "mm"], default="km")
+    parser.add_argument('-u', '--unit', help='Distance unit of measurement [Mm, km, m, cm, mm]',
+                        choices=["Mm", "km", "m", "cm", "mm"], default="km")
     # parser.add_argument('-r', '--round', help='Rounding on ouput, e.g. ["2dp", "3sf"]')
     args = parser.parse_args()
     return args
 
 
 def main(original_wavelength, new_wavelength, mode=False, unit="km"):  # unit, rounding
-    """ Obtian RV offset between wavelengths and print to screen.
+    """Obtian RV offset between wavelengths and print to screen.
 
-    prints rv between the wavelength values.
+    Prints rv between the wavelength values.
     """
     if mode == "reverse":
         # Switch direction of doppler shift
@@ -56,11 +58,11 @@ def main(original_wavelength, new_wavelength, mode=False, unit="km"):  # unit, r
     elif unit == "Mm":
         rv *= 1e-3
 
-    print("\n" + "-" * 20 )
-    print("Original   -->   New   |  RV ({0}/s)".format(unit) )
-    print("-" * 20 )
+    print("\n" + "-" * 20)
+    print("Original   -->   New   |  RV ({0}/s)".format(unit))
+    print("-" * 20)
     print("{0}  -->  {1}  |  {2}".format(original_wavelength, new_wavelength, rv))
-    print("-" * 20 )
+    print("-" * 20)
 
 
 if __name__ == "__main__":
