@@ -28,9 +28,9 @@ image_path = dir_path + "/images/"
 observation_name = os.path.split(dir_path)[-1] 
 
 for chip_num in range(1, 5):
-    combined_name = get_filenames(combined_path, 'CRIRE*.sum.fits', "*_{}.*".format(chip_num))
-    nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{}.*".format(chip_num))
-    norm_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{}.*".format(chip_num))
+    combined_name = get_filenames(combined_path, 'CRIRE*.sum.fits', "*_{0}.*".format(chip_num))
+    nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
+    norm_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
     
     combined_data = fits.getdata(combined_path + combined_name[0])
     nod_data = [fits.getdata(name) for name in nod_names]
@@ -74,6 +74,6 @@ for chip_num in range(1, 5):
     #plt.show()
 
     # Save figure
-    fig.savefig(image_path+"quicklook_{}_{}_reduction.pdf".format(observation_name, chip_num))
-    fig.savefig(image_path+"quicklook_{}_{}_reduction.png".format(observation_name, chip_num))
+    fig.savefig(image_path+"quicklook_{0}_{1}_reduction.pdf".format(observation_name, chip_num))
+    fig.savefig(image_path+"quicklook_{0}_{1}_reduction.png".format(observation_name, chip_num))
     plt.close(fig)

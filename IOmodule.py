@@ -9,7 +9,7 @@ import numpy as np
 
 
 def pdread_2col(filename, noheader=False):
-    """ Read in a 2 column file with pandas.
+    """Read in a 2 column file with pandas.
 
     Faster then read_2col
 
@@ -30,17 +30,16 @@ def pdread_2col(filename, noheader=False):
     """
     if noheader:
         data = pd.read_table(filename, comment='#', names=["col1", "col2"],
-                         header=None, dtype=np.float64, delim_whitespace=True)
+                             header=None, dtype=np.float64, delim_whitespace=True)
     else:
         data = pd.read_table(filename, comment='#', names=["col1", "col2"],
-                         dtype=np.float64, delim_whitespace=True)
-
+                             dtype=np.float64, delim_whitespace=True)
 
     return data["col1"].values, data["col2"].values
 
 
 def pdread_3col(filename, noheader=False):
-    """ Read in a 3 column file with pandas.
+    """Read in a 3 column file with pandas.
 
     Faster then read_3col
 
@@ -71,10 +70,10 @@ def pdread_3col(filename, noheader=False):
 
 
 def read_fullcol(filename):
-    # This program reads column formatted data from a file and
-    # returns a list in which each sublist correspond to the line's elements.
-    # THE RESULT IS A LIST OF STRINGS!
+    """This program reads column formatted data from a file and returns a list in which each sublist correspond to the line's elements.
 
+    THE RESULT IS A LIST OF STRINGS!
+    """
     f = open(filename, "r")
 
     list_data = []
@@ -95,10 +94,10 @@ def read_fullcol(filename):
 
 
 def read_col(filename):
-    # This program reads column formatted data from a file and
-    # returns a list in which each sublist correspond to the line's elements.
-    # THE RESULT IS A LIST OF STRINGS!
+    """This program reads column formatted data from a file and returns a list in which each sublist correspond to the line's elements.
 
+    THE RESULT IS A LIST OF STRINGS!
+    """
     f = open(filename, "r")
 
     list_data = []
@@ -119,10 +118,10 @@ def read_col(filename):
 
 
 def read_col_charsplit(filename, sepchar):
-    # This program reads column formatted data from a file and
-    # returns a list in which each sublist correspond to the line's elements separated by sepchar.
-    # THE RESULT IS A LIST OF STRINGS!
+    """This program reads column formatted data from a file and returns a list in which each sublist correspond to the line's elements separated by sepchar.
 
+    THE RESULT IS A LIST OF STRINGS!
+    """
     f = open(filename, "r")
 
     list_data = []
@@ -143,16 +142,17 @@ def read_col_charsplit(filename, sepchar):
 
 
 def read_2col(filename):
-    # The same as the previous, but returns 2 vectors, corresponding each
-    # one to a column.THE RESULTS ARE FLOAT PYTHON VECTORS.
-    # Note that in python all "float" are in fact "double-precision".
+    """The same as the previous, but returns 2 vectors, corresponding each one to a column.
 
+    THE RESULTS ARE FLOAT PYTHON VECTORS.
+    # Note that in python all "float" are in fact "double-precision".
+    """
     list_data = read_col(filename)
 
     col1 = []
     col2 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -162,14 +162,13 @@ def read_2col(filename):
 
 
 def read_2col1str(filename):
-    # The same as the previous, but returns 2 columns and the first is a string
-
+    """The same as the previous, but returns 2 columns and the first is a string."""
     list_data = read_col(filename)
 
     col1 = []
     col2 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -179,15 +178,14 @@ def read_2col1str(filename):
 
 
 def read_3col(filename):
-    # The same as the previous, but returns 3 columns
-
+    """The same as the previous, but returns 3 columns."""
     list_data = read_col(filename)
 
     col1 = []
     col2 = []
     col3 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -198,15 +196,14 @@ def read_3col(filename):
 
 
 def read_3col1str(filename):
-    # The same as the previous, but returns 3 columns and the first is a string
-
+    """The same as the previous, but returns 3 columns and the first is a string."""
     list_data = read_col(filename)
 
     col1 = []
     col2 = []
     col3 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -217,15 +214,14 @@ def read_3col1str(filename):
 
 
 def read_3col2str(filename):
-    # The same as the previous, but returns 3 columns and the first two are strings
-
+    """The same as the previous, but returns 3 columns and the first two are strings."""
     list_data = read_col(filename)
 
     col1 = []
     col2 = []
     col3 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -236,8 +232,7 @@ def read_3col2str(filename):
 
 
 def read_4col(filename):
-    # The same as the previous, but returns 4 columns
-
+    """The same as the previous, but returns 4 columns."""
     list_data = read_col(filename)
 
     col1 = []
@@ -245,7 +240,7 @@ def read_4col(filename):
     col3 = []
     col4 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -257,8 +252,7 @@ def read_4col(filename):
 
 
 def read_4col1str(filename):
-    # The same as the previous, but returns 4 columns and the first is a string
-
+    """The same as the previous, but returns 4 columns and the first is a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -266,7 +260,7 @@ def read_4col1str(filename):
     col3 = []
     col4 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -278,8 +272,7 @@ def read_4col1str(filename):
 
 
 def read_5col(filename):
-    # The same as the previous, but returns 5 columns
-
+    """The same as the previous, but returns 5 columns."""
     list_data = read_col(filename)
 
     col1 = []
@@ -288,7 +281,7 @@ def read_5col(filename):
     col4 = []
     col5 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -301,8 +294,7 @@ def read_5col(filename):
 
 
 def read_5col1str(filename):
-    # The same as the previous, but returns 5 columns of which one is a string
-
+    """The same as the previous, but returns 5 columns of which one is a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -311,7 +303,7 @@ def read_5col1str(filename):
     col4 = []
     col5 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -324,8 +316,7 @@ def read_5col1str(filename):
 
 
 def read_6col1str(filename):
-    # The same as the previous, but returns 6 columns and the first is a string
-
+    """The same as the previous, but returns 6 columns and the first is a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -335,7 +326,7 @@ def read_6col1str(filename):
     col5 = []
     col6 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -349,8 +340,7 @@ def read_6col1str(filename):
 
 
 def read_6col(filename):
-    # The same as the previous, but returns 6 columns
-
+    """The same as the previous, but returns 6 columns."""
     list_data = read_col(filename)
 
     col1 = []
@@ -360,7 +350,7 @@ def read_6col(filename):
     col5 = []
     col6 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -374,8 +364,7 @@ def read_6col(filename):
 
 
 def read_7col(filename):
-    # The same as the previous, but returns 5 columns
-
+    """The same as the previous, but returns 5 columns."""
     list_data = read_col(filename)
 
     col1 = []
@@ -386,7 +375,7 @@ def read_7col(filename):
     col6 = []
     col7 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -401,8 +390,7 @@ def read_7col(filename):
 
 
 def read_7col1str(filename):
-    # The same as the previous, but returns 7 columns being the first a string
-
+    """The same as the previous, but returns 7 columns being the first a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -413,7 +401,7 @@ def read_7col1str(filename):
     col6 = []
     col7 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -428,8 +416,7 @@ def read_7col1str(filename):
 
 
 def read_8col(filename):
-    # The same as the previous, but returns 8 columns
-
+    """The same as the previous, but returns 8 columns."""
     list_data = read_col(filename)
 
     col1 = []
@@ -441,7 +428,7 @@ def read_8col(filename):
     col7 = []
     col8 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -457,8 +444,7 @@ def read_8col(filename):
 
 
 def read_8col1str(filename):
-    # The same as the previous, but returns 8 columns the first being a string
-
+    """The same as the previous, but returns 8 columns the first being a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -470,7 +456,7 @@ def read_8col1str(filename):
     col7 = []
     col8 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -486,8 +472,7 @@ def read_8col1str(filename):
 
 
 def read_9col(filename):
-    # The same as the previous, but returns 9 columns the first being a string
-
+    """The same as the previous, but returns 9 columns the first being a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -500,7 +485,7 @@ def read_9col(filename):
     col8 = []
     col9 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -517,8 +502,7 @@ def read_9col(filename):
 
 
 def read_9col1str(filename):
-    # The same as the previous, but returns 9 columns the first being a string
-
+    """The same as the previous, but returns 9 columns the first being a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -531,7 +515,7 @@ def read_9col1str(filename):
     col8 = []
     col9 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -548,8 +532,7 @@ def read_9col1str(filename):
 
 
 def read_10col(filename):
-    # The same as the previous, but returns 11 columns
-
+    """The same as the previous, but returns 11 columns."""
     list_data = read_col(filename)
 
     col1 = []
@@ -563,7 +546,7 @@ def read_10col(filename):
     col9 = []
     col10 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -581,8 +564,7 @@ def read_10col(filename):
 
 
 def read_10col1strl(filename):
-    # The same as the previous, but returns 10 columns with the last column being a string
-
+    """The same as the previous, but returns 10 columns with the last column being a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -596,7 +578,7 @@ def read_10col1strl(filename):
     col9 = []
     col10 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
         # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -614,8 +596,7 @@ def read_10col1strl(filename):
 
 
 def read_11col(filename):
-    # The same as the previous, but returns 11 columns
-
+    """The same as the previous, but returns 11 columns."""
     list_data = read_col(filename)
 
     col1 = []
@@ -630,7 +611,7 @@ def read_11col(filename):
     col10 = []
     col11 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -649,8 +630,7 @@ def read_11col(filename):
 
 
 def read_11col1str(filename):
-    # The same as the previous, but returns 11 columns the first being a string
-
+    """The same as the previous, but returns 11 columns the first being a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -665,7 +645,7 @@ def read_11col1str(filename):
     col10 = []
     col11 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -684,8 +664,7 @@ def read_11col1str(filename):
 
 
 def read_12col(filename):
-    # The same as the previous, but returns 12 columns the first being a string
-
+    """The same as the previous, but returns 12 columns the first being a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -701,7 +680,7 @@ def read_12col(filename):
     col11 = []
     col12 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(float(list_data[i][0]))
@@ -721,8 +700,7 @@ def read_12col(filename):
 
 
 def read_12col1str(filename):
-    # The same as the previous, but returns 12 columns the first being a string
-
+    """The same as the previous, but returns 12 columns the first being a string."""
     list_data = read_col(filename)
 
     col1 = []
@@ -738,7 +716,7 @@ def read_12col1str(filename):
     col11 = []
     col12 = []
 
-    for i in range(len(list_data)):
+    for i, val in enumerate(list_data):
                 # checking if the line is valid
         if(list_data[i][0][0] != '#'):
             col1.append(list_data[i][0])
@@ -758,9 +736,10 @@ def read_12col1str(filename):
 
 
 def read_2col_rdb(filename):
-    # The same as the previous, but returns 2 columns
-    # This is particularly usefull to read the "*_coralie.rdb" files
+    """The same as the previous, but returns 2 columns.
 
+    This is particularly usefull to read the "*_coralie.rdb" files
+    """
     list_data = read_col(filename)
 
     col1 = []
@@ -776,9 +755,10 @@ def read_2col_rdb(filename):
 
 
 def read_3col_rdb(filename):
-    # The same as the previous, but returns 3 columns
-    # This is particularly usefull to read the "*_coralie.rdb" files
+    """The same as the previous, but returns 3 columns.
 
+    This is particularly usefull to read the "*_coralie.rdb" files
+    """
     list_data = read_col(filename)
 
     col1 = []
@@ -796,9 +776,10 @@ def read_3col_rdb(filename):
 
 
 def read_4col_rdb(filename):
-    # The same as the previous, but returns 6 columns
-    # This is particularly usefull to read the "*_coralie.rdb" files
+    """The same as the previous, but returns 6 columns.
 
+    # This is particularly usefull to read the "*_coralie.rdb" files
+    """
     list_data = read_col(filename)
 
     col1 = []
@@ -818,9 +799,10 @@ def read_4col_rdb(filename):
 
 
 def read_5col_rdb(filename):
-    # The same as the previous, but returns 6 columns
-    # This is particularly usefull to read the "*_coralie.rdb" files
+    """The same as the previous, but returns 6 columns.
 
+    # This is particularly usefull to read the "*_coralie.rdb" files
+    """
     list_data = read_col(filename)
 
     col1 = []
@@ -842,9 +824,10 @@ def read_5col_rdb(filename):
 
 
 def read_6col_rdb(filename):
-    # The same as the previous, but returns 6 columns
-    # This is particularly usefull to read the "*_coralie.rdb" files
+    """The same as the previous, but returns 6 columns.
 
+    # This is particularly usefull to read the "*_coralie.rdb" files
+    """
     list_data = read_col(filename)
 
     col1 = []
@@ -868,9 +851,10 @@ def read_6col_rdb(filename):
 
 
 def read_7col_rdb(filename):
-    # The same as the previous, but returns 7 columns
-    # This is particularly usefull to read the "*_coralie.rdb" files
+    """The same as the previous, but returns 7 columns.
 
+    # This is particularly usefull to read the "*_coralie.rdb" files
+    """
     list_data = read_col(filename)
 
     col1 = []
@@ -896,9 +880,10 @@ def read_7col_rdb(filename):
 
 
 def read_10col_rdb(filename):
-    # The same as the previous, but returns 10 columns
-    # This is particularly usefull to read the "*_coralie.rdb" files
+    """The same as the previous, but returns 10 columns.
 
+    # This is particularly usefull to read the "*_coralie.rdb" files
+    """
     list_data = read_col(filename)
 
     col1 = []
@@ -930,9 +915,10 @@ def read_10col_rdb(filename):
 
 
 def read_15col_rdb(filename):
-    # The same as the previous, but returns 10 columns
-    # This is particularly usefull to read the "*_coralie.rdb" files
+    """The same as the previous, but returns 10 columns.
 
+    # This is particularly usefull to read the "*_coralie.rdb" files
+    """
     list_data = read_col(filename)
 
     col1 = []
@@ -975,16 +961,15 @@ def read_15col_rdb(filename):
 
 
 def read_Gauss():
-    # The same as the previous, but returns 10 columns
-
+    """The same as the previous, but returns 10 columns."""
     list_data = read_col(("/scisoft/i386/Packages/Python-2.4.3/myownpackages/GaussDist4py.txt"))
-    Gaussdata = []
+    gauss_data = []
 
-    for i in range(len(list_data)):
-        for j in range(len(list_data[0])):
-            Gaussdata.append(float(list_data[i][j]))
+    for i, val in enumerate(list_data):
+        for j, val in enumerate(list_data[0]):
+            gauss_data.append(float(list_data[i][j]))
 
-    return Gaussdata
+    return gauss_data
 
 ################################################################################
 #
@@ -994,44 +979,43 @@ def read_Gauss():
 
 
 def write_2col(filename, data1, data2):
-    # Writes data in 2 columns separated by tabs in a "filename" file.
+    """Write data in 2 columns separated by tabs in a "filename" file."""
 
     f = open(filename, "w")
 
-    for i in range(len(data1)):
-        f.write("\t"+str(data1[i])+"\t\t"+str(data2[i])+"\n")
+    for i, val in enumerate(data1):
+        f.write("\t" + str(data1[i]) + "\t\t" + str(data2[i]) + "\n")
 
     f.close()
 
 
 def write_3col(filename, data1, data2, data3):
-    # Writes data in 2 columns separated by tabs in a "filename" file.
-
+    """Write data in 2 columns separated by tabs in a "filename" file."""
     f = open(filename, "w")
 
-    for i in range(len(data1)):
-        f.write("\t"+str(data1[i])+"\t\t"+str(data2[i])+"\t\t"+str(data3[i])+"\n")
+    for i, val in enumerate(data1):
+        f.write("\t" + str(data1[i]) + "\t\t" + str(data2[i]) + "\t\t" + str(data3[i]) + "\n")
 
     f.close()
 
 
 def write_4col(filename, data1, data2, data3, data4):
-    # Writes data in 2 columns separated by tabs in a "filename" file.
-
+    """Write data in 2 columns separated by tabs in a "filename" file."""
     f = open(filename, "w")
 
-    for i in range(len(data1)):
-        f.write("\t"+str(data1[i])+"\t\t"+str(data2[i])+"\t\t"+str(data3[i])+"\t\t"+str(data4[i])+"\n")
+    for i, val in enumerate(data1):
+        f.write("\t" + str(data1[i]) + "\t\t" + str(data2[i]) + "\t\t" + str(data3[i]) +
+                "\t\t" + str(data4[i]) + "\n")
 
     f.close()
 
 
 def write_5col(filename, data1, data2, data3, data4, data5):
-    # Writes data in 5 columns separated by tabs in a "filename" file.
-
+    """Write data in 5 columns separated by tabs in a "filename" file."""
     f = open(filename, "w")
 
-    for i in range(len(data1)):
-        f.write("\t"+str(data1[i])+"\t\t"+str(data2[i])+"\t\t"+str(data3[i])+"\t\t"+str(data4[i])+"\t\t"+str(data5[i])+"\n")
+    for i, val in enumerate(data1):
+        f.write("\t" + str(data1[i]) + "\t\t" + str(data2[i]) + "\t\t" + str(data3[i]) +
+                "\t\t" + str(data4[i]) + "\t\t" + str(data5[i]) + "\n")
 
     f.close()

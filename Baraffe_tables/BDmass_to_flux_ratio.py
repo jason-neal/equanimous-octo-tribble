@@ -61,9 +61,9 @@ def main(star_name, companion_mass, stellar_age, model="2003"):
     star_params = get_stellar_params(star_name)  # returns a astroquesry result table
 
     # Get parameters for this mass and age
-    companion = mass_table_search(companion_mass, stellar_age, model=model)
+    companion_params = mass_table_search(companion_mass, stellar_age, model=model)
 
-    Flux_ratios = calculate_flux_ratios(star_params, companion)
+    Flux_ratios = calculate_flux_ratios(star_params, companion_params)
 
     # Compare to area ratio
     Rstar = calculate_stellar_radius(star_name, star_params)
@@ -134,7 +134,7 @@ def mass_table_search(companion_mass, age, model="2003"):
         # Find closest age model
         modelages = ["0.001", "0.005", "0.010", "0.050", "0.100", "0.120",
                      "0.500", "1.000", "5.000", "10.000"]
-        model_age = min(modelages, key=lambda x: abs(float(x)-age))  # Closest one
+        model_age = min(modelages, key=lambda x: abs(float(x) - age))  # Closest one
         model_id = "p".join(str(model_age).split("."))
 
         model_name = "./Baraffe2003/BaraffeCOND2003-" + model_id + "Gyr.dat"
