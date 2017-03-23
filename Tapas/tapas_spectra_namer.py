@@ -1,21 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
+"""Rename tapas spectra based on the some of the header information in it.
 
-""" 
-Rename tapas spectra based on the some of the header information in it.
-
-
-TO DO - some improvements
+TODO - some improvements
 - Check for exitcodes on subprocessed calls
 - USE gunzips own -keep functionality for the extraction.
 
 """
-
 import argparse
-from astropy.io import fits
-from time import strftime, strptime
-import os
 import subprocess
+from time import strftime, strptime
 import Obtain_Telluric as obt
 
 
@@ -36,17 +30,17 @@ def _parser():
 
 
 def main(fname, extract=False, prefix="", keep_original=False, species=False):
-    
+    """Rename tapas files."""
     split_fname = fname.split("/")
     if len(split_fname) == 1:
-        # No path 
+        # No path
         filename = fname
         path = ""
     else:
         filename = fname.split("/")[-1]
         path_folders = fname.split("/")[:-1]
         path = "/".join(path_folders) + "/"
-    
+
     ext = filename.split(".")[-1]
 
     if keep_original:
@@ -54,27 +48,27 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
         if ext == "gz":
             filename = path + "tmp_file." + filename.split(".")[-2] + ".gz"
         else:
-            filename = path + "tmp_file." + ext   
+            filename = path + "tmp_file." + ext
         subprocess.call(["cp", old_filename, filename])
-    
+
     if extract and ext == "gz":
         subprocess.call(["gunzip", filename])
         filename = filename[:-3]
         ext = filename.split(".")[-1]
     elif ext == "gz":
         print("The file ends in .gz. Add -x to call to extract it first")
-        #raise
+        # raise
     data, hdr = obt.load_telluric(path, filename)
 
     date = strftime("%Y-%m-%dT%H-%M-%S", strptime(hdr["DATE-OBS"], "%Y/%m/%d %H:%M:%S"))
-    req_id = int(float(hdr["req_id"]))  # Id of request 
+    req_id = int(float(hdr["req_id"]))  # Id of request
     berv = hdr["BARYDONE"]
-    
+
     try:
         sampling = int(float(hdr["SAMPRATI"]))
     except:
         sampling = -1
-   
+
     try:
         respower = int(float(hdr["RESPOWER"]))
     except:
@@ -82,32 +76,31 @@ def main(fname, extract=False, prefix="", keep_original=False, species=False):
 
     if sampling is -1 and respower is -1:
         if species:
-            new_name = "{}_ReqId_{}_No_Ifunction_barydone-{}_species-{}".format(date, req_id, berv, species)
+            new_name = "{0}_ReqId_{1}_No_Ifunction_barydone-{2}_species-{3}".format(date, req_id, berv, species)
         else:
-            new_name = "{}_ReqId_{}_No_Ifunction_barydone-{}".format(date, req_id, berv)
+            new_name = "{0}_ReqId_{1}_No_Ifunction_barydone-{2}".format(date, req_id, berv)
     else:
         if species:
-            new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}_species-{}".format(date, req_id, respower, sampling, berv, species)
+            new_name = "{0}_ReqId_{1}_R-{2}_sratio-{3}_barydone-{4}_species-{5}".format(date, req_id, respower,
+                                                                                        sampling, berv, species)
         else:
-            new_name = "{}_ReqId_{}_R-{}_sratio-{}_barydone-{}".format(date, req_id, respower, sampling, berv)
-  
+            new_name = "{0}_ReqId_{1}_R-{2}_sratio-{3}_barydone-{4}".format(date, req_id, respower, sampling, berv)
+
     if prefix:
         new_name = path + "tapas_" + prefix + "_" + new_name + "." + ext
     else:
         new_name = path + "tapas_" + new_name + "." + ext
-    #print("Name for file = ", new_name)
+    # print("Name for file = ", new_name)
 
     subprocess.call(["mv", filename, new_name])
-    #print("Renamed {} to {}".format(filename, new_name))
-    
-    print("Changed '{}' into  '{}'".format(fname, new_name))
+    # print("Renamed {} to {}".format(filename, new_name))
+
+    print("Changed '{0}' into  '{1}'".format(fname, new_name))
 
 
 if __name__ == "__main__":
     args = vars(_parser())
     fname = args.pop('fname')
     opts = {k: args[k] for k in args}
-    
-    #print(opts)
-
+    # print(opts)
     main(fname, **opts)

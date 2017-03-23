@@ -11,8 +11,14 @@
 
 # In[135]:
 
-from joblib import Parallel, delayed
 import time
+import tempfile
+import shutil
+import os
+import numpy as np
+
+from joblib import Parallel, delayed
+from joblib import load, dump
 
 
 # In[136]:
@@ -82,13 +88,6 @@ print("newatm after parallel", newatm)
 
 # In[128]:
 
-import tempfile
-import shutil
-import os
-import numpy as np
-
-from joblib import Parallel, delayed
-from joblib import load, dump
 
 def inside_loop(newatm, models, layer, column, gridpoints, teff_logg_feh):
     tlayer = np.zeros( len(models))
@@ -131,15 +130,6 @@ finally:
 # # Direct copy of Joblib memmaping example
 
 # In[ ]:
-
-import tempfile
-import shutil
-import os
-import numpy as np
-
-from joblib import Parallel, delayed
-from joblib import load, dump
-
 
 def sum_row(input, output, i):
     """Compute the sum of a row in input and store it in output"""
