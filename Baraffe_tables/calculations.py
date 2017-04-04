@@ -1,7 +1,7 @@
 """Calculations for flux ratios."""
 import numpy as np
-from db_queries import get_temperature
 from typing import Dict, List, Any
+from db_queries import get_temperature
 
 
 def flux_mag_ratio(mag1: float, mag2: float) -> float:

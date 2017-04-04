@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
-# Get Filenames of files that match regular expresion
+"""Get Filenames of files that match regular expresion.
 
-import fnmatch
+Possibly better to use the glob module.
+"""
 import os
+import fnmatch
 
 
 def get_filenames(path, regexp, regexp2=False):

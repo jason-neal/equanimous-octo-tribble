@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
-# RVCalculations
+"""RVCalculations.
+
+Calulate the Radial Velocity shift that would be
+present with a given wavelength shift in the NIR range
+we have.
+"""
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
-""" Calulate the Radial Velocity shift that would be
-present with a given wavelength shift in the NIR range
- we have"""
 
 
 def Calculate_RV(Lambda, deltalambda):
@@ -15,11 +17,13 @@ def Calculate_RV(Lambda, deltalambda):
     return V
 
 
-def Calculate_WLshift(Lambda, v):
-    """lambda = wavelength
-        v = velocity"""
+def Calculate_WLshift(lambda, v):
+    """Lambda = wavelength.
+
+    v = velocity.
+    """
     c = 299792458.  # m/s
-    deltalambda = [(v / c) * lmda for lmda in Lambda]
+    deltalambda = [(v / c) * lmda for lmda in lambda]
     return deltalambda
 
 
@@ -72,22 +76,15 @@ plt.ylabel("Velocity (m/s)")
 
 plt.show()
 
-
-
-
-
-
-
-
-####### OLD Way using range of Lambda #######
+# ###### OLD Way using range of Lambda #######
 # plt.figure()
 # for vel in vels:
-#     print("This vel",vel)
+#     print("This vel", vel)
 #     delta = Calculate_WLshift(nir_wls, vel)
-#     print("This delta",delta)
+#     print("This delta", delta)
 #     print(" length delta", len(delta))
 
-#     plt.plot(nir_wls,delta,label="V= "+str(vel)+" (m/s)")
+#     plt.plot(nir_wls, delta, label="V= "+str(vel)+" (m/s)")
 
 # plt.legend()
 # plt.title("Wavelength Differences caused by different Velocities")
@@ -97,7 +94,7 @@ plt.show()
 # plt.figure()
 # for deltawl in deltalambdas:
 #     RV = Calculate_RV(nir_wls, deltawl)
-#     plt.plot(nir_wls,RV,label="deltaWL= "+str(deltawl)+" (nm)")
+#     plt.plot(nir_wls, RV, label="deltaWL= "+str(deltawl)+" (nm)")
 
 # plt.legend()
 # plt.title("RV signal caused by different Wavelength shifts")

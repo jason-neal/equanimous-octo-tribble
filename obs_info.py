@@ -11,10 +11,10 @@ import os
 import datetime
 import argparse
 import numpy as np
-from astropy.time import Time, TimeDelta
 from astropy.io import fits
 from astropy import units as u
 from astropy.coordinates import Angle
+from astropy.time import Time, TimeDelta
 
 
 def _parser():
@@ -269,7 +269,7 @@ def main(fname, output=False, separator=":", verbose=True):
 
             out.write("Total observation time  [inc. exptime] (JD)  = {0} \n".format(obs_total))
             out.write("Total observation time  [inc. exptime] (min) = {0} \n".format(obs_total_minutes))
-            out.write("Total intergration time [NEXP*exptime] (min) = {0} \n".format(exptime * NEXP / 60))
+            out.write("Total intergration time [NEXP * exptime] (min) = {0} \n".format(exptime * NEXP / 60))
 
             out.write("\nAirmass values:\n------------------\n")
             out.write("Nod airmasses = {0}\n".format(nod_airmass))
