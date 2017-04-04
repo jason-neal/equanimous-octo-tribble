@@ -1,0 +1,16 @@
+numpy
+astropy
+scipy
+astroquery
+pandas
+argparse
+PyAstronomy
+matplotlib
+seaborn
+tqdm
+multiprocess
+datetime
+ephem
+seaborn
+joblib
+gooey

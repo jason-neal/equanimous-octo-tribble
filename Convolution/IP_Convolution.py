@@ -1,4 +1,3 @@
-
 # Convolution of spectra to a Instrument profile of resolution R.
 #
 # The spectra does not have to be equidistant in wavelength.
@@ -10,11 +9,10 @@ from datetime import datetime as dt
 
 
 def wav_selector(wav, flux, wav_min, wav_max):
-    """ Faster Wavelenght selector
+    """Faster Wavelenght selector.
 
     If passed lists it will return lists.
     If passed np arrays it will return arrays
-
     """
     wav = np.asarray(wav)
     flux = np.asarray(flux)
@@ -26,44 +24,41 @@ def wav_selector(wav, flux, wav_min, wav_max):
 
 
 def unitary_Gauss(x, center, FWHM):
-    """
-    Gaussian_function of area=1
+    """Gaussian_function of area=1.
 
     p[0] = A;
     p[1] = mean;
     p[2] = FWHM;
     """
-
     sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)))
-    Amp = 1.0 / (sigma*np.sqrt(2*np.pi))
-    tau = -((x - center)**2) / (2*(sigma**2))
+    Amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
+    tau = -((x - center)**2) / (2 * (sigma**2))
     result = Amp * np.exp(tau)
 
     return result
 
 
 def fast_convolve(wav_val, R, wav_extended, flux_extended, FWHM_lim):
-    """IP convolution multiplication step for a single wavelength value"""
-    FWHM = wav_val/R
+    """IP convolution multiplication step for a single wavelength value."""
+    FWHM = wav_val / R
     # Mask of wavelength range within 5 FWHM of wav
-    index_mask = ((wav_extended > (wav_val - FWHM_lim*FWHM)) &
-                  (wav_extended < (wav_val + FWHM_lim*FWHM)))
+    index_mask = ((wav_extended > (wav_val - FWHM_lim * FWHM)) &
+                  (wav_extended < (wav_val + FWHM_lim * FWHM)))
 
     flux_2convolve = flux_extended[index_mask]
     # Gausian Instrument Profile for given resolution and wavelength
     IP = unitary_Gauss(wav_extended[index_mask], wav_val, FWHM)
 
-    sum_val = np.sum(IP*flux_2convolve)
+    sum_val = np.sum(IP * flux_2convolve)
     # Correct for the effect of convolution with non-equidistant postions
-    unitary_val = np.sum(IP*np.ones_like(flux_2convolve))
+    unitary_val = np.sum(IP * np.ones_like(flux_2convolve))
 
     return sum_val / unitary_val
 
 
 def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
                   verbose=True):
-    """Spectral convolution which allows non-equidistance step values"""
-
+    """Spectral convolution which allows non-equidistance step values."""
     # Make sure they are numpy arrays
     wav = np.asarray(wav, dtype='float64')
     flux = np.asarray(flux, dtype='float64')
@@ -85,19 +80,18 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
     # Predefine array space
     flux_conv_res = np.empty_like(wav_chip, dtype="float64")
     counter = 0
-    base_val = len(wav_chip)//20   # Adjust here to change % between reports
+    base_val = len(wav_chip) // 20   # Adjust here to change % between reports
 
     for n, wav in enumerate(wav_chip):
         # Put convolution value directly into the array
-        flux_conv_res[n] = fast_convolve(wav, R, wav_ext, flux_ext,
-                                         FWHM_lim)
+        flux_conv_res[n] = fast_convolve(wav, R, wav_ext, flux_ext, FWHM_lim)
         if (n % base_val == 0) and verbose:
             counter = counter + 5  # And ajust here to change % between reports
-            print("Resolution Convolution at {}%%...".format(counter))
+            print("Resolution Convolution at {0}%%...".format(counter))
 
     timeEnd = dt.now()
     print("Single-Process convolution has been completed in"
-          " {}.\n".format(timeEnd-timeInit))
+          " {}.\n".format(timeEnd - timeInit))
 
     if plot:
         plt.figure(1)

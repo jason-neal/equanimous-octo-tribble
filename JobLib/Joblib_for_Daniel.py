@@ -2,23 +2,29 @@
 # coding: utf-8
 
 # # Joblib for Daniel:
-# 
+#
 # Trying to implement parallelism into Daniels problem.
 
-# 
+#
 # ## Some Tests with random values
 # I don't know if these quite match your data types
 
 # In[135]:
 
-from joblib import Parallel, delayed
 import time
+import tempfile
+import shutil
+import os
+import numpy as np
+
+from joblib import Parallel, delayed
+from joblib import load, dump
 
 
 # In[136]:
 
 def griddata(gridpoints, tlayer, teff_logg_feh, method='linear', rescale=True):
-    """ Do what ever it does"""
+    """Do what ever it does"""
     # put a short wait.
     time.sleep(0.5)
     return np.sum(tlayer) * teff_logg_feh[0] + teff_logg_feh[1] + teff_logg_feh[2]   # thing to test inputs
@@ -27,13 +33,13 @@ def griddata(gridpoints, tlayer, teff_logg_feh, method='linear', rescale=True):
 # In[137]:
 
 def inside_loop(newatm, models, layer, column, gridpoints, teff_logg_feh):
-    tlayer = np.zeros( len(models))
+    tlayer = np.zeros(len(models))
     for inx, model in enumerate(models):
         tlayer[indx] = model[layer, column]
-    #print(" for layer = {0}, column = {1}".format(layer, column))
-    print("[Worker %d] Layer %d and Column %d is about to griddata" % (os.getpid(), layer, column))
-    newatm[layer,column] = griddata(gridpoints, tlayer, teff_logg_feh, method='linear', rescale=True)
-    
+    # print(" for layer = {0}, column = {1}".format(layer, column))
+    print("[Worker {0:d}] Layer {1:d} and Column {2:d} is about to griddata".format(os.getpid(), layer, column))
+    newatm[layer, column] = griddata(gridpoints, tlayer, teff_logg_feh, method='linear', rescale=True)
+
 
 
 # In[138]:
@@ -44,26 +50,26 @@ gridpoints = 5
 teff = 1000
 logg = 1
 feh = -0.01
-model1 = np.array([[1,2],[3,4],[5,6]])
-model2 = np.array([[7,8],[9,10],[11,12]])
-models = [model1, model2, model1*2, model2*2] # random models
+model1 = np.array([[1, 2], [3, 4], [5, 6]])
+model2 = np.array([[7, 8], [9, 10], [11, 12]])
+models = [model1, model2, model1 * 2, model2 * 2] # random models
 
 
 # In[139]:
 
-#%%timeit 
+# %%timeit
 newatm = np.zeros([len(layers), len(columns)])
 generator = (inside_loop(newatm, models, layer, column, gridpoints, (teff, logg, feh)) for  layer in layers for column in columns)
 
 for i in generator:
-    #print(newatm)
+    # print(newatm)
     pass
 print(newatm)
 
 
 # In[ ]:
 
-#%%timeit
+# %%timeit
 # Turning parallel
 newatm = np.zeros([len(layers), len(columns)])
 print("newatm before parallel", newatm)
@@ -74,32 +80,26 @@ print("newatm after parallel", newatm)
 
 # This runs in parallel but it does not return any data yet.
 
-#Need to memmap the results
-
+# Need to memmap the results
 
 # ## Parallel over both loops with memapping
 # Look here to implement the memmap to your solution:
 
 # In[128]:
 
-import tempfile
-import shutil
-import os
-import numpy as np
-
-from joblib import Parallel, delayed
-from joblib import load, dump
 
 def inside_loop(newatm, models, layer, column, gridpoints, teff_logg_feh):
-    tlayer = np.zeros( len(models))
+    tlayer = np.zeros(len(models))
     for inx, model in enumerate(models):
         tlayer[indx] = model[layer, column]
-    newatm[layer,column] = griddata(gridpoints, tlayer, teff_logg_feh, method='linear', rescale=True)
-    
+    newatm[layer, column] = griddata(gridpoints, tlayer, teff_logg_feh, method='linear', rescale=True)
+
+
 def griddata(gridpoints, tlayer, teff_logg_feh, method='linear', rescale=True):
-    """ Do what ever it does"""
+    """Do what ever it does"""
     time.sleep(0.5)
     return True   # thing to test inputs
+
 
 folder = tempfile.mkdtemp()
 newatm_name = os.path.join(folder, 'newatm')
@@ -115,12 +115,11 @@ try:
     print("newatm after parallel", newatm)
 
 finally:
-    # deleting temp files after testing the reuslt in example 
+    # deleting temp files after testing the reuslt in example
         try:
             shutil.rmtree(folder)
         except:
             print("Failed to delete: " + folder)
-            
 
 
 # In[ ]:
@@ -132,19 +131,10 @@ finally:
 
 # In[ ]:
 
-import tempfile
-import shutil
-import os
-import numpy as np
-
-from joblib import Parallel, delayed
-from joblib import load, dump
-
-
 def sum_row(input, output, i):
     """Compute the sum of a row in input and store it in output"""
     sum_ = input[i, :].sum()
-    print("[Worker %d] Sum for row %d is %f" % (os.getpid(), i, sum_))
+    print("[Worker {0:d}] Sum for row {1:d} is {2:f}".format(os.getpid(), i, sum_))
     output[i] = sum_
 
 if __name__ == "__main__":
@@ -191,6 +181,3 @@ if __name__ == "__main__":
 
 
 # In[ ]:
-
-
-
