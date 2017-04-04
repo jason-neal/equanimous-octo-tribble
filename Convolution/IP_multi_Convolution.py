@@ -1,4 +1,3 @@
-
 # Convolution of spectra to a Instrument profile of resolution R.
 #
 # The spectra does not have to be equidistant in wavelength.
@@ -7,17 +6,16 @@
 # The addition of multiprocess was added by Jorge Martins
 # If you do not want to use multiprocessing then see IP_Convolution.py
 
-
 from __future__ import division, print_function
 import numpy as np
-import matplotlib.pyplot as plt
-from datetime import datetime as dt
-import multiprocess as mprocess
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import multiprocess as mprocess
+from datetime import datetime as dt
 
 
 def wav_selector(wav, flux, wav_min, wav_max):
-    """ Faster Wavelenght selector
+    """Faster Wavelenght selector.
 
     If passed lists it will return lists.
     If passed np arrays it will return arrays
@@ -33,14 +31,12 @@ def wav_selector(wav, flux, wav_min, wav_max):
 
 
 def unitary_Gauss(x, center, FWHM):
-    """
-    Gaussian_function of area=1
+    """Gaussian_function of area=1.
 
     p[0] = A;
     p[1] = mean;
     p[2] = FWHM;
     """
-
     sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)))
     Amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
     tau = -((x - center) ** 2) / (2 * (sigma ** 2))
@@ -50,7 +46,7 @@ def unitary_Gauss(x, center, FWHM):
 
 
 def fast_convolve(wav_val, R, wav_extended, flux_extended, FWHM_lim):
-    """IP convolution multiplication step for a single wavelength value"""
+    """IP convolution multiplication step for a single wavelength value."""
     FWHM = wav_val / R
     # Mask of wavelength range within 5 FWHM of wav
     index_mask = ((wav_extended > (wav_val - FWHM_lim * FWHM)) &
@@ -68,17 +64,17 @@ def fast_convolve(wav_val, R, wav_extended, flux_extended, FWHM_lim):
 
 
 def wrapper_fast_convolve(args):
-    """ Wrapper for fast_convolve needed to unpack the arguments for
-    fast_convolve as multiprocess.Pool.map does not accept multiple
-    arguments"""
+    """Wrapper for fast_convolve.
 
+    Needed to unpack the arguments for fast_convolve as multiprocess.Pool.map does not accept multiple
+    arguments.
+    """
     return fast_convolve(*args)
 
 
 def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
                   verbose=True, numProcs=None):
-    """Spectral convolution which allows non-equidistance step values"""
-
+    """Spectral convolution which allows non-equidistance step values."""
     # Turn into numpy arrays
     wav = np.asarray(wav, dtype='float64')
     flux = np.asarray(flux, dtype='float64')
@@ -113,7 +109,7 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
     mprocPool.close()
     timeEnd = dt.now()
     print("Multi-Proc convolution has been completed in "
-          "{} using {}/{} cores.\n".format(timeEnd-timeInit, numProcs,
+          "{} using {}/{} cores.\n".format(timeEnd - timeInit, numProcs,
                                            mprocess.cpu_count()))
 
     if (plot):

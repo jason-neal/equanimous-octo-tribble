@@ -1,11 +1,11 @@
-#/usr/bin/python
+#!/usr/bin/python
 """Motivation: Replace : with _ in fits files for use in windows.
 
 # Author: Jason J. Neal <jason.neal@astro.up.pt>
 """
 from __future__ import division, print_function
-import argparse
 import os
+import argparse
 
 
 def _parser():
@@ -33,16 +33,16 @@ def char_replace(fname, remove_char, replace_char=""):
        - replace_char -- Character to replace with. Default = "" (blank)
 
     Examples:
-    >>> char_replace("test_:.txt",":","1")
+    >>> char_replace("test_:.txt", ":", "1")
     'test_1.txt'
 
-    >>> char_replace("test_adding_nothing.txt","_")
+    >>> char_replace("test_adding_nothing.txt", "_")
     'testaddingnothing.txt'
 
-    >>> char_replace("test_adding_space.txt","_", " ")
+    >>> char_replace("test_adding_space.txt", "_", " ")
     'testaddingnothing.txt'
 
-    >>> char_replace("test removing space.txt"," ", "_" )
+    >>> char_replace("test removing space.txt", " ", "_" )
     'test_removing_space.txt'
 
     """
@@ -57,9 +57,9 @@ def main(filenames, cut=":", paste=""):
     This script can be run from command line as
     python fits_renamer.py "test_filename.txt" -x "_" -v "-"
 
-    ##TO DO: Could maybe exend this to take pairs to characters to replace.
-    ## e.g. -x -,:,+ -v _,_,-
-    ## -x and -v would need to be same length
+    # # TO DO: Could maybe exend this to take pairs to characters to replace.
+    # # e.g. -x -, :, + -v _, _, -
+    # # -x and -v would need to be same length
 
     """
     if isinstance(filenames, list):

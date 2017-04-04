@@ -1,4 +1,3 @@
-
 ################################################################################
 #
 #    Functions to read column-separated files
@@ -106,9 +105,9 @@ def read_col(filename):
         line = f.readline()
 
         if line == "":
-                    break
+            break
         if line[0] == '#':
-                    continue
+            continue
 
         list_data.append(line.strip().split())
 
@@ -971,16 +970,14 @@ def read_Gauss():
 
     return gauss_data
 
+
 ################################################################################
 #
 #    Functions to write files in column-separated formats
 #
 ################################################################################
-
-
 def write_2col(filename, data1, data2):
     """Write data in 2 columns separated by tabs in a "filename" file."""
-
     f = open(filename, "w")
 
     for i, val in enumerate(data1):

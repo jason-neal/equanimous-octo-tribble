@@ -2,10 +2,10 @@
 
 # Collection of useful tools for dealing with spectra:
 from __future__ import division
-import numpy as np
 import time
-from scipy.interpolate import interp1d
+import numpy as np
 import matplotlib.pyplot as plt
+from scipy.interpolate import interp1d
 
 
 def BERVcorr(wl, Berv):
@@ -34,9 +34,8 @@ def BERVcorr(wl, Berv):
     return wl * (1 + Berv / c)
 
 
-#    return None
 def inverse_BERV(w1, Berv):
-    """Obtain un-BERV corrected wavelengths"""
+    """Obtain un-BERV corrected wavelengths."""
     c = 299792.458  # km/s
     return w1 * (1 - Berv / c)
 
@@ -49,7 +48,7 @@ def Convolution():  # IP convolution ?
 
 
 def air2vac(air):
-    """ Conversion of air wavelenghts to vacuum wavelenghts.
+    """Conversion of air wavelenghts to vacuum wavelenghts.
 
     Adapted from wcal from Pat Hall's IRAF tasks for displaying SDSS spectra
 
@@ -72,7 +71,7 @@ def air2vac(air):
 
 
 def vac2air(vac):
-    """ Conversion of vacuum wavelenghts to air wavelenghts.
+    """Conversion of vacuum wavelenghts to air wavelenghts.
 
     From http://classic.sdss.org/dr7/products/spectra/vacwavelength.html
     AIR = VAC / (1.0 + 2.735182E-4 + 131.4182 / VAC^2 + 2.76249E8 / VAC^4) given in Morton (1991, ApJS, 77, 119)
@@ -150,7 +149,6 @@ def unitary_Gauss(x, center, FWHM):
     p[1] = mean
     p[2] = FWHM
     """
-
     sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)))
     Amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
     tau = -((x - center)**2) / (2 * (sigma**2))
@@ -160,7 +158,7 @@ def unitary_Gauss(x, center, FWHM):
 
 
 def fast_convolve(wav_val, R, wav_extended, flux_extended, fwhm_lim):
-    """IP convolution multiplication step for a single wavelength value"""
+    """IP convolution multiplication step for a single wavelength value."""
     FWHM = wav_val / R
 
     index_mask = (wav_extended > (wav_val - fwhm_lim * FWHM)) & (wav_extended < (wav_val + fwhm_lim * FWHM))
@@ -176,7 +174,6 @@ def fast_convolve(wav_val, R, wav_extended, flux_extended, fwhm_lim):
 
 def instrument_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True, verbose=True):
     """Convolution code adapted from pedros code and speed up with np mask logic."""
-
     # print("types", type(wav), type(flux), type(chip))
     # print("lengths", len(wav), len(flux), len(chip))
 
@@ -192,7 +189,7 @@ def instrument_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True, v
     # wide wavelength bin for the resolution_convolution
     wav_extended, flux_extended = wav_selector(wav, flux, wav_chip[0] - fwhm_lim * FWHM_min,
                                                wav_chip[-1] + fwhm_lim * FWHM_max, verbose=False)
-    # isinstance check is ~100*faster then arraying the array again.
+    # isinstance check is ~100 * faster then arraying the array again.
     if not isinstance(wav_extended, np.ndarray):
         wav_extended = np.array(wav_extended, dtype="float64")
     if not isinstance(flux_extended, np.ndarray):

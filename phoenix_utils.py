@@ -1,4 +1,4 @@
-""" Phoenix Utilities.
+"""Phoenix Utilities.
 
 Some functions to deal with phoenix models
 i.e. searching for models with certian parameters
@@ -6,12 +6,12 @@ i.e. searching for models with certian parameters
 Jason Neal, Janurary 2017
 """
 import glob
-import numpy as np
 import itertools
+import numpy as np
 
 
 def find_closest_phoenix(data_dir, teff, logg, feh, alpha=None):
-    """ Find the closest PHOENIX-ACES model to the stellar parameters given.
+    """Find the closest PHOENIX-ACES model to the stellar parameters given.
 
     alpha parameter is  not implemented yet.
     Parameters
@@ -28,7 +28,6 @@ def find_closest_phoenix(data_dir, teff, logg, feh, alpha=None):
     phoenix_model: str
      Path/Filename to the closest matching model.
     """
-
     if alpha is not None:
         raise NotImplemented("Alpha not implemented")
 
@@ -60,7 +59,7 @@ def find_closest_phoenix(data_dir, teff, logg, feh, alpha=None):
 
 
 def find_phoenix_models(base_dir, ref_model, mode="temp"):
-    """ Find other phoenix models with similar temp and metalicities.
+    """Find other phoenix models with similar temp and metalicities.
 
     Parameters
     ----------

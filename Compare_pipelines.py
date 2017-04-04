@@ -5,20 +5,18 @@
 from __future__ import division, print_function
 import os
 import urllib
+import argparse
+import matplotlib
 import numpy as np
+from astropy.io import fits
 import scipy.interpolate as sci
 import matplotlib.pyplot as plt
-import matplotlib
-from astropy.io import fits
-from astropy.modeling import models, fitting
-import argparse
 from gooey import Gooey, GooeyParser
+from astropy.modeling import models, fitting
 
 
 def _download_spec(fout):
-    """
-    Download a spectrum from my personal web page
-    """
+    """Download a spectrum from my personal web page."""
     import requests
     spec = fout.rpartition('/')[-1]
     url = 'http://www.astro.up.pt/~dandreasen/{0!s}'.format(spec)
@@ -28,7 +26,7 @@ def _download_spec(fout):
 
 
 class Cursor:
-    """Get a crosshair at the cursor's position
+    """Get a crosshair at the cursor's position.
 
     The code is from here:
     http://matplotlib.org/examples/pylab_examples/cursor_demo.html
@@ -49,14 +47,13 @@ class Cursor:
 
 
 def ccf_astro(spectrum1, spectrum2, rvmin=0, rvmax=200, drv=1):
-    """Make a CCF between 2 spectra and find the RV
+    """Make a CCF between 2 spectra and find the RV.
 
     :spectrum1: The stellar spectrum
     :spectrum2: The model, sun or telluric
     :dv: The velocity step
     :returns: The RV shift
     """
-
     # Calculate the cross correlation
     s = False
     w, f = spectrum1
@@ -85,13 +82,14 @@ def ccf_astro(spectrum1, spectrum2, rvmin=0, rvmax=200, drv=1):
 
     # Fit the CCF with a gaussian
     cc[cc == 0] = np.mean(cc)
-    cc = (cc-min(cc))/(max(cc)-min(cc))
+    cc = (cc - min(cc)) / (max(cc) - min(cc))
     RV, g = _fit_ccf(drvs, cc)
     return int(RV), drvs, cc, drvs, g(drvs)
 
 
 def _fit_ccf(rv, ccf):
-    """Fit the CCF with a 1D gaussian
+    """Fit the CCF with a 1D gaussian.
+
     :rv: The RV vector
     :ccf: The CCF values
     :returns: The RV, and best fit gaussian
@@ -99,13 +97,13 @@ def _fit_ccf(rv, ccf):
     """
     ampl = 1
     mean = rv[ccf == ampl]
-    I = np.where(ccf == ampl)[0]
+    i_peak = np.where(ccf == ampl)[0]
 
     g_init = models.Gaussian1D(amplitude=ampl, mean=mean, stddev=5)
     fit_g = fitting.LevMarLSQFitter()
 
     try:
-        g = fit_g(g_init, rv[I - 10:I + 10], ccf[I - 10:I + 10])
+        g = fit_g(g_init, rv[i_peak - 10:i_peak + 10], ccf[i_peak - 10:i_peak + 10])
     except TypeError:
         print('Warning: Not able to fit a gaussian to the CCF')
         return 0, g_init
@@ -114,7 +112,9 @@ def _fit_ccf(rv, ccf):
 
 
 def nrefrac(wavelength, density=1.0):
-    """Calculate refractive index of air from Cauchy formula. Input:
+    """Calculate refractive index of air from Cauchy formula.
+
+    Input:
     wavelength in Angstrom, density of air in amagat (relative to STP,
     e.g. ~10% decrease per 1000m above sea level). Returns N = (n-1) *
     1.e6.
@@ -134,6 +134,7 @@ def nrefrac(wavelength, density=1.0):
 
 def dopplerShift(wvl, flux, v, edgeHandling='firstlast', fill_value=None):
     """Doppler shift a given spectrum.
+
     This code is taken from the PyAstronomy project:
     https://github.com/sczesla/PyAstronomy
     All credit to the author.
@@ -190,7 +191,6 @@ def dopplerShift(wvl, flux, v, edgeHandling='firstlast', fill_value=None):
     wlprime : array
         The shifted wavelength axis.
     """
-
     # Shifted wavelength axis
     wlprime = wvl * (1.0 + v / 299792.458)
 
@@ -229,8 +229,7 @@ def dopplerShift(wvl, flux, v, edgeHandling='firstlast', fill_value=None):
 
 
 def get_wavelength(hdr):
-    """Return the wavelength vector calculated from the header of a FITS
-    file.
+    """Return the wavelength vector calculated from the header of a FITS file.
 
     :hdr: Header from a FITS ('CRVAL1', 'CDELT1', and 'NAXIS1' is required as
             keywords)
@@ -262,7 +261,7 @@ def _parser():
                         widget='FileChooser',
                         help='If not the Sun shoul be used as a model, put'
                         ' the model here (only support BT-Settl for the'
-                        ' moment)',)
+                        ' moment)')
     parser.add_argument('-s', '--sun',
                         help='Over plot solar spectrum',
                         action='store_true')
@@ -301,7 +300,7 @@ def _parser():
                         choices=['0', '1', '2', '3', '4'], default='0')
     parser.add_argument('--fitsext2', help='Select fits extention, Default 0.',
                         choices=['0', '1', '2', '3', '4'], default='0')
-    #parser.add_argument('--fitsext', default=0, type=int, 
+    # parser.add_argument('--fitsext', default=0, type=int,
     #                    help='Select fits extention, 0 = Primary header')
     args = parser.parse_args()
     return args
@@ -310,7 +309,7 @@ def _parser():
 def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
          rv=False, rv1=False, rv2=False, ccf='none', ftype='CRIRES', ftype2='DRACS',
          fitsext='0', fitsext2='0'):
-    """Plot a fits file with extensive options
+    """Plot a fits file with extensive options.
 
     :fname: Input spectra
     :lines: Absorption lines
@@ -322,7 +321,7 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
     :rv2: RV of telluric spectrum
     :ccf: Calculate CCF (sun, model, telluric, both)
     :ftype: Type of fits file (ARES or CRIRES)
-    :fitsext: Slecet fits extention to use (0,1,2,3,4)
+    :fitsext: Slecet fits extention to use (0, 1, 2, 3, 4)
     :returns: RV if CCF have been calculated
     """
     print('\n-----------------------------------')
@@ -348,89 +347,89 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
         _download_spec(pathsun)
         print('Downloading telluric spectrum...')
         _download_spec(pathtel)
-    
+
     fitsext = int(fitsext)
     fitsext2 = int(fitsext2)
     if ftype == 'ARES':
-        I = fits.getdata(fname, fitsext)
+        i_flux = fits.getdata(fname, fitsext)
         hdr = fits.getheader(fname, fitsext)
         w = get_wavelength(hdr)
         label1 = "Star - ARES"
     elif ftype == 'CRIRES':
         d = fits.getdata(fname, fitsext)
         hdr = fits.getheader(fname, fitsext)
-        I = d['Extracted_OPT']
-        w = d['Wavelength']*10
+        i_flux = d['Extracted_OPT']
+        w = d['Wavelength'] * 10
         label1 = "Star - CRIRES"
     elif ftype == 'DRACS':
         d = fits.getdata(fname)
         hdr = fits.getheader(fname)
         try:
-            I = d['Extracted_DRACS']
-            w = d['Wavelength']*10    
-            label1 = "Star - CALIBRATED DRACS " 
+            i_flux = d['Extracted_DRACS']
+            w = d['Wavelength'] * 10
+            label1 = "Star - CALIBRATED DRACS "
         except:
             try:
-                I = d["Combined"]
+                i_flux = d["Combined"]
             except:
-                I = d
-            w = np.linspace(hdr["HIERARCH ESO INS WLEN STRT"], hdr["HIERARCH ESO INS WLEN END"], len(I))*10
+                i_flux = d
+            w = np.linspace(hdr["HIERARCH ESO INS WLEN STRT"], hdr["HIERARCH ESO INS WLEN END"], len(i_flux)) * 10
             label1 = "Star - DRACS (uncalib)"
     if ftype2 == 'ARES':
-        I2 = fits.getdata(fname2, fitsext2)
+        i_flux2 = fits.getdata(fname2, fitsext2)
         hdr = fits.getheader(fname2, fitsext2)
         w = get_wavelength(hdr)
         label2 = "Star - ARES"
     elif ftype2 == 'CRIRES':
         d2 = fits.getdata(fname2, fitsext2)
         hdr2 = fits.getheader(fname2, fitsext2)
-        I2 = d2['Extracted_OPT']
-        w2 = d2['Wavelength']*10
+        i_flux2 = d2['Extracted_OPT']
+        w2 = d2['Wavelength'] * 10
         label2 = "Star - CRIRES"
     elif ftype2 == 'DRACS':
         d2 = fits.getdata(fname2)
         hdr2 = fits.getheader(fname2)
         try:
-            I2 = d2['Extracted_DRACS']
-            w2 = d2['Wavelength']*10 
-            label2 = "Star - CALIBRATED DRACS "    
+            i_flux2 = d2['Extracted_DRACS']
+            w2 = d2['Wavelength'] * 10
+            label2 = "Star - CALIBRATED DRACS "
         except:
             try:
-                I2 = d2["Combined"]
+                i_flux2 = d2["Combined"]
             except:
-                I2 = d2
-            w2 = np.linspace(hdr2['ESO INS WLEN MIN'], hdr2['ESO INS WLEN MAX'], len(I2))*10
-            label2 = "Star - DRACS (uncalib)"    
-        #w = np.linspace(hdr['ESO INS WLEN MIN'], hdr['ESO INS WLEN MAX'], len(I)) * 10
-    I /= np.median(I)
-    I2 /= np.median(I2)
+                i_flux2 = d2
+            w2 = np.linspace(hdr2['ESO INS WLEN MIN'], hdr2['ESO INS WLEN MAX'], len(i_flux2)) * 10
+            label2 = "Star - DRACS (uncalib)"
+        # w = np.linspace(hdr['ESO INS WLEN MIN'], hdr['ESO INS WLEN MAX'], len(I)) * 10
+    i_flux /= np.median(i_flux)
+    i_flux2 /= np.median(i_flux2)
     # Normalization (use first 50 points below 1.2 as constant continuum)
-    maxes = I[(I < 1.2)].argsort()[-50:][::-1]
-    I /= np.median(I[maxes])
-    maxes2 = I2[(I2 < 1.2)].argsort()[-50:][::-1]
-    I2 /= np.median(I2[maxes2])
-    #hdr = fits.getheader(fname)
+    maxes = i_flux[(i_flux < 1.2)].argsort()[-50:][::-1]
+    i_flux /= np.median(i_flux[maxes])
+    maxes2 = i_flux2[(i_flux2 < 1.2)].argsort()[-50:][::-1]
+    i_flux2 /= np.median(i_flux2[maxes2])
+    # hdr = fits.getheader(fname)
     dw = 10  # Some extra coverage for RV shifts
 
     if rv:
-        I, w = dopplerShift(wvl=w, flux=I, v=rv, fill_value=0.95)
-        I2, w2 = dopplerShift(wvl=w2, flux=I2, v=rv, fill_value=0.95)
+        i_flux, w = dopplerShift(wvl=w, flux=i_flux, v=rv, fill_value=0.95)
+        i_flux2, w2 = dopplerShift(wvl=w2, flux=i_flux2, v=rv, fill_value=0.95)
     w0, w1 = w[0] - dw, w[-1] + dw
     w02, w12 = w2[0] - dw, w2[-1] + dw
 
     if sun and not model:
-        I_sun = fits.getdata(pathsun)
+        i_sun = fits.getdata(pathsun)
         hdr = fits.getheader(pathsun)
         w_sun = get_wavelength(hdr)
         i = (w_sun > w0) & (w_sun < w1)
         w_sun = w_sun[i]
-        I_sun = I_sun[i]
+        i_sun = i_sun[i]
         if len(w_sun) > 0:
-            I_sun /= np.median(I_sun)
+            i_sun /= np.median(i_sun)
             if ccf in ['sun', 'both'] and rv1:
                 print('Warning: RV set for Sun. Calculate RV with CCF')
             if rv1 and ccf not in ['sun', 'both']:
-                I_sun, w_sun = dopplerShift(wvl=w_sun, flux=I_sun, v=rv1, fill_value=0.95)
+                i_sun, w_sun = dopplerShift(wvl=w_sun, flux=i_sun, v=rv1, fill_value=0.95)
         else:
             print('Warning: Solar spectrum not available in wavelength range.')
             sun = False
@@ -439,7 +438,7 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
         sun = False
 
     if model:
-        I_mod = fits.getdata(model)
+        i_flux_mod = fits.getdata(model)
         hdr = fits.getheader(model)
         if 'WAVE' in hdr.keys():
             w_mod = fits.getdata(pathwave)
@@ -449,35 +448,35 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
         w_mod = w_mod / (1 + 1e-6 * nre)
         i = (w_mod > w0) & (w_mod < w1)
         w_mod = w_mod[i]
-        I_mod = I_mod[i]
+        i_flux_mod = i_flux_mod[i]
         if len(w_mod) > 0:
             # https://phoenix.ens-lyon.fr/Grids/FORMAT
-            # I_mod = 10 ** (I_mod-8.0)
-            I_mod /= np.median(I_mod)
+            # i_flux_mod = 10 ** (i_flux_mod-8.0)
+            i_flux_mod /= np.median(i_flux_mod)
             # Normalization (use first 50 points below 1.2 as continuum)
-            maxes = I_mod[(I_mod < 1.2)].argsort()[-50:][::-1]
-            I_mod /= np.median(I_mod[maxes])
+            maxes = i_flux_mod[(i_flux_mod < 1.2)].argsort()[-50:][::-1]
+            i_flux_mod /= np.median(i_flux_mod[maxes])
             if ccf in ['model', 'both'] and rv1:
                 print('Warning: RV set for model. Calculate RV with CCF')
             if rv1 and ccf not in ['model', 'both']:
-                I_mod, w_mod = dopplerShift(wvl=w_mod, flux=I_mod, v=rv1, fill_value=0.95)
+                i_flux_mod, w_mod = dopplerShift(wvl=w_mod, flux=i_flux_mod, v=rv1, fill_value=0.95)
         else:
             print('Warning: Model spectrum not available in wavelength range.')
             model = False
 
     if telluric:
-        I_tel = fits.getdata(pathtel)
+        i_tel = fits.getdata(pathtel)
         hdr = fits.getheader(pathtel)
         w_tel = get_wavelength(hdr)
         i = (w_tel > w0) & (w_tel < w1)
         w_tel = w_tel[i]
-        I_tel = I_tel[i]
+        i_tel = i_tel[i]
         if len(w_tel) > 0:
-            I_tel /= np.median(I_tel)
+            i_tel /= np.median(i_tel)
             if ccf in ['telluric', 'both'] and rv2:
                 print('Warning: RV set for telluric, Calculate RV with CCF')
             if rv2 and ccf not in ['telluric', 'both']:
-                I_tel, w_tel = dopplerShift(wvl=w_tel, flux=I_tel, v=rv2, fill_value=0.95)
+                i_tel, w_tel = dopplerShift(wvl=w_tel, flux=i_tel, v=rv2, fill_value=0.95)
         else:
             print('Warning: Telluric spectrum not available in wavelength range.')
             telluric = False
@@ -488,30 +487,30 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
             # remove tellurics from the Solar spectrum
             if telluric and sun:
                 print('Correcting solar spectrum for tellurics...')
-                I_sun = I_sun / I_tel
+                i_sun = i_sun / i_tel
             print('Calculating CCF for the Sun...')
-            rv1, r_sun, c_sun, x_sun, y_sun = ccf_astro((w, -I + 1), (w_sun, -I_sun + 1))
+            rv1, r_sun, c_sun, x_sun, y_sun = ccf_astro((w, -i_flux + 1), (w_sun, -i_sun + 1))
             if rv1 != 0:
                 print('Shifting solar spectrum...')
-                I_sun, w_sun = dopplerShift(w_sun, I_sun, v=rv1, fill_value=0.95)
+                i_sun, w_sun = dopplerShift(w_sun, i_sun, v=rv1, fill_value=0.95)
                 rvs['sun'] = rv1
                 print('DONE')
 
         if ccf in ['model', 'both'] and model:
             print('Calculating CCF for the model...')
-            rv1, r_mod, c_mod, x_mod, y_mod = ccf_astro((w, -I + 1), (w_mod, -I_mod + 1))
+            rv1, r_mod, c_mod, x_mod, y_mod = ccf_astro((w, -i_flux + 1), (w_mod, -i_flux_mod + 1))
             if rv1 != 0:
                 print('Shifting model spectrum...')
-                I_mod, w_mod = dopplerShift(w_mod, I_mod, v=rv1, fill_value=0.95)
+                i_flux_mod, w_mod = dopplerShift(w_mod, i_flux_mod, v=rv1, fill_value=0.95)
                 rvs['model'] = rv1
                 print('DONE')
 
         if ccf in ['telluric', 'both'] and telluric:
             print('Calculating CCF for the model...')
-            rv2, r_tel, c_tel, x_tel, y_tel = ccf_astro((w, -I + 1), (w_tel, -I_tel + 1))
+            rv2, r_tel, c_tel, x_tel, y_tel = ccf_astro((w, -i_flux + 1), (w_tel, -i_tel + 1))
             if rv2 != 0:
                 print('Shifting telluric spectrum...')
-                I_tel, w_tel = dopplerShift(w_tel, I_tel, v=rv2, fill_value=0.95)
+                i_tel, w_tel = dopplerShift(w_tel, i_tel, v=rv2, fill_value=0.95)
                 rvs['telluric'] = rv2
                 print('DONE')
 
@@ -547,13 +546,13 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
     ax1.xaxis.set_major_formatter(x_formatter)
 
     if sun and not model:
-        ax1.plot(w_sun, I_sun, '-g', lw=2, alpha=0.6, label='Sun')
+        ax1.plot(w_sun, i_sun, '-g', lw=2, alpha=0.6, label='Sun')
     if telluric:
-        ax1.plot(w_tel, I_tel, '-r', lw=2, alpha=0.5, label='Telluric')
+        ax1.plot(w_tel, i_tel, '-r', lw=2, alpha=0.5, label='Telluric')
     if model:
-        ax1.plot(w_mod, I_mod, '-g', lw=2, alpha=0.5, label='Model')
-    ax1.plot(w, I, '-k', lw=2, label=label1)
-    ax1.plot(w2, I2, '-m', lw=2, label=label2)
+        ax1.plot(w_mod, i_flux_mod, '-g', lw=2, alpha=0.5, label='Model')
+    ax1.plot(w, i_flux, '-k', lw=2, label=label1)
+    ax1.plot(w2, i_flux2, '-m', lw=2, label=label2)
 
     # Add crosshair
     xlim = ax1.get_xlim()
@@ -566,12 +565,12 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
         if rv1:
             shift = (1.0 + rv1 / 299792.458)
             for line in lines:
-                ax1.vlines(line*shift, y0, y1, linewidth=2, color='m', alpha=0.5)
-                ax1.text(line*shift-0.7, 1.2, str(line), rotation=90)
+                ax1.vlines(line * shift, y0, y1, linewidth=2, color='m', alpha=0.5)
+                ax1.text(line * shift - 0.7, 1.2, str(line), rotation=90)
         else:
             for line in lines:
                 ax1.vlines(line, y0, y1, linewidth=2, color='m', alpha=0.5)
-                ax1.text(line-0.7, 1.2, str(line), rotation=90)
+                ax1.text(line - 0.7, 1.2, str(line), rotation=90)
 
     ax1.set_xlabel('Wavelength')
     ax1.set_ylabel('"Normalized" flux')
