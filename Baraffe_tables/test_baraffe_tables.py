@@ -4,13 +4,13 @@ import pytest
 import numpy as np
 from astropy.constants import M_jup, M_sun
 
-from calculations import flux_mag_ratio, calculate_flux_ratio, calculate_companion_magnitude
-from table_search import mass_table_search, magnitude_table_search, age_table
 from BDmass_to_flux_ratio import main as mass_main
-from BDmass_to_flux_ratio import _parser as mass_parser
 from flux_ratio_to_BDmass import main as ratio_main
+from BDmass_to_flux_ratio import _parser as mass_parser
 from flux_ratio_to_BDmass import _parser as ratio_parser
+from table_search import mass_table_search, magnitude_table_search, age_table
 from db_queries import get_sweet_cat_temp, get_stellar_params, get_temperature
+from calculations import flux_mag_ratio, calculate_flux_ratio, calculate_companion_magnitude
 
 org_sysargv = sys.argv
 
@@ -24,7 +24,7 @@ def test_main(raises=Exception):
         Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
         url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
         object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
-        resolution',)).
+        resolution')).
     """
     assert mass_main("HD30501", 90, 5) is 0
     assert mass_main("HD30501", 90, 5, area_ratio=True) is 0
@@ -38,7 +38,7 @@ def test_ratio_main(raises=Exception):
         Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
         url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
         object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
-        resolution',)).
+        resolution', )).
     """
     assert ratio_main("HD30501", 0.01, 5) is 0
 
@@ -99,7 +99,7 @@ def test_get_temperature_without_params_input():
         Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
         url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
         object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
-        resolution',)).
+        resolution', )).
     """
     name = "HD30501"
     params = get_stellar_params(name)
@@ -114,7 +114,7 @@ def test_get_temerature_examples():
         Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
         url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
         object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
-        resolution',)).
+        resolution', )).
     """
     star = "HD12116"   # Has zero temp in simbad (Check this is not used)
     assert get_temperature(star) != 0
@@ -137,7 +137,7 @@ def test_get_stellar_params():
         Exception: Query failed: HTTPConnectionPool(host='simbad.u-strasbg.fr', port=80): Max retries exceeded with
         url: /simbad/sim-script (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection
         object at 0x7fe4e509b438>: Failed to establish a new connection: [Errno -3] Temporary failure in name
-        resolution',)).
+        resolution', )).
     """
     name = "HD219828"
     params = get_stellar_params(name)
@@ -306,7 +306,7 @@ def test_magnitude_table_search_errors():
 
     with pytest.raises(ValueError):
         # More than one band not allowed
-        magnitude_table_search({"K": 9.91, "H": 9.91}, 5, band=("K",), model="2015")
+        magnitude_table_search({"K": 9.91, "H": 9.91}, 5, band=("K", ), model="2015")
 
     with pytest.raises(ValueError):
         # More then one band not allowed

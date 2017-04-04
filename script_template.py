@@ -17,7 +17,7 @@ def _parser():
 
 
 def main(pos_arg, flag=False):
-    """ Do main stuff"""
+    """Do main stuff."""
     pass
 
 

@@ -12,6 +12,6 @@ declare -a arr=("HD202206-1" "HD202206-2" "HD202206-3"
 for FOLDER in "${arr[@]}"
 do
     echo "Moving ", $FOLDER, "xml files"
-    #python tapas_xml_request_generator.py ../../data/Crires/BDs-DRACS/$FOLDER/list_spectra.txt -f none -u vacuum -c h2o -l -o "../../data/Crires/BDs-DRACS/"$FOLDER"/"$FOLDER"_tapas_h2o_bash_request.xml"
+    # python tapas_xml_request_generator.py ../../data/Crires/BDs-DRACS/$FOLDER/list_spectra.txt -f none -u vacuum -c h2o -l -o "../../data/Crires/BDs-DRACS/"$FOLDER"/"$FOLDER"_tapas_h2o_bash_request.xml"
     mv bash_requests/$FOLDER*.xml ../../data/Crires/BDs-DRACS/$FOLDER/
 done

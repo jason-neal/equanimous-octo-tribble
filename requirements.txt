@@ -10,3 +10,7 @@ seaborn
 tqdm
 multiprocess
 datetime
+ephem
+seaborn
+joblib
+gooey

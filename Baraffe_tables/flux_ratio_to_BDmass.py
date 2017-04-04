@@ -18,12 +18,12 @@ age: float
 from __future__ import division, print_function
 import sys
 import argparse
-from astropy.constants import M_sun, M_jup
 from typing import List, Optional
+from astropy.constants import M_sun, M_jup
 
 from db_queries import get_stellar_params
-from calculations import calculate_companion_magnitude
 from table_search import magnitude_table_search
+from calculations import calculate_companion_magnitude
 
 
 def _parser() -> object:

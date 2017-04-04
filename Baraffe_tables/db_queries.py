@@ -1,7 +1,7 @@
 """Access Databases."""
 import numpy as np
-from astroquery.simbad import Simbad
 from PyAstronomy import pyasl
+from astroquery.simbad import Simbad
 from typing import Any, Union, Optional
 
 

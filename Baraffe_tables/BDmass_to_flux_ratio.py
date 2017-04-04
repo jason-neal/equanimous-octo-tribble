@@ -31,9 +31,9 @@ import numpy as np
 from typing import List, Optional
 from astropy.constants import M_sun, M_jup
 
-from calculations import calculate_flux_ratio, calculate_stellar_radius
-from table_search import mass_table_search
 from db_queries import get_stellar_params
+from table_search import mass_table_search
+from calculations import calculate_flux_ratio, calculate_stellar_radius
 
 
 def _parser() -> object:
@@ -92,7 +92,7 @@ def main(star_name: str, companion_mass: float, stellar_age: float, bands: Optio
 
     # Print flux ratios using a generator
     print("\nFlux ratios:")
-    print_generator = (("{0!s} band star/companion Flux ratio = {1:4.2f},"
+    print_generator = (("{0!s} band star/companion Flux ratio = {1:4.2f}, "
                        " >>> companion/star Flux ratio = {2:0.4f}").format(key, val, 1. / val)
                        for key, val in flux_ratios.items() if key in bands)
 

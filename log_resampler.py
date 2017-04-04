@@ -1,14 +1,14 @@
-# Logorithmic linear resampling.
-
+"""Logorithmic linear resampling."""
 import numpy as np
 
+
 def log_resampler(wavelength, flux):
-    """ Log linear resampling """
+    """Log linear resampling."""
     # Take log of wavelength
     log_wav = np.log10(wavelength)
 
     # Minimum difference in log wavelength
-    min_log = np.min(abs(log_wav[1:]-log_wav[:-1]))
+    min_log = np.min(abs(log_wav[1:] - log_wav[:-1]))
     print("min log", min_log)
     print("log_wav[0]", log_wav[0])
     print("log_wav[-1]", log_wav[-1])
@@ -24,8 +24,7 @@ def log_resampler(wavelength, flux):
 
 
 def test_resampler():
-    """ Test reampler visually"""
-
+    """Test reampler visually."""
     import matplotlib.pyplot as plt
     from astropy.io import fits
     from Get_filenames import get_filenames

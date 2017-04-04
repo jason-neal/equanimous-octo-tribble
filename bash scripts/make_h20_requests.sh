@@ -13,5 +13,5 @@ do
     echo "Request for ", $FOLDER
     #python tapas_xml_request_generator.py ../../data/Crires/BDs-DRACS/$FOLDER/list_spectra.txt -f none -u vacuum -c h2o -l -o "../../data/Crires/BDs-DRACS/"$FOLDER"/"$FOLDER"_tapas_h2o_bash_request.xml"
     python tapas_xml_request_generator.py ../../data/Crires/BDs-DRACS/$FOLDER/list_spectra.txt -f none -u vacuum -c h2o -l -o "bash_requests/"$FOLDER"_tapas_h2o_bash_request.xml"
- 
+
 done

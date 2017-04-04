@@ -4,10 +4,11 @@
 # Module to perform Chi-square analysis for a grid of values.
 from __future__ import division, print_function
 import os
-from joblib import Memory
-from joblib import Parallel, delayed
 import numpy as np
+from joblib import Memory
 import matplotlib.pyplot as plt
+from joblib import Parallel, delayed
+
 
 path = "/home/jneal/Phd/Codes/equanimous-octo-tribble/"  # save path
 cachedir = os.path.join(path, "cache")  # save path
@@ -17,6 +18,7 @@ memory = Memory(cachedir=cachedir, verbose=0)
 # @memory.cache
 def chi_squared(observed, expected, error=None):
     """Calculate chi squared.
+
     Same result as as scipy.stats.chisquare
     """
     if np.any(error):
@@ -68,7 +70,7 @@ if __name__ == "__main__":
     iterable_c = np.arange(1, 4)
     simulation = model_func(a, b, c, t)
 
-    chisqr_grid = parallel_chisqr_3D(iterable_a, iterable_b, iterable_c, simulation, model_func, (t,))
+    chisqr_grid = parallel_chisqr_3D(iterable_a, iterable_b, iterable_c, simulation, model_func, (t, ))
 
     print(chisqr_grid)
     X, Y, Z = np.meshgrid(iterable_a, iterable_b, iterable_c, indexing="ij")

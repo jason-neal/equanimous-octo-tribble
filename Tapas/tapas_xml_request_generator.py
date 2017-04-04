@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
-""" Take CRIRES fits file and generate a tapas xml request to submit on .
+"""Take CRIRES fits file and generate a tapas xml request to submit on.
 
 """
 from __future__ import print_function
@@ -406,11 +406,11 @@ def main(fname=("/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/"
 </tapas> """
 
 # ECMWF = ARLETTY
-# [{"text": "ECMWF","value": 0},{"text": "TROPICAL","value": 1},{"text": "MEDIUM_LATITUDE_SUMMER","value": 2},
-# {"text": "MEDIUM_LATITUDE_WINTER","value": 3},{"text": "SUBARCTIC_SUMMER","value": 4},{"text": "SUBARCTIC_WINTER",
-# "value": 5},{"text": "US_STANDARD_1976","value": 6}]
+# [{"text": "ECMWF", "value": 0}, {"text": "TROPICAL", "value": 1}, {"text": "MEDIUM_LATITUDE_SUMMER", "value": 2},
+# {"text": "MEDIUM_LATITUDE_WINTER", "value": 3}, {"text": "SUBARCTIC_SUMMER", "value": 4}, {"text": "SUBARCTIC_WINTER",
+# "value": 5}, {"text": "US_STANDARD_1976", "value": 6}]
 
-# ######################TODO - Missing all in one transmission
+# ###################### TODO - Missing all in one transmission
 
 # tapasTexts["NM_STANDARD"] = "Standard Wavelength (nm)";
 #            tapasTexts["NM_VACUUM"] = "Vacuum Wavelength (nm)";
