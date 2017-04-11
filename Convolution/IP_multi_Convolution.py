@@ -7,6 +7,7 @@
 # If you do not want to use multiprocessing then see IP_Convolution.py
 
 from __future__ import division, print_function
+import logging
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -30,14 +31,14 @@ def wav_selector(wav, flux, wav_min, wav_max):
     return [wav_sel, flux_sel]
 
 
-def unitary_Gauss(x, center, FWHM):
+def unitary_Gauss(x, center, fwhm):
     """Gaussian_function of area=1.
 
     p[0] = A;
     p[1] = mean;
-    p[2] = FWHM;
+    p[2] = fwhm;
     """
-    sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)))
+    sigma = np.abs(fwhm) / (2 * np.sqrt(2 * np.log(2)))
     Amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
     tau = -((x - center) ** 2) / (2 * (sigma ** 2))
     result = Amp * np.exp(tau)
@@ -45,20 +46,20 @@ def unitary_Gauss(x, center, FWHM):
     return result
 
 
-def fast_convolve(wav_val, R, wav_extended, flux_extended, FWHM_lim):
+def fast_convolve(wav_val, R, wav_extended, flux_extended, fwhm_lim):
     """IP convolution multiplication step for a single wavelength value."""
-    FWHM = wav_val / R
-    # Mask of wavelength range within 5 FWHM of wav
-    index_mask = ((wav_extended > (wav_val - FWHM_lim * FWHM)) &
-                  (wav_extended < (wav_val + FWHM_lim * FWHM)))
+    fwhm = wav_val / R
+    # Mask of wavelength range within 5 fwhm of wav
+    index_mask = ((wav_extended > (wav_val - fwhm_lim * fwhm)) &
+                  (wav_extended < (wav_val + fwhm_lim * fwhm)))
 
     flux_2convolve = flux_extended[index_mask]
     # Gausian Instrument Profile for given resolution and wavelength
-    IP = unitary_Gauss(wav_extended[index_mask], wav_val, FWHM)
+    inst_profile = unitary_Gauss(wav_extended[index_mask], wav_val, fwhm)
 
-    sum_val = np.sum(IP * flux_2convolve)
+    sum_val = np.sum(inst_profile * flux_2convolve)
     # Correct for the effect of convolution with non-equidistant postions
-    unitary_val = np.sum(IP * np.ones_like(flux_2convolve))
+    unitary_val = np.sum(inst_profile * np.ones_like(flux_2convolve))
 
     return sum_val / unitary_val
 
@@ -72,8 +73,8 @@ def wrapper_fast_convolve(args):
     return fast_convolve(*args)
 
 
-def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
-                  verbose=True, numProcs=None):
+def ip_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True,
+                   verbose=True, numProcs=None):
     """Spectral convolution which allows non-equidistance step values."""
     # Turn into numpy arrays
     wav = np.asarray(wav, dtype='float64')
@@ -82,14 +83,14 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
     timeInit = dt.now()
     wav_chip, flux_chip = wav_selector(wav, flux, chip_limits[0],
                                        chip_limits[1])
-    # We need to calculate the FWHM at this value in order to set the starting
+    # We need to calculate the fwhm at this value in order to set the starting
     # point for the convolution
-    FWHM_min = wav_chip[0] / R    # FWHM at the extremes of vector
-    FWHM_max = wav_chip[-1] / R
+    fwhm_min = wav_chip[0] / R    # fwhm at the extremes of vector
+    fwhm_max = wav_chip[-1] / R
 
     # Wide wavelength bin for the resolution_convolution
-    wav_min = wav_chip[0] - FWHM_lim * FWHM_min
-    wav_max = wav_chip[-1] + FWHM_lim * FWHM_max
+    wav_min = wav_chip[0] - fwhm_lim * fwhm_min
+    wav_max = wav_chip[-1] + fwhm_lim * fwhm_max
     wav_ext, flux_ext = wav_selector(wav, flux, wav_min, wav_max)
 
     print("Starting the Resolution convolution...")
@@ -100,7 +101,7 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
 
     mprocPool = mprocess.Pool(processes=numProcs)
 
-    args_generator = tqdm([[wav, R, wav_ext, flux_ext, FWHM_lim]
+    args_generator = tqdm([[wav, R, wav_ext, flux_ext, fwhm_lim]
                           for wav in wav_chip])
 
     flux_conv_res = np.array(mprocPool.map(wrapper_fast_convolve,
@@ -126,6 +127,17 @@ def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
     return [wav_chip, flux_conv_res]
 
 
+def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
+                  verbose=True, numProcs=None):
+    """Wrapper of ip_convolution for backwards compatibility.
+    Lower case of variable name of FWHM.
+    """
+    logging.warning("IPconvolution is depreciated, should use ip_convolution instead."
+                    "IPconvolution is still available for compatibility.")
+    return ip_convolution(wav, flux, chip_limits, R, fwhm_lim=FWHM_lim, plot=plot,
+                         verbose=verbose, numProcs=numProcs)
+
+
 if __name__ == "__main__":
     # Example useage of this convolution
     wav = np.linspace(2040, 2050, 30000)
@@ -135,6 +147,6 @@ if __name__ == "__main__":
     chip_limits = [2042, 2049]
 
     R = 1000
-    convolved_wav, convolved_flux = IPconvolution(wav, flux, chip_limits, R,
-                                                  FWHM_lim=5.0, plot=True,
-                                                  verbose=True)
+    convolved_wav, convolved_flux = ip_convolution(wav, flux, chip_limits, R,
+                                                   fwhm_lim=5.0, plot=True,
+                                                   verbose=True)
