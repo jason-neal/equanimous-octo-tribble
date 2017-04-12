@@ -52,7 +52,9 @@ def calculate_flux_ratio(star_params: Any, companion_params: Dict[str, float], b
     flux_ratios = dict()
     for band in bands:
         band = band.upper()
-        flux_ratios[band] = flux_mag_ratio(float(star_params["FLUX_{0!s}".format(band)][0]),
+        # flux_ratios[band] = flux_mag_ratio(float(star_params["FLUX_{0!s}".format(band)][0]),
+        #                                    companion_params["M{}".format(band.lower())])
+        flux_ratios[band] = flux_mag_ratio(float(star_params["FLUX_{0!s}".format(band)]),
                                            companion_params["M{}".format(band.lower())])
 
     return flux_ratios
