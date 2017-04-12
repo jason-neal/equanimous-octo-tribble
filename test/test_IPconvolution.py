@@ -1,7 +1,10 @@
 import py.test
-
 import numpy as np
-from IP_Convolution import fast_wav_selector, unitary_Gauss, fast_convolve, IPconvolution
+from IP_Convolution import wav_selector, unitary_Gauss, fast_convolve, IPconvolution, ip_convolution
+
+from IP_multi_Convolution import ip_convolution as ip_multi_Convolution
+from IP_multi_Convolution import wav_selector as wav_selector_multi
+from IP_multi_Convolution import fast_convolve as fast_convolve_multi
 
 
 def test_wav_selector():
@@ -9,21 +12,14 @@ def test_wav_selector():
     y = [1, 2, 1, 1, 2]
     x_np = np.array(x)
     y_np = np.array(y)
-    assert isinstance(fast_wav_selector(x, y, 1, 3), list)
-    assert isinstance(fast_wav_selector(x_np, y_np, 1, 3), list)
-    assert isinstance(fast_wav_selector(x, y, 1, 3)[0], list)
-    assert isinstance(fast_wav_selector(x, y, 1, 3)[1], list)
-    assert isinstance(fast_wav_selector(x_np, y_np, 1, 3)[0], np.ndarray)
-    assert isinstance(fast_wav_selector(x_np, y_np, 1, 3)[1], np.ndarray)
-    assert fast_wav_selector(x, y, 0, 3)[0] == [1, 2]
-
-# def test_unitary_Gauss():
-#    FWHM = 1
-#    normalization = 2 * np.sqrt(2 * np.log(2)) / (np.abs(FWHM) * np.sqrt(2 * np.pi))
-#
-#    assert unitary_Gauss(0, 0, FWHM) == normalization
-
-    # assert type(unitary_Gauss([-1, 0, 1, 3], 0, FWHM)) == 'numpy.ndarray'
+    assert isinstance(wav_selector(x, y, 1, 3), list)
+    assert isinstance(wav_selector(x_np, y_np, 1, 3), list)
+    assert isinstance(wav_selector(x, y, 1, 3)[0], list)
+    assert isinstance(wav_selector(x, y, 1, 3)[1], list)
+    assert isinstance(wav_selector(x_np, y_np, 1, 3)[0], np.ndarray)
+    assert isinstance(wav_selector(x_np, y_np, 1, 3)[1], np.ndarray)
+    assert wav_selector(x, y, 0, 3)[0] == [1, 2]
+    assert wav_selector(x, y, 0, 3)[0] == wav_selector_multi(x, y, 0, 3)[0]
 
 
 def test_fast_convolution():
@@ -37,6 +33,7 @@ def test_fast_convolution():
         assert type(fast_convolve(a_val, R, b, c, 5)) == np.float64
         assert fast_convolve(a_val, R, b, c, 5) == 1     # Test a flat input of 1s gives a flat ouput of 1s
         assert fast_convolve(a_val, R, b, 0 * c, 5) == 0     # Test a flat input of 1s gives a flat ouput of 1s
+        assert np.allclose(fast_convolve(a_val, R, b, c, 5), fast_convolve_multi(a_val, R, b, c, 5))
 
 
 def test_IPconvolution():
@@ -46,6 +43,13 @@ def test_IPconvolution():
     R = 100
     ans = IPconvolution(wave, flux, chip_limits, R, plot=False)
     assert ans == [1, 1]
+
+
+def test_ip_wrapper():
+    a = np.linspace(2130, 2170, 1024)
+    b = np.linspace(2100, 2200, 1024)
+    assert np.all(IPconvolution(a, b, [2140, 2165], R=50000, plot=False),
+                  ip_convolution(a, b, [2140, 2165], R=50000, plot=False))
 
 
 if __name__ == "__main__":

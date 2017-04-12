@@ -16,7 +16,7 @@ from datetime import datetime as dt
 
 
 def wav_selector(wav, flux, wav_min, wav_max):
-    """Faster Wavelenght selector.
+    """Wavelenght selector.
 
     If passed lists it will return lists.
     If passed np arrays it will return arrays
