@@ -21,9 +21,14 @@ import argparse
 from typing import List, Optional
 from astropy.constants import M_sun, M_jup
 
-from db_queries import get_stellar_params
-from table_search import magnitude_table_search
-from calculations import calculate_companion_magnitude
+try:
+    from db_queries import get_stellar_params
+    from table_search import magnitude_table_search
+    from calculations import calculate_companion_magnitude
+except:
+    from Baraffe_tables.db_queries import get_stellar_params
+    from Baraffe_tables.table_search import magnitude_table_search
+    from Baraffe_tables.calculations import calculate_companion_magnitude
 
 
 def _parser() -> object:

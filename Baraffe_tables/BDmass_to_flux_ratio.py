@@ -30,10 +30,14 @@ import argparse
 import numpy as np
 from typing import List, Optional
 from astropy.constants import M_sun, M_jup
-
-from db_queries import get_stellar_params
-from table_search import mass_table_search
-from calculations import calculate_flux_ratio, calculate_stellar_radius
+try:
+    from db_queries import get_stellar_params
+    from table_search import mass_table_search
+    from calculations import calculate_flux_ratio, calculate_stellar_radius
+except:
+    from Baraffe_tables.db_queries import get_stellar_params
+    from Baraffe_tables.table_search import mass_table_search
+    from Baraffe_tables.calculations import calculate_flux_ratio, calculate_stellar_radius
 
 
 def _parser() -> object:
