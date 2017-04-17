@@ -4,13 +4,13 @@ import pytest
 import numpy as np
 from astropy.constants import M_jup, M_sun
 
-from BDmass_to_flux_ratio import main as mass_main
-from flux_ratio_to_BDmass import main as ratio_main
-from BDmass_to_flux_ratio import _parser as mass_parser
-from flux_ratio_to_BDmass import _parser as ratio_parser
-from table_search import mass_table_search, magnitude_table_search, age_table
-from db_queries import get_sweet_cat_temp, get_stellar_params, get_temperature
-from calculations import flux_mag_ratio, calculate_flux_ratio, calculate_companion_magnitude
+from Baraffe_tables.BDmass_to_flux_ratio import main as mass_main
+from Baraffe_tables.flux_ratio_to_BDmass import main as ratio_main
+from Baraffe_tables.BDmass_to_flux_ratio import _parser as mass_parser
+from Baraffe_tables.flux_ratio_to_BDmass import _parser as ratio_parser
+from Baraffe_tables.table_search import mass_table_search, magnitude_table_search, age_table
+from Baraffe_tables.db_queries import get_sweet_cat_temp, get_stellar_params, get_temperature
+from Baraffe_tables.calculations import flux_mag_ratio, calculate_flux_ratio, calculate_companion_magnitude
 
 org_sysargv = sys.argv
 

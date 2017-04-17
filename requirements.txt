@@ -13,4 +13,3 @@ datetime
 ephem
 seaborn
 joblib
-gooey

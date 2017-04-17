@@ -3,6 +3,7 @@
 __pycache__/
 requests/
 cache/
+*.coverage
 
 #### GIT IGNORE ###
 

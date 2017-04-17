@@ -1,7 +1,10 @@
 """Calculations for flux ratios."""
 import numpy as np
 from typing import Dict, List, Any
-from db_queries import get_temperature
+try:
+    from db_queries import get_temperature
+except:
+    from Baraffe_tables.db_queries import get_temperature
 
 
 def flux_mag_ratio(mag1: float, mag2: float) -> float:
@@ -23,12 +26,12 @@ def flux_mag_ratio(mag1: float, mag2: float) -> float:
         flux/contrast ratio between the two magnitudes.
 
     """
-    if isinstance(mag1, float) and isinstance(mag2, float):
+    if isinstance(mag1, (int, float)) and isinstance(mag2, (int, float)):
         # return 2.512**(mag2 - mag1)  # Approximation
         return 10**(-0.4 * (mag1 - mag2))
     else:
         print(type(mag1), type(mag2))
-        raise ValueError("Magnitudes given were not floats. Mag1 = {}, Mag2 = {}".format(mag1, mag2))
+        raise ValueError("Magnitudes given were not floats or ints. Mag1 = {}, Mag2 = {}".format(mag1, mag2))
 
 
 def calculate_flux_ratio(star_params: Any, companion_params: Dict[str, float], bands: List[str]) -> Dict[str, float]:
@@ -52,7 +55,9 @@ def calculate_flux_ratio(star_params: Any, companion_params: Dict[str, float], b
     flux_ratios = dict()
     for band in bands:
         band = band.upper()
-        flux_ratios[band] = flux_mag_ratio(float(star_params["FLUX_{0!s}".format(band)][0]),
+        # flux_ratios[band] = flux_mag_ratio(float(star_params["FLUX_{0!s}".format(band)][0]),
+        #                                    companion_params["M{}".format(band.lower())])
+        flux_ratios[band] = flux_mag_ratio(float(star_params["FLUX_{0!s}".format(band)]),
                                            companion_params["M{}".format(band.lower())])
 
     return flux_ratios

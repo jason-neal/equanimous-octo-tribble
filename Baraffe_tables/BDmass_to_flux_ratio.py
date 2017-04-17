@@ -30,10 +30,14 @@ import argparse
 import numpy as np
 from typing import List, Optional
 from astropy.constants import M_sun, M_jup
-
-from db_queries import get_stellar_params
-from table_search import mass_table_search
-from calculations import calculate_flux_ratio, calculate_stellar_radius
+try:
+    from db_queries import get_stellar_params
+    from table_search import mass_table_search
+    from calculations import calculate_flux_ratio, calculate_stellar_radius
+except:
+    from Baraffe_tables.db_queries import get_stellar_params
+    from Baraffe_tables.table_search import mass_table_search
+    from Baraffe_tables.calculations import calculate_flux_ratio, calculate_stellar_radius
 
 
 def _parser() -> object:
@@ -84,6 +88,7 @@ def main(star_name: str, companion_mass: float, stellar_age: float, bands: Optio
     star_params = get_stellar_params(star_name)  # returns a astroquesry result table
 
     companion_mass_solar = companion_mass * (M_jup / M_sun).value    # transform to solar mass for table search
+
     # Get parameters for this mass and age
     companion_params = mass_table_search(companion_mass_solar, stellar_age, model=model)
 

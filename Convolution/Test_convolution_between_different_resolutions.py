@@ -5,7 +5,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from IP_multi_Convolution import unitary_Gauss, IPconvolution
+from IP_multi_Convolution import unitary_Gauss, ip_convolution
 
 
 def main():
@@ -21,32 +21,32 @@ def main():
 
     # Convolution to 80k
     R = 80000
-    wav_80k, flux_80k = IPconvolution(wav, flux, chip_limits, R,
-                                      FWHM_lim=5.0, plot=False, verbose=True)
+    wav_80k, flux_80k = ip_convolution(wav, flux, chip_limits, R,
+                                       fwhm_lim=5.0, plot=False, verbose=True)
 
     # Convolution to 50k
     R = 50000
-    wav_50k, flux_50k = IPconvolution(wav, flux, chip_limits, R,
-                                      FWHM_lim=5.0, plot=False, verbose=True)
+    wav_50k, flux_50k = ip_convolution(wav, flux, chip_limits, R,
+                                       fwhm_lim=5.0, plot=False, verbose=True)
 
-    wav_80k_50k, flux_80k_50k = IPconvolution(wav_80k, flux_80k, chip_limits, R,
-                                              FWHM_lim=5.0, plot=False, verbose=True)
+    wav_80k_50k, flux_80k_50k = ip_convolution(wav_80k, flux_80k, chip_limits, R,
+                                               fwhm_lim=5.0, plot=False, verbose=True)
 
     # Convolution to 20k
     R = 20000
-    wav_80k_20k, flux_80k_20k = IPconvolution(wav_80k, flux_80k, chip_limits, R,
-                                              FWHM_lim=5.0, plot=False, verbose=True)
+    wav_80k_20k, flux_80k_20k = ip_convolution(wav_80k, flux_80k, chip_limits, R,
+                                               fwhm_lim=5.0, plot=False, verbose=True)
 
-    wav_50k_20k, flux_50k_20k = IPconvolution(wav_50k, flux_50k, chip_limits, R,
-                                              FWHM_lim=5.0, plot=False, verbose=True)
+    wav_50k_20k, flux_50k_20k = ip_convolution(wav_50k, flux_50k, chip_limits, R,
+                                               fwhm_lim=5.0, plot=False, verbose=True)
 
-    wav_80k_50k_20k, flux_80k_50k_20k = IPconvolution(wav_80k_50k, flux_80k_50k,
-                                                      chip_limits, R, FWHM_lim=5.0,
-                                                      plot=False, verbose=True)
+    wav_80k_50k_20k, flux_80k_50k_20k = ip_convolution(wav_80k_50k, flux_80k_50k,
+                                                       chip_limits, R, fwhm_lim=5.0,
+                                                       plot=False, verbose=True)
 
     # Convolution straight to 20000
-    wav_20k, flux_20k = IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0,
-                                      plot=False, verbose=True)
+    wav_20k, flux_20k = ip_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0,
+                                       plot=False, verbose=True)
 
     # Plot the results
 
