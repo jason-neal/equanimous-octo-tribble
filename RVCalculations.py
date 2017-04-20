@@ -17,14 +17,17 @@ def Calculate_RV(Lambda, deltalambda):
     return V
 
 
-def Calculate_WLshift(lambda, v):
+def Calculate_WLshift(wav, v):
     """Lambda = wavelength.
 
-    v = velocity.
+    v = velocity in m/s.
     """
     c = 299792458.  # m/s
-    deltalambda = [(v / c) * lmda for lmda in lambda]
-    return deltalambda
+    if isinstance(v, (int, float)):
+        return (v / c) * wav
+    else:
+        deltalambda = [(v / c) * lmda for lmda in wav]
+        return deltalambda
 
 
 def Calc_RV(Lambda, deltalambda):

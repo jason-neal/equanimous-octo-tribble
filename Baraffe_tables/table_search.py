@@ -11,7 +11,7 @@ def age_table(age: float, model: str="2003") -> Tuple[Dict[str, List[float]], Li
     age: float
         Stellar age (Gyr).
     model: str
-        Baraffe mdel version to use. options=[2003, 2015].
+        Baraffe model version to use. options=[03, 15, 2003, 2015].
 
     Returns
     -------
@@ -23,7 +23,7 @@ def age_table(age: float, model: str="2003") -> Tuple[Dict[str, List[float]], Li
     """
     if not isinstance(model, str):
         raise ValueError("Model is not the valid type 'str'.")
-    elif model not in ["2003", "03", "2015", "2003"]:
+    elif model not in ["2003", "03", "2015", "15"]:
         raise ValueError("Model value '{}' is not valid".format(model))
 
     if model in '2003':
