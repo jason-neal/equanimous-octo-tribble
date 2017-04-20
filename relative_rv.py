@@ -63,7 +63,7 @@ def main(original_wavelength, new_wavelength, mode=False, unit="km"):  # unit, r
     scale_factor = {"mm": 1e6, "cm": 1e5, "m": 1e3, "km": 1e0, "Mm": 1e-3}
 
     print("\n" + "-" * 20)
-    print("Original  -->   New   |  RV (km/s)")
+    print("Original  -->   New   |  RV ({0}/s})".format(unit))
     print("-" * 20)
     if mode == "iterable":
         for wav1, wav2 in zip(original_wavelength, new_wavelength):
