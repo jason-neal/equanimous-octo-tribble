@@ -1,0 +1,6 @@
+# Test bool grid data to parse in:
+# 4*8 values
+11111011
+01111111
+11011101
+00000010
