@@ -15,6 +15,15 @@ import multiprocess as mprocess
 from datetime import datetime as dt
 
 
+def setup_debug(debug_val=False):
+    """Set debug level."""
+    if debug_val:
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+    else:
+        logging.basicConfig(level=logging.WARNING, format='%(asctime)s %(levelname)s %(message)s')
+    return None
+
+
 def wav_selector(wav, flux, wav_min, wav_max):
     """Wavelenght selector.
 
@@ -74,8 +83,26 @@ def wrapper_fast_convolve(args):
 
 
 def ip_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True,
-                   verbose=True, numProcs=None):
-    """Spectral convolution which allows non-equidistance step values."""
+                   verbose=False, numProcs=None, progbar=True, debug=False):
+    """Spectral convolution which allows non-equidistance step values.
+
+    Parameters
+    ----------
+    verbose: bool
+        Does nothing anymore...
+    numProcs: int
+        NUmber of processes to use. Defualt=None selects cpu_count - 1.
+    progbar: bool
+        Enable the tqdm progress bar. Default=True.
+    debug: bool
+        Enable logging debug information. Default=False.
+    """
+    if verbose:
+        """Verbose was turned on when doesn't do anything."""
+        logging.warning("ip_convolution's unused 'verbose' parameter was enabled."
+                      " It is unused/depreciated so should be avoided.")
+
+    setup_debug(debug_val=debug)
     # Turn into numpy arrays
     wav = np.asarray(wav, dtype='float64')
     flux = np.asarray(flux, dtype='float64')
@@ -93,7 +120,7 @@ def ip_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True,
     wav_max = wav_chip[-1] + fwhm_lim * fwhm_max
     wav_ext, flux_ext = wav_selector(wav, flux, wav_min, wav_max)
 
-    print("Starting the Resolution convolution...")
+    logging.debug("Starting the Resolution convolution...")
 
     # multiprocessing part
     if numProcs is None:
@@ -102,16 +129,17 @@ def ip_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True,
     mprocPool = mprocess.Pool(processes=numProcs)
 
     args_generator = tqdm([[wav, R, wav_ext, flux_ext, fwhm_lim]
-                          for wav in wav_chip])
+                          for wav in wav_chip], disable=(not progbar))
 
     flux_conv_res = np.array(mprocPool.map(wrapper_fast_convolve,
                                            args_generator))
 
     mprocPool.close()
     timeEnd = dt.now()
-    print("Multi-Proc convolution has been completed in "
-          "{} using {}/{} cores.\n".format(timeEnd - timeInit, numProcs,
-                                           mprocess.cpu_count()))
+    logging.debug("Multi-Proc convolution has been completed in "
+                  "{} using {}/{} cores.\n".format(timeEnd - timeInit,
+                                                   numProcs,
+                                                   mprocess.cpu_count()))
 
     if (plot):
         plt.figure(1)
@@ -128,7 +156,7 @@ def ip_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True,
 
 
 def IPconvolution(wav, flux, chip_limits, R, FWHM_lim=5.0, plot=True,
-                  verbose=True, numProcs=None):
+                  verbose=False, numProcs=None):
     """Wrapper of ip_convolution for backwards compatibility.
     Lower case of variable name of FWHM.
     """
