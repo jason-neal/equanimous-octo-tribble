@@ -65,7 +65,30 @@ def _parser():
 
 def main(**kwargs):
     """Main function."""
-    pass
+
+    # Raising errors on non implemented features.
+    if kwargs["spectralcoords"]:
+        raise NotImplementedError("Spectral coordinate not available.")
+
+    if kwargs["nod_num"] != 8:
+        raise NotImplementedError("A nod number that is not 8 has not been implemented.")
+
+    # List of combination methods to use.
+    if kwargs["combination"] == "all":
+        comb_methods = ["optimal", "non-opt", "mix"]
+    else:
+        comb_methods = kwargs["combination"]
+
+    # Get optimal nod grid
+    if kwargs["optimal_nods"]:
+        try:
+            nod_mask = parse_boolgrid(kwargs["optimal_nods"])
+        except Exception as e:
+            print("Issue with the parse_boolgrid")
+            raise e
+    else:
+        if "mix" in comb_methods:
+            raise ValueError("No optimal_nod file supplied for 'mix' combination.")
             if kwargs["snr"]:
                 # Analysis signal to noise in a part of the continuim of each spectra.
                 # Normlazied result.
