@@ -183,6 +183,20 @@ def main(**kwargs):
                 print("mix_norm_sum snr = {}".format(sampled_snr(mix_norm_sum, chip_num)))
         # plot Results
 
+        # save results
+            # try sigma clipping on norm data
+
+            # turn to array here ( can do before jsut need to work out how/where what to change)
+            mix_norm_nods_arr = np.asarray(mix_norm_nods)
+
+            bad_pixel_record = sigma_detect(mix_norm_nods_arr, plot="True")
+
+            fix_mix_nods = interp_badpixels(mix_norm_nods_arr, bad_pixel_record)
+
+            plt.plot(mix_norm_nods_arr.T, ".")
+            plt.plot(fix_mix_nods.T, label="fixed")
+            plt.legend()
+            plt.show()
 
 
     return 0
