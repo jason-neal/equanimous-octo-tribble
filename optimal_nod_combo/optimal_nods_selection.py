@@ -170,6 +170,51 @@ def sigma_detect(nods, plot=True):
 
 
 
+def interp_badpixels(nods, bad_pixels):
+    """Linearly interpolate over nearby pixels.
+
+    If it is at the end then just replace with the next pixel value.
+
+    Parameters:
+    nods: array
+        A nod*pixel array of the pixel flux values.
+    bad_pixels: list of lists of ints
+        Index position [nod, pixel] of bad pixels to replace.
+
+    Returns
+    -------
+    nods: array
+        Array of nods with bad pixels interpolated over.
+    """
+    if isinstance(nods, list):
+        raise TypeError("Input an nod*pixel array please.")
+
+    # Warn about consecutive bad_pixels
+    warn_consec_badpixels(bad_pixels, stop=False)
+
+    for pixel in bad_pixels:
+        if pixel[1] == 0:
+            replacement = nods[pixel[0], pixel[1] + 1]   # pixel number 2
+        elif pixel[1] == (nods.shape[1] - 1):
+            replacement = nods[pixel[0], pixel[1] - 1]    # pixel number -2
+        else:
+            if left_consec_search(pixel, bad_pixels) + right_consec_search(pixel, bad_pixels):
+                replacement = -1
+                logging.warning("Need to finish up here")
+            else: # No consecutives
+                # Interpolation when have both side pixels.
+                x = [0, 1, 2]
+                xp = [0, 2]
+                fp = [nods[pixel[0], pixel[1] - 1], nods[pixel[0], pixel[1] + 1]]
+                y = np.interp(x, xp, fp)
+                replacement = y[1]
+                # print(x, xp, fp, y)
+
+        nods[pixel[0], pixel[1]] = replacement
+
+    return nods
+
+
 
 
 if __name__ == "__main__":

@@ -61,3 +61,14 @@ def test_sigma_detect():
     assert np.all([pix_record[1] == bad_pixel[1] for pix_record, bad_pixel in zip(bad_pixel_record, bad_pixels)])
 
 
+def test_inter_badpixel_simple():
+    nods = np.array([[1, 3, 4, 3, 5], [1, 3, 4, 1, 2], [1, 3, 4, 5, 2]], dtype=np.float32)
+    interp_nods = ons.interp_badpixels(nods, [[0, 2], [1, 1], [2, 4]])
+
+    expected_array = np.array([[1, 3, 3, 3, 5], [1, 2.5, 4, 1, 2], [1, 3, 4, 5, 5]])
+
+    for row in range(expected_array.shape[0]):
+        assert np.all(interp_nods[row] == expected_array[row])
+    assert np.all(interp_nods == expected_array)
+
+
