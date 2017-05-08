@@ -68,8 +68,92 @@ def main(**kwargs):
     pass
 
 
-    if __name__ == "__main__":
-        args = vars(_parser())
 
-        opts = {k: args[k] for k in args}
-        sys.exit(main(**opts))
+# TODO Add a level of Iteration!
+# np.nan the bad pixels the loop untill doesnt change maybe?
+# or just do 2-3 loops
+
+def sigma_detect(nods, plot=True):
+    """Detect the local pixels that are outside 4sigma from all nods.
+
+    Local means 2 pixels either side.
+    """
+    if isinstance(nods, list):
+        raise TypeError("Input an nod*pixel array please.")
+    sig_clip = 4  # Sigma clipping Value.
+
+    nods = np.asarray(nods)
+    if nods.shape[0] > 8:
+        raise ValueError("Too many nods (>8), check dimensions of input. ([nod, pixel])")
+
+    print(nods.shape)
+    bad_pixel_count = 0
+    bad_pixel_record = []
+    for pixel in range(nods.shape[1]):
+        if (pixel < 2):
+            near_pixels = nods[:, :5]      # First 5 pixels to do the 2 end pixels..
+            grid_index = pixel
+        elif pixel > (nods.shape[1] - 3):
+            near_pixels = nods[:, -5:]     # Last 5 pixels to do the last 2 end pixels..
+            grid_index = pixel - nods.shape[1]
+        else:
+            near_pixels = nods[:, slice(pixel - 2, pixel + 3)]
+            grid_index = 2
+
+        # ravel pixels near this picel output
+        ravel_pixels = near_pixels.ravel()
+        median = np.median(ravel_pixels)
+        std = np.std(ravel_pixels)
+
+        # The values of this pixel for all nods, taken from near_pixels. Should be same as nods[:, pixel]
+        this_pixel = near_pixels[:, grid_index]
+        assert np.all(this_pixel == nods[:, pixel])
+
+        sig_over = this_pixel > (median + sig_clip * std)
+        sig_below = this_pixel < (median - sig_clip * std)
+        sig = sig_over | sig_below
+        if np.any(sig):
+            bad_pixel_count += 1
+            print("A sigma clip value was found")
+            print("pixel num", pixel)
+            print("median", median, "std", std)
+            bad_nod = sig.nonzero()
+            if len(bad_nod) > 1:
+                raise ValueError("More then one bad pixel this time")
+            print(np.asarray(sig_over, dtype=int) - np.asarray(sig_below, dtype=int))
+            # print("location of bad pixel above should be in position {}".format(bad_nod))
+            # print(near_pixels)
+
+            print("bad nod", bad_nod)
+            bad_pixel_record += [[bad_nod[0][0], pixel, this_pixel[bad_nod[0][0]]]]
+        # print(near_pixels)
+    print("bad_pixel_count", bad_pixel_count)
+    print("bad_pixel_record", bad_pixel_record)
+
+
+    if plot:
+        for i, nod in enumerate(nods):
+            plt.plot(nod, label="nod {}".format(i))
+        bad_pixel_x = [x[1] for x in bad_pixel_record]
+        bad_pixel_y = [x[2] for x in bad_pixel_record]
+
+        plt.plot(bad_pixel_x, bad_pixel_y, "x", label=">4 sigma")
+        plt.legend()
+        plt.title("Identifying bad pixels")
+        plt.xlabel("pixel")
+        plt.ylabel("norm flux")
+        plt.show()
+
+    return [pixel[0:2] for pixel in bad_pixel_record]
+
+
+
+
+
+if __name__ == "__main__":
+    args = vars(_parser())
+
+    opts = {k: args[k] for k in args}
+    sys.exit(main(**opts))
+
+    #
