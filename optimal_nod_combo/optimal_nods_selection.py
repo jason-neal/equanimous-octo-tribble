@@ -66,7 +66,29 @@ def _parser():
 def main(**kwargs):
     """Main function."""
     pass
+            if kwargs["snr"]:
+                # Analysis signal to noise in a part of the continuim of each spectra.
+                # Normlazied result.
+                print("For chip {}".format(chip_num))
+                print("opt_norm_mean snr = {}".format(sampled_snr(opt_norm_mean, chip_num)))
+                print("opt_norm_median snr = {}".format(sampled_snr(opt_norm_median, chip_num)))
+                print("opt_norm_sum snr = {}".format(sampled_snr(opt_norm_sum, chip_num)))
+                print("nonopt_norm_mean snr = {}".format(sampled_snr(nonopt_norm_mean, chip_num)))
+                print("nonopt_norm_median snr = {}".format(sampled_snr(nonopt_median, chip_num)))
+                print("nonopt_norm_sum snr = {}".format(sampled_snr(nonopt_norm_sum, chip_num)))
+                print("mix_norm_mean snr = {}".format(sampled_snr(mix_norm_mean, chip_num)))
+                print("mix_norm_median snr = {}".format(sampled_snr(mix_norm_median, chip_num)))
+                print("mix_norm_sum snr = {}".format(sampled_snr(mix_norm_sum, chip_num)))
 
+
+    return 0
+
+
+def sampled_snr(spectrum, chip):
+    """Sample SNR with Predefined continuim locations per chip."""
+    limits = {1: [900, 960], 2: [460, 600], 3: [240, 310], 4: [450, 490]}
+    section = spectrum[slice(limits[chip][0], limits[chip][1])]
+    return np.mean(section) / np.std(section)
 
 
 # TODO Add a level of Iteration!
