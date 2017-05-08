@@ -89,6 +89,85 @@ def main(**kwargs):
     else:
         if "mix" in comb_methods:
             raise ValueError("No optimal_nod file supplied for 'mix' combination.")
+
+    # Now need to load in the spectra. Cycle over combination options []
+
+    # def file structure
+    dir_path = os.getcwd()
+    intermediate_path = dir_path + "/Intermediate_steps/"
+    combined_path = dir_path + "/Combined_Nods/"
+    image_path = dir_path + "/images/"
+    observation_name = os.path.split(dir_path)[-1]
+
+
+    for chip_num in tqdm(range(1, 5)):
+        # print("Starting Chip # {}".format(chip_num))
+        combined_name = get_filenames(combined_path, 'CRIRE*norm.sum.fits', "*_{0}.*".format(chip_num))
+        nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
+        norm_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
+
+        # print(norm_names)
+
+        combined_data = fits.getdata(combined_path + combined_name[0])
+    # for combo in comb_methods:
+        if combined_data.shape != (3, 1, 1024):
+
+            raise ValueError("Fits files do no have the right shape, [3,1,1024]")
+        else:
+            optimal_nods = [fits.getdata(name)[0, 0] for name in nod_names]
+            optimal_norm_nods = [fits.getdata(name)[0, 0] for name in norm_names]
+            nonoptimal_nods = [fits.getdata(name)[1, 0] for name in nod_names]
+            nonoptimal_norm_nods = [fits.getdata(name)[1, 0] for name in norm_names]
+
+            # print("this chips nod bools =", nod_mask[chip_num - 1])
+            if "mix" in comb_methods:
+                # True values map to index zero. whereas False maps to index 1.
+                band_index = [int(not x) for x in nod_mask[chip_num - 1]]
+                mix_nods = [fits.getdata(name)[indx, 0] for name, indx in zip(nod_names, band_index)]
+                mix_norm_nods = [fits.getdata(name)[indx, 0] for name, indx in zip(norm_names, band_index)]
+            else:
+                mix_nods, mix_norm_nods = [], []
+
+
+            opt_median = np.median(optimal_nods, axis=0)
+            opt_mean = np.mean(optimal_nods, axis=0)
+            opt_norm_median = np.median(optimal_norm_nods, axis=0)
+            opt_norm_mean = np.mean(optimal_norm_nods, axis=0)
+            opt_norm_sum = np.sum(optimal_norm_nods, axis=0)
+            nonopt_median = np.median(nonoptimal_nods, axis=0)
+            nonopt_mean = np.mean(nonoptimal_nods, axis=0)
+            nonopt_norm_median = np.median(nonoptimal_norm_nods, axis=0)
+            nonopt_norm_mean = np.mean(nonoptimal_norm_nods, axis=0)
+            nonopt_norm_sum = np.sum(nonoptimal_norm_nods, axis=0)
+            mix_median = np.median(mix_nods, axis=0)
+            mix_mean = np.mean(mix_nods, axis=0)
+            mix_norm_median = np.median(mix_norm_nods, axis=0)
+            mix_norm_mean = np.mean(mix_norm_nods, axis=0)
+            mix_norm_sum = np.sum(mix_norm_nods, axis=0)
+
+            fig = plt.figure()
+            # ax1 = plt.subplot(211)
+            # plt.plot(opt_median, label="opt_median")
+            # plt.plot(opt_mean, label="opt_mean")
+            # plt.plot(nonopt_median, label="nonopt_median")
+            # plt.plot(nonopt_mean, label="nonopt_mean")
+            # plt.plot(mix_median, label="mix_median")
+            # plt.plot(mix_mean, label="mix_mean")
+            # plt.legend()
+
+
+            #ax2 = plt.subplot(212)
+            plt.plot(opt_norm_median, label="opt_norm_median")
+            plt.plot(opt_norm_mean, label="opt_norm_mean")
+            plt.plot(nonopt_norm_median, label="nonopt_norm_median")
+            plt.plot(nonopt_norm_mean, label="nonopt_norm_mean")
+            plt.plot(mix_norm_median, label="mix_norm_median")
+            plt.plot(mix_norm_mean, label="mix_norm_mean")
+
+            plt.legend()
+            plt.show()
+            # print result
+
             if kwargs["snr"]:
                 # Analysis signal to noise in a part of the continuim of each spectra.
                 # Normlazied result.
@@ -102,6 +181,8 @@ def main(**kwargs):
                 print("mix_norm_mean snr = {}".format(sampled_snr(mix_norm_mean, chip_num)))
                 print("mix_norm_median snr = {}".format(sampled_snr(mix_norm_median, chip_num)))
                 print("mix_norm_sum snr = {}".format(sampled_snr(mix_norm_sum, chip_num)))
+        # plot Results
+
 
 
     return 0
