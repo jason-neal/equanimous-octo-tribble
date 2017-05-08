@@ -215,6 +215,64 @@ def interp_badpixels(nods, bad_pixels):
     return nods
 
 
+def left_consec_search(pixel, bad_pixels):
+    """Count number of consecutive bad pixels to the left of this pixel."""
+    prev_pixel = [pixel[0], pixel[1] - 1]
+    if prev_pixel in bad_pixels:
+        print("prev_pixel in recursion", prev_pixel)
+        return left_consec_search(prev_pixel, bad_pixels) + 1
+    else:
+        return 0
+
+
+def right_consec_search(pixel, bad_pixels):
+    """Count number of consecutive bad pixels to the right of this."""
+    next_pixel = [pixel[0], pixel[1] + 1]
+    if next_pixel in bad_pixels:
+        print("next_pixel in recursion", next_pixel)
+        return right_consec_search(next_pixel, bad_pixels) + 1
+    else:
+        return 0
+
+
+def consec_badpixels(bad_pixels):
+    """Check for consecutive badpixels in the same nod.
+
+    Consecutive in in axis=1 for the same axis=0 value.
+
+    parameters
+    ----------
+    bad_pixels: list of list of ints
+        List of index locations of bad pixels [nod, pixel].
+
+    returns
+    -------
+    is_consec: bool
+        True if a consecutve bad pixel found."""
+
+    for pixel in bad_pixels:
+        left_pix = [pixel[0], pixel[1] - 1]
+        right_pix = [pixel[0], pixel[1] + 1]
+        if (left_pix in bad_pixels) or (right_pix in bad_pixels):
+            return True
+
+    return False
+
+
+def warn_consec_badpixels(bad_pixels, stop=True):
+    """Raise erro on consecutive badpixels in the same nod.
+
+    parameters
+    ----------
+    bad_pixels: list of list of ints
+        List of index locations of bad pixels [nod, pixel]."""
+
+    if consec_badpixels(bad_pixels):
+        if stop:
+            raise ValueError("Consective bad pixels were found. Need to deal with these.")
+        else:
+            logging.warning("Consective bad pixels in a nod were found.")
+    return None
 
 
 if __name__ == "__main__":

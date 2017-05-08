@@ -1,5 +1,4 @@
 import pytest
-#from optimal_nods_selection import parse_boolgrid, sampled_snr
 import numpy as np
 import optimal_nods_selection as ons
 
@@ -15,6 +14,7 @@ def test_parse_boolgrid():
                           [1, 1, 0, 1, 1, 1, 0, 1],
                           [0, 0, 0, 0, 0, 0, 1, 0]], dtype=bool)
     assert np.array_equal(ons.parse_boolgrid(testfile), test_grid)
+
 
 @pytest.mark.xfail
 @pytest.mark.parametrize("snr", [100, 200])
@@ -72,3 +72,32 @@ def test_inter_badpixel_simple():
     assert np.all(interp_nods == expected_array)
 
 
+@pytest.mark.parametrize("test_input,expected", [
+    ([[1, 10], [1, 11]], True),
+    ([[5, 1], [5, 2]], True),
+    ([[1, 10], [2, 10], [3, 10]], False),
+    ([[1, 7], [2, 8], [4, 9]], False)])
+def test_consecutive_badpixels(test_input, expected):
+    """Test detection of consecutives"""
+    assert ons.consec_badpixels(test_input) == expected
+
+
+def test_warn_consec_badpixels():
+    """Test warn consutive throws and error."""
+
+    with pytest.raises(ValueError):
+        ons.warn_consec_badpixels([[1, 10], [1, 11]])
+
+    assert ons.warn_consec_badpixels([[1, 7], [2, 7], [3, 8]]) is None
+
+
+def test_left_consecutive_count():
+    bad_pixels = [[1, 2], [1, 3], [1, 4], [1, 5]]
+    pixel = [1, 5]
+    assert ons.left_consec_search(pixel, bad_pixels) == 3
+
+
+def test_right_consecutive_count():
+    bad_pixels = bad_pixels = [[1, 2], [0, 8], [1, 3], [0, 0], [1, 4], [1, 5], [1, 7]]
+    pixel = [1, 4]
+    assert ons.right_consec_search(pixel, bad_pixels) == 1
