@@ -192,7 +192,8 @@ def main(**kwargs):
             bad_pixel_record = sigma_detect(mix_norm_nods_arr, plot="True")
 
             fix_mix_nods = interp_badpixels(mix_norm_nods_arr, bad_pixel_record)
-
+            if len(bad_pixel_record) > 0:
+                assert np.any(fix_mix_nods != mix_norm_nods_arr)
             plt.plot(mix_norm_nods_arr.T, ".")
             plt.plot(fix_mix_nods.T, label="fixed")
             plt.legend()
@@ -311,6 +312,8 @@ def interp_badpixels(nods, bad_pixels):
 
     # Warn about consecutive bad_pixels
     warn_consec_badpixels(bad_pixels, stop=False)
+    output = np.empty_like(nods)
+    output[:] = nods            # aviods mutation
 
     for pixel in bad_pixels:
         if pixel[1] == 0:
@@ -330,9 +333,9 @@ def interp_badpixels(nods, bad_pixels):
                 replacement = y[1]
                 # print(x, xp, fp, y)
 
-        nods[pixel[0], pixel[1]] = replacement
+        output[pixel[0], pixel[1]] = replacement
 
-    return nods
+    return output
 
 
 def left_consec_search(pixel, bad_pixels):
