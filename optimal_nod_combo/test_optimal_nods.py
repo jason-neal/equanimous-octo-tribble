@@ -49,7 +49,7 @@ def test_sigma_detect():
             slice_data = data[:, -5:]
         else:
             slice_data = data[:, bad_loc[1] - 2: bad_loc[1] + 3]
-        data[bad_loc[0], bad_loc[1]] += 8 * np.std(slice_data.ravel()) * (2 * np.random.randint(0, 2) - 1)   # add random sign to sigma
+        data[bad_loc[0], bad_loc[1]] += 8 * np.std(slice_data.ravel()) * (2 * np.random.randint(0, 2) - 1)   # add sign
 
     bad_pixel_record = ons.sigma_detect(data, plot=False)
 
@@ -70,6 +70,20 @@ def test_inter_badpixel_simple():
     for row in range(expected_array.shape[0]):
         assert np.all(interp_nods[row] == expected_array[row])
     assert np.all(interp_nods == expected_array)
+
+
+def test_bad_pixel_interp_types():
+    """Nod must be array, bad_pixels must be list.
+
+    interp_badpixels does a core dump if given a bad_pixels array.
+    """
+    bad_pixels = np.array([[1, 2], [3, 4]])
+
+    with pytest.raises(TypeError):
+        ons.interp_badpixels(np.array([1, 2, 3]), bad_pixels)   # second value should be a list
+
+    with pytest.raises(TypeError):
+        ons.interp_badpixels([1, 2, 3], list(bad_pixels))  # first values should not be a list
 
 
 @pytest.mark.parametrize("test_input,expected", [

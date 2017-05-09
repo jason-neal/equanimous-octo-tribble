@@ -186,7 +186,7 @@ def main(**kwargs):
         # save results
             # try sigma clipping on norm data
 
-            # turn to array here ( can do before jsut need to work out how/where what to change)
+            # turn to array here ( can do before just need to work out how/where what to change)
             mix_norm_nods_arr = np.asarray(mix_norm_nods)
 
             bad_pixel_record = sigma_detect(mix_norm_nods_arr, plot="True")
@@ -194,8 +194,10 @@ def main(**kwargs):
             fix_mix_nods = interp_badpixels(mix_norm_nods_arr, bad_pixel_record)
             if len(bad_pixel_record) > 0:
                 assert np.any(fix_mix_nods != mix_norm_nods_arr)
+
             plt.plot(mix_norm_nods_arr.T, ".")
             plt.plot(fix_mix_nods.T, label="fixed")
+            plt.title("After bad pixel correction")
             plt.legend()
             plt.show()
 
@@ -310,6 +312,9 @@ def interp_badpixels(nods, bad_pixels):
     if isinstance(nods, list):
         raise TypeError("Input an nod*pixel array please.")
 
+    if not isinstance(bad_pixels, list):
+        raise TypeError("Bad_pixels must be a list.")
+
     # Warn about consecutive bad_pixels
     warn_consec_badpixels(bad_pixels, stop=False)
     output = np.empty_like(nods)
@@ -324,7 +329,7 @@ def interp_badpixels(nods, bad_pixels):
             if (left_consec_search(pixel, bad_pixels) + right_consec_search(pixel, bad_pixels)) != 0:
                 replacement = -1
                 logging.warning("Need to finish up here")
-            else: # No consecutives
+            else:  # No consecutives
                 # Interpolation when have both side pixels.
                 x = [0, 1, 2]
                 xp = [0, 2]
