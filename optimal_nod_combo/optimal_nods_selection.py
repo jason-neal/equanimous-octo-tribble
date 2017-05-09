@@ -321,7 +321,7 @@ def interp_badpixels(nods, bad_pixels):
         elif pixel[1] == (nods.shape[1] - 1):
             replacement = nods[pixel[0], pixel[1] - 1]    # pixel number -2
         else:
-            if left_consec_search(pixel, bad_pixels) + right_consec_search(pixel, bad_pixels):
+            if (left_consec_search(pixel, bad_pixels) + right_consec_search(pixel, bad_pixels)) != 0:
                 replacement = -1
                 logging.warning("Need to finish up here")
             else: # No consecutives
@@ -341,8 +341,8 @@ def interp_badpixels(nods, bad_pixels):
 def left_consec_search(pixel, bad_pixels):
     """Count number of consecutive bad pixels to the left of this pixel."""
     prev_pixel = [pixel[0], pixel[1] - 1]
-    if prev_pixel in bad_pixels:
-        print("prev_pixel in recursion", prev_pixel)
+    if (prev_pixel in bad_pixels) or (tuple(prev_pixel) in bad_pixels):
+        # print("prev_pixel in recursion", prev_pixel)
         return left_consec_search(prev_pixel, bad_pixels) + 1
     else:
         return 0
@@ -351,8 +351,8 @@ def left_consec_search(pixel, bad_pixels):
 def right_consec_search(pixel, bad_pixels):
     """Count number of consecutive bad pixels to the right of this."""
     next_pixel = [pixel[0], pixel[1] + 1]
-    if next_pixel in bad_pixels:
-        print("next_pixel in recursion", next_pixel)
+    if (next_pixel in bad_pixels) or (tuple(next_pixel) in bad_pixels):
+        # print("next_pixel in recursion", next_pixel)
         return right_consec_search(next_pixel, bad_pixels) + 1
     else:
         return 0

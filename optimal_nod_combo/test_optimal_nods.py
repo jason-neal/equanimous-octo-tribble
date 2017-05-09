@@ -92,12 +92,24 @@ def test_warn_consec_badpixels():
 
 
 def test_left_consecutive_count():
+    """Test consecutive counting works on left."""
     bad_pixels = [[1, 2], [1, 3], [1, 4], [1, 5]]
     pixel = [1, 5]
     assert ons.left_consec_search(pixel, bad_pixels) == 3
 
 
 def test_right_consecutive_count():
-    bad_pixels = bad_pixels = [[1, 2], [0, 8], [1, 3], [0, 0], [1, 4], [1, 5], [1, 7]]
+    """Test consecutive counting works on right."""
+    bad_pixels = [[1, 2], [0, 8], [1, 3], [0, 0], [1, 4], [1, 5], [1, 7]]
     pixel = [1, 4]
     assert ons.right_consec_search(pixel, bad_pixels) == 1
+
+
+def test_consecutive_counts():
+    """Test consecutive counting works on both sides, and sum is correct."""
+    bad_pixels = [[1, 2], [0, 8], [1, 3], [0, 0], [1, 4], [1, 5], [1, 8],
+                  [2, 9], [1, 7], [1, 11], [1, 12], [1, 13]]
+    pixel = [1, 6]
+    assert ons.right_consec_search(pixel, bad_pixels) == 2
+    assert ons.left_consec_search(pixel, bad_pixels) == 4
+    assert (ons.right_consec_search(pixel, bad_pixels) + ons.left_consec_search(pixel, bad_pixels)) == 6
