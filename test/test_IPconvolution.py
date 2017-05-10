@@ -1,10 +1,10 @@
 import py.test
 import numpy as np
-from IP_Convolution import wav_selector, unitary_Gauss, fast_convolve, IPconvolution, ip_convolution
+from Convolution.IP_Convolution import wav_selector, unitary_Gauss, fast_convolve, IPconvolution, ip_convolution
 
-from IP_multi_Convolution import ip_convolution as ip_multi_Convolution
-from IP_multi_Convolution import wav_selector as wav_selector_multi
-from IP_multi_Convolution import fast_convolve as fast_convolve_multi
+from Convolution.IP_multi_Convolution import ip_convolution as ip_multi_Convolution
+from Convolution.IP_multi_Convolution import wav_selector as wav_selector_multi
+from Convolution.IP_multi_Convolution import fast_convolve as fast_convolve_multi
 
 
 def test_wav_selector():
