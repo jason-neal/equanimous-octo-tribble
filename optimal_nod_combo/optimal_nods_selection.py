@@ -1,4 +1,5 @@
 #!/home/jneal/anaconda3/bin/python
+
 """Select optimal/non-optimal spectra in regards to specification
    Median and norm Combine spectra after
 """
@@ -99,14 +100,11 @@ def main(**kwargs):
     image_path = dir_path + "/images/"
     observation_name = os.path.split(dir_path)[-1]
 
-
     for chip_num in tqdm(range(1, 5)):
         # print("Starting Chip # {}".format(chip_num))
         combined_name = get_filenames(combined_path, 'CRIRE*norm.sum.fits', "*_{0}.*".format(chip_num))
         nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
         norm_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
-
-        # print(norm_names)
 
         combined_data = fits.getdata(combined_path + combined_name[0])
     # for combo in comb_methods:
@@ -127,7 +125,6 @@ def main(**kwargs):
                 mix_norm_nods = [fits.getdata(name)[indx, 0] for name, indx in zip(norm_names, band_index)]
             else:
                 mix_nods, mix_norm_nods = [], []
-
 
             opt_median = np.median(optimal_nods, axis=0)
             opt_mean = np.mean(optimal_nods, axis=0)
@@ -155,8 +152,7 @@ def main(**kwargs):
             # plt.plot(mix_mean, label="mix_mean")
             # plt.legend()
 
-
-            #ax2 = plt.subplot(212)
+            # ax2 = plt.subplot(212)
             plt.plot(opt_norm_median, label="opt_norm_median")
             plt.plot(opt_norm_mean, label="opt_norm_mean")
             plt.plot(nonopt_norm_median, label="nonopt_norm_median")
@@ -203,7 +199,6 @@ def main(**kwargs):
             plt.legend()
             plt.show()
 
-
     return 0
 
 
@@ -213,10 +208,6 @@ def sampled_snr(spectrum, chip):
     section = spectrum[slice(limits[chip][0], limits[chip][1])]
     return np.mean(section) / np.std(section)
 
-
-# TODO Add a level of Iteration!
-# np.nan the bad pixels the loop untill doesnt change maybe?
-# or just do 2-3 loops
 
 def sigma_detect(nods, plot=True):
     """Detect the local pixels that are outside 4sigma from all nods.
@@ -294,7 +285,6 @@ def sigma_detect(nods, plot=True):
     return [pixel[0:2] for pixel in bad_pixel_record]
 
 
-
 def interp_badpixels(nods, bad_pixels):
     """Linearly interpolate over nearby pixels.
 
@@ -317,48 +307,42 @@ def interp_badpixels(nods, bad_pixels):
     if not isinstance(bad_pixels, list):
         raise TypeError("Bad_pixels must be a list.")
 
+    if nods.shape[1] < 3:
+        raise ValueError("The number of pixels to interpolate ({}) is very small."
+                         "Are you sure you are doing the correct thing?".format(nods.shape[1]))
+
     # Warn about consecutive bad_pixels
     warn_consec_badpixels(bad_pixels, stop=False)
     output = np.empty_like(nods)
     output[:] = nods            # aviods mutation
 
     for pixel in bad_pixels:
+        # Count any consecutive bad pixels
         bp_right = right_consec_search(pixel, bad_pixels)
         bp_left = left_consec_search(pixel, bad_pixels)
 
-        if pixel[1] == 0:
-            #if bp_right > 0:
-            #    print("There was consec bad pixels at the left edge.")
-            #    replacement = nods[pixel[0], pixel[1] + 1 + bp_right]   # pixel number 2
-            #else:
-             replacement = nods[pixel[0], pixel[1] + 1]   # pixel number 2
+        if (bp_left + bp_right) > 5:
+            logging.warning("Interpolating over more than 5 bad pixels in a row.")
 
-        elif pixel[1] == (nods.shape[1] - 1):
-            #if bp_left > 0:
-            #    print("There was consec bad pixels at the right edge.")
-            #    replacement = nods[pixel[0], pixel[1] - 1 - bp_left]    # pixel number -2
-            #else:
-            replacement = nods[pixel[0], pixel[1] - 1]    # pixel number -2
+        if (bp_left + bp_right + 1) == nods.shape[1]:
+            replacement = nods[pixel[0], pixel[1]]           # Replace with self as all others are bad.
+        elif pixel[1] == 0:                                  # first vaue
+            replacement = nods[pixel[0], pixel[1] + 1 + bp_right]
 
+        elif pixel[1] == (nods.shape[1] - 1):                # Last vaue
+            replacement = nods[pixel[0], pixel[1] - 1 - bp_left]
+
+        elif ((nods.shape[1] - pixel[1] - 1) == bp_right):   # All bad pixels until the end
+                    replacement = nods[pixel[0], pixel[1] - 1 - bp_left]
+
+        elif pixel[1] == bp_left:                             # All bad pixels to the left
+                    replacement = nods[pixel[0], pixel[1] + 1 + bp_right]
         else:
-            if (bp_left + bp_right) != 0:
-                if (bp_left + bp_right) > 5:
-                    logging.warning("Interpolating over more than 5 bad pixels in arow.")
-                x = range(-bp_left, bp_right + 1)
-                xp = [-bp_left, bp_right]
-                fp = [nods[pixel[0], pixel[1] - 1 - bp_left], nods[pixel[0], pixel[1] + 1 + bp_right]]
-                logging.warning("Need to finish up here")
-                y = np.interp(x, xp, fp)
-                replacement = y[1]
-
-            else:  # No consecutives
-                # Interpolation when have both side pixels.
-                x = [0, 1, 2]
-                xp = [0, 2]
-                fp = [nods[pixel[0], pixel[1] - 1], nods[pixel[0], pixel[1] + 1]]
-                y = np.interp(x, xp, fp)
-                replacement = y[1]
-                # print(x, xp, fp, y)
+            x = range(0 - bp_left, 3 + bp_right)
+            xp = [0 - bp_left, 2 + bp_right]
+            fp = [nods[pixel[0], pixel[1] - 1 - bp_left], nods[pixel[0], pixel[1] + 1 + bp_right]]
+            y = np.interp(x, xp, fp)
+            replacement = y[1 + bp_left]
 
         output[pixel[0], pixel[1]] = replacement
 

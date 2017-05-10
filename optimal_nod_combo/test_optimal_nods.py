@@ -61,31 +61,6 @@ def test_sigma_detect():
     assert np.all([pix_record[1] == bad_pixel[1] for pix_record, bad_pixel in zip(bad_pixel_record, bad_pixels)])
 
 
-def test_inter_badpixel_simple():
-    nods = np.array([[1, 3, 4, 3, 5], [1, 3, 4, 1, 2], [1, 3, 4, 5, 2]], dtype=np.float32)
-    interp_nods = ons.interp_badpixels(nods, [[0, 2], [1, 1], [2, 4]])
-
-    expected_array = np.array([[1, 3, 3, 3, 5], [1, 2.5, 4, 1, 2], [1, 3, 4, 5, 5]])
-
-    for row in range(expected_array.shape[0]):
-        assert np.all(interp_nods[row] == expected_array[row])
-    assert np.all(interp_nods == expected_array)
-
-
-def test_bad_pixel_interp_types():
-    """Nod must be array, bad_pixels must be list.
-
-    interp_badpixels does a core dump if given a bad_pixels array.
-    """
-    bad_pixels = np.array([[1, 2], [3, 4]])
-
-    with pytest.raises(TypeError):
-        ons.interp_badpixels(np.array([1, 2, 3]), bad_pixels)   # second value should be a list
-
-    with pytest.raises(TypeError):
-        ons.interp_badpixels([1, 2, 3], list(bad_pixels))  # first values should not be a list
-
-
 @pytest.mark.parametrize("test_input,expected", [
     ([[1, 10], [1, 11]], True),
     ([[5, 1], [5, 2]], True),
@@ -129,57 +104,90 @@ def test_consecutive_counts():
     assert (ons.right_consec_search(pixel, bad_pixels) + ons.left_consec_search(pixel, bad_pixels)) == 6
 
 
-def test_small_multi_bp_interpolation():
+def test_interp_badpixel():
+    """Test of Linear interpolation across bad pixels.
+
+    Single bad pixels at the start, middle and end.
+    """
+    nods = np.array([[-99, 5, -99, 3, 1], [1, -99, 4, 1, 2], [1, 3, 4, 5, -99]], dtype=np.float32)
+    interp_nods = ons.interp_badpixels(nods, [[0, 0], [0, 2], [1, 1], [2, 4]])
+
+    expected_array = np.array([[5, 5, 4, 3, 1], [1, 2.5, 4, 1, 2], [1, 3, 4, 5, 5]])
+
+    assert np.allclose(interp_nods, expected_array)
+
+
+def test_bad_pixel_interp_types():
+    """Nod must be array, bad_pixels must be list.
+
+    interp_badpixels does a core dump if given a bad_pixels array.
+    """
+    bad_pixels = np.array([[1, 2], [3, 4]])
+
+    with pytest.raises(TypeError):
+        ons.interp_badpixels(np.array([1, 2, 3]), bad_pixels)   # second value should be a list
+
+    with pytest.raises(TypeError):
+        ons.interp_badpixels([1, 2, 3], list(bad_pixels))  # first values should not be a list
+
+
+# Add in a number of examples. The first 9 are systematic. The last two are more complicated.
+@pytest.mark.parametrize("test_in,bad,expected",[
+    ([[-99, 2, 3, 4]], [[0, 0]], [[2, 2, 3, 4]]),
+    ([[1, -99, 3, 4]], [[0, 1]], [[1, 2, 3, 4]]),
+    ([[1, 2, -99, 4]], [[0, 2]], [[1, 2, 3, 4]]),
+    ([[1, 2, 3, -99]], [[0, 3]], [[1, 2, 3, 3]]),
+    ([[-99, -99, 3, 4]], [[0, 0],[0, 1]], [[3, 3, 3, 4]]),
+    ([[1, -99, -99, 4]], [[0, 1],[0, 2]], [[1, 2, 3, 4]]),
+    ([[1, 2, -99, -99]], [[0, 2],[0, 3]], [[1, 2, 2, 2]]),
+    ([[-99, -99, -99, 4]], [[0, 1], [0, 2], [0, 0]], [[4, 4, 4, 4]]),
+    ([[1, -99, -99, -99,]], [[0, 2], [0, 3], [0, 1]], [[1, 1, 1, 1]]),
+    ([[8, -99, -99, 5]], [[0, 1], [0, 2]], [[8, 7, 6, 5]]),
+    ([[-99, -99, -99, 1.5, 3, 1, 3, 4, -99, 0], [3, 5, 1, 3, 4, -99, -99, -99, -99, 0]],
+     [[0, 0], [0, 1], [0, 2], [0, 8], [1, 5], [1, 6], [1, 7], [1, 8]],
+     [[1.5, 1.5, 1.5, 1.5, 3, 1, 3, 4, 2, 0], [3, 5, 1, 3, 4, 3.2, 2.4, 1.6, 0.8, 0]]),
+    ([[1, 3, 4, -99, -99, 1, 3, 4, -99, 2], [3, 5, 1, 3, 4, -99, -99, -99, -99, 2]],
+     [[0, 3], [0, 4], [0, 8], [1, 5], [1, 6], [1, 7], [1, 8]],
+     [[1, 3, 4, 3, 2, 1, 3, 4, 3, 2], [3, 5, 1, 3, 4, 3.6, 3.2, 2.8, 2.4, 2]])
+])
+def test_multiple_bp_interpolation(test_in, bad, expected):
     """Linear interpolation with multiple bad pixels.
 
-    Using -1 for clarity of bad pixels.
+    Parametrized to catch all the edge cases. Using -99 for clarity of bad pixels.
     """
+    nods = np.array(test_in, dtype=np.float32)
+    expected_array = np.array(expected, dtype=np.float32)
 
-    nods = np.array([[1, -2, -3, 4]], dtype=np.float32)
-    expected_array = np.array([[1, 2, 3, 4]])
+    interp_nods = ons.interp_badpixels(nods, bad)
+    print("input", nods)
+    print("expected", expected_array)
+    print("interped", interp_nods)
 
-    bad_pixels = [[0, 1], [0, 2]]
-
-    interp_nods = ons.interp_badpixels(nods, bad_pixels)
-
-    for row in range(expected_array.shape[0]):
-        assert np.all(interp_nods[row] == expected_array[row])
-    assert np.all(interp_nods == expected_array)
+    assert np.allclose(interp_nods, expected_array)
 
 
-def test_multi_bp_interpolation():
-    """Linear interpolation with multiple bad pixels.
+@pytest.mark.parametrize("test_in",[
+    ([[-99],[1], [2]]),
+    ([[1, 2], [3, 4]])])
+def test_fail_on_small_array(test_in):
+    """Test small arrays are failed."""
+    nods = np.array(test_in, dtype=np.float32)
+    bad = [[0, 0], [1, 0]]
 
-    Using -1 for clarity of bad pixels.
-    """
-
-    nods = np.array([[1, 3, 4, -1, -1, 1, 3, 4, -1, 2],
-                     [3, 5, 1, 3, 4, -1, -1, -1, -1, 2]], dtype=np.float32)
-    expected_array = np.array([[1, 3, 4, 3, 2, 1, 3, 4, 3, 2], [3, 5, 1, 3, 4, 3.6, 3.2, 2.8, 2.4, 2]], dtype=np.float32)
-
-    bad_pixels = [[0, 3], [0, 4], [0, 8], [1, 5], [1, 6], [1, 7], [1, 8]]
-
-    interp_nods = ons.interp_badpixels(nods, bad_pixels)
-
-    for row in range(expected_array.shape[0]):
-        assert np.all(interp_nods[row] == expected_array[row])
-    assert np.all(interp_nods == expected_array)
+    with pytest.raises(ValueError):
+        interp_nods = ons.interp_badpixels(nods, bad)
 
 
-@pytest.mark.xfail
-def test_multi_bp_interpolation_on_end():
-    """Linear interpolation with multiple bad pixels.
+def test_allbadpixels():
+    """A completly bad row is unchanged."""
+    nods = np.array([[-99, -99, -99], [-99, -99, 1]], dtype=np.float32)
+    expected_array = np.array([[-99, -99, -99], [1, 1, 1]], dtype=np.float32)
 
-    Using -1 for clarity of bad pixels.
-    """
-    nods = np.array([[0, -1, -1, 1.5, 3, 1, 3, 4, -1, 0],
-                     [3, 5, 1, 3, 4, -1, -1, -1, -1, 0]], dtype=np.float32)
-    expected_array = np.array([[1.5, 1.5, 1.5, 1.5, 3, 1, 3, 4, 2, 0], [3, 5, 1, 3, 4, 4, 4, 4, 4, 4]], dtype=np.float32)
+    bad = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1]]
 
-    bad_pixels = [[0, 1], [0, 1], [0, 2], [0, 8], [1, 5], [1, 6], [1, 7], [1, 8], [1, 8]]
+    interp_nods = ons.interp_badpixels(nods, bad)
+    print("input", nods)
+    print("expected", expected_array)
+    print("interped", interp_nods)
 
-    interp_nods = ons.interp_badpixels(nods, bad_pixels)
-
-    for row in range(expected_array.shape[0]):
-        assert np.all(interp_nods[row] == expected_array[row])
-    assert np.all(interp_nods == expected_array)
+    assert np.allclose(interp_nods, expected_array)
