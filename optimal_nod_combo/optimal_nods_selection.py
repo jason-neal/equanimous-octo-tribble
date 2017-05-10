@@ -191,6 +191,8 @@ def main(**kwargs):
 
             bad_pixel_record = sigma_detect(mix_norm_nods_arr, plot="True")
 
+            warn_consec_badpixels(bad_pixel_record, stop=True)
+
             fix_mix_nods = interp_badpixels(mix_norm_nods_arr, bad_pixel_record)
             if len(bad_pixel_record) > 0:
                 assert np.any(fix_mix_nods != mix_norm_nods_arr)
@@ -321,14 +323,34 @@ def interp_badpixels(nods, bad_pixels):
     output[:] = nods            # aviods mutation
 
     for pixel in bad_pixels:
+        bp_right = right_consec_search(pixel, bad_pixels)
+        bp_left = left_consec_search(pixel, bad_pixels)
+
         if pixel[1] == 0:
-            replacement = nods[pixel[0], pixel[1] + 1]   # pixel number 2
+            #if bp_right > 0:
+            #    print("There was consec bad pixels at the left edge.")
+            #    replacement = nods[pixel[0], pixel[1] + 1 + bp_right]   # pixel number 2
+            #else:
+             replacement = nods[pixel[0], pixel[1] + 1]   # pixel number 2
+
         elif pixel[1] == (nods.shape[1] - 1):
+            #if bp_left > 0:
+            #    print("There was consec bad pixels at the right edge.")
+            #    replacement = nods[pixel[0], pixel[1] - 1 - bp_left]    # pixel number -2
+            #else:
             replacement = nods[pixel[0], pixel[1] - 1]    # pixel number -2
+
         else:
-            if (left_consec_search(pixel, bad_pixels) + right_consec_search(pixel, bad_pixels)) != 0:
-                replacement = -1
+            if (bp_left + bp_right) != 0:
+                if (bp_left + bp_right) > 5:
+                    logging.warning("Interpolating over more than 5 bad pixels in arow.")
+                x = range(-bp_left, bp_right + 1)
+                xp = [-bp_left, bp_right]
+                fp = [nods[pixel[0], pixel[1] - 1 - bp_left], nods[pixel[0], pixel[1] + 1 + bp_right]]
                 logging.warning("Need to finish up here")
+                y = np.interp(x, xp, fp)
+                replacement = y[1]
+
             else:  # No consecutives
                 # Interpolation when have both side pixels.
                 x = [0, 1, 2]

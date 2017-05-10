@@ -127,3 +127,59 @@ def test_consecutive_counts():
     assert ons.right_consec_search(pixel, bad_pixels) == 2
     assert ons.left_consec_search(pixel, bad_pixels) == 4
     assert (ons.right_consec_search(pixel, bad_pixels) + ons.left_consec_search(pixel, bad_pixels)) == 6
+
+
+def test_small_multi_bp_interpolation():
+    """Linear interpolation with multiple bad pixels.
+
+    Using -1 for clarity of bad pixels.
+    """
+
+    nods = np.array([[1, -2, -3, 4]], dtype=np.float32)
+    expected_array = np.array([[1, 2, 3, 4]])
+
+    bad_pixels = [[0, 1], [0, 2]]
+
+    interp_nods = ons.interp_badpixels(nods, bad_pixels)
+
+    for row in range(expected_array.shape[0]):
+        assert np.all(interp_nods[row] == expected_array[row])
+    assert np.all(interp_nods == expected_array)
+
+
+def test_multi_bp_interpolation():
+    """Linear interpolation with multiple bad pixels.
+
+    Using -1 for clarity of bad pixels.
+    """
+
+    nods = np.array([[1, 3, 4, -1, -1, 1, 3, 4, -1, 2],
+                     [3, 5, 1, 3, 4, -1, -1, -1, -1, 2]], dtype=np.float32)
+    expected_array = np.array([[1, 3, 4, 3, 2, 1, 3, 4, 3, 2], [3, 5, 1, 3, 4, 3.6, 3.2, 2.8, 2.4, 2]], dtype=np.float32)
+
+    bad_pixels = [[0, 3], [0, 4], [0, 8], [1, 5], [1, 6], [1, 7], [1, 8]]
+
+    interp_nods = ons.interp_badpixels(nods, bad_pixels)
+
+    for row in range(expected_array.shape[0]):
+        assert np.all(interp_nods[row] == expected_array[row])
+    assert np.all(interp_nods == expected_array)
+
+
+@pytest.mark.xfail
+def test_multi_bp_interpolation_on_end():
+    """Linear interpolation with multiple bad pixels.
+
+    Using -1 for clarity of bad pixels.
+    """
+    nods = np.array([[0, -1, -1, 1.5, 3, 1, 3, 4, -1, 0],
+                     [3, 5, 1, 3, 4, -1, -1, -1, -1, 0]], dtype=np.float32)
+    expected_array = np.array([[1.5, 1.5, 1.5, 1.5, 3, 1, 3, 4, 2, 0], [3, 5, 1, 3, 4, 4, 4, 4, 4, 4]], dtype=np.float32)
+
+    bad_pixels = [[0, 1], [0, 1], [0, 2], [0, 8], [1, 5], [1, 6], [1, 7], [1, 8], [1, 8]]
+
+    interp_nods = ons.interp_badpixels(nods, bad_pixels)
+
+    for row in range(expected_array.shape[0]):
+        assert np.all(interp_nods[row] == expected_array[row])
+    assert np.all(interp_nods == expected_array)
