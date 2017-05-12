@@ -187,23 +187,41 @@ def main(**kwargs):
             # try sigma clipping on norm data
 
             # turn to array here ( can do before just need to work out how/where what to change)
-            mix_norm_nods_arr = np.asarray(mix_norm_nods)
+            fix_opt_nods = clean_nods(optimal_norm_nods)
+            fix_nonopt_nods = clean_nods(nonoptimal_norm_nods)
+            fix_mix_nods = clean_nods(mix_norm_nods)
 
-            bad_pixel_record = bp.sigma_detect(mix_norm_nods_arr, plot="True")
+            # bad_pixel_record = bp.sigma_detect(mix_norm_nods_arr, plot=True)
+            #
+            # bp.warn_consec_badpixels(bad_pixel_record, stop=True)
+            #
+            # fix_mix_nods = bp.interp_badpixels(mix_norm_nods_arr, bad_pixel_record)
+            # if len(bad_pixel_record) > 0:
+            #     assert np.any(fix_mix_nods != mix_norm_nods_arr)
 
-            bp.warn_consec_badpixels(bad_pixel_record, stop=True)
-
-            fix_mix_nods = bp.interp_badpixels(mix_norm_nods_arr, bad_pixel_record)
-            if len(bad_pixel_record) > 0:
-                assert np.any(fix_mix_nods != mix_norm_nods_arr)
-
-            plt.plot(mix_norm_nods_arr.T, ".")
+            plt.plot(fix_opt_nods.T, ".", label="opt")
             plt.plot(fix_mix_nods.T, label="fixed")
             plt.title("After bad pixel correction")
             plt.legend()
             plt.show()
 
     return 0
+
+
+def clean_nods(nods):
+    # type: (Union[np.ndarray, List[List[float]]]) -> np.ndarray
+    """Clean bad pixels from the nods."""
+    nod_array = np.asarray(nods)
+    bad_pixels = bp.sigma_detect(nod_array, plot=True)
+
+    bp.warn_consec_badpixels(bad_pixels, stop=True)
+
+    fixed_nods = bp.interp_badpixels(nod_array, bad_pixels)
+    print("Number of bad pixels = {}".format(len(bad_pixels)))
+    if len(bad_pixels) > 0:
+        assert np.any(fixed_nods != nod_array)
+
+    return fixed_nods
 
 
 def sampled_snr(spectrum, chip):
