@@ -84,6 +84,7 @@ def main(**kwargs):
     else:
         comb_methods = kwargs["combination"]
     print("Combiunation mehtod", comb_methods)
+
     # Get optimal nod grid
     if kwargs["optimal_nods"]:
         try:
@@ -94,6 +95,8 @@ def main(**kwargs):
     else:
         if "mix" in comb_methods:
             raise ValueError("No optimal_nod file supplied for 'mix' combination.")
+        else:
+            nod_mask = None
 
     # Now need to load in the spectra. Cycle over combination options []
 
@@ -110,6 +113,8 @@ def main(**kwargs):
         nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
         norm_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
 
+        if kwargs["snr"]:
+            snr_calculations(nod_names, norm_names, nod_mask, chip_num)
         combined_data = fits.getdata(combined_path + combined_name[0])
     # for combo in comb_methods:
         if combined_data.shape != (3, 1, 1024):
@@ -144,24 +149,6 @@ def main(**kwargs):
             mean_fix_opt_norm_nods = np.mean(fix_opt_norm_nods, axis=0)
             mean_fix_nonopt_norm_nods = np.mean(fix_nonopt_norm_nods, axis=0)
             mean_fix_mix_norm_nods = np.mean(fix_mix_norm_nods, axis=0)
-
-            if kwargs["snr"]:
-                # Analysis signal to noise in a part of the continuim of each spectra.
-                d = {"optimal_nods": optimal_nods, "optimal_norm_nods": optimal_norm_nods,
-                     "nonoptimal_nods": nonoptimal_nods, "nonoptimal_norm_nods": nonoptimal_norm_nods,
-                     "mix_nods": mix_nods, "mix_norm_nods": mix_norm_nods}
-                print("For chip {}".format(chip_num))
-                for key, this_nods in d.items():
-                    fixed_nods = clean_nods(this_nods)
-                    avg, med, sum_ = nod_calcs(this_nods)
-                    fix_avg, fix_med, fix_sum_ = nod_calcs(fixed_nods)
-
-                    print("{} mean combined   = {}".format(key, sampled_snr(avg, chip_num)))
-                    print("{} median combined = {}".format(key, sampled_snr(med, chip_num)))
-                    print("{} sum combined    = {}".format(key, sampled_snr(sum_, chip_num)))
-                    print("fixed {} mean combined = {}".format(key, sampled_snr(fix_avg, chip_num)))
-                    print("fixed {} median combined = {}".format(key, sampled_snr(fix_med, chip_num)))
-                    print("fixed {} sum combined = {}".format(key, sampled_snr(fix_sum_, chip_num)))
         # plot Results
 
         # save results
@@ -193,6 +180,38 @@ def clean_nods(nods):
         assert np.any(fixed_nods != nod_array)
 
     return fixed_nods
+
+
+def snr_calculations(nod_names, norm_names, nod_mask, chip_num):
+    # Analysis signal to noise in a part of the continuim of each spectra.
+    optimal_nods = [fits.getdata(name)[0, 0] for name in nod_names]
+    optimal_norm_nods = [fits.getdata(name)[0, 0] for name in norm_names]
+    nonoptimal_nods = [fits.getdata(name)[1, 0] for name in nod_names]
+    nonoptimal_norm_nods = [fits.getdata(name)[1, 0] for name in norm_names]
+
+    if nod_mask is not None:
+        band_index = [int(not x) for x in nod_mask[chip_num - 1]]
+        mix_nods = [fits.getdata(name)[indx, 0] for name, indx in zip(nod_names, band_index)]
+        mix_norm_nods = [fits.getdata(name)[indx, 0] for name, indx in zip(norm_names, band_index)]
+    else:
+        mix_nods = []
+        mix_norm_nods = []
+
+    d = {"optimal_nods": optimal_nods, "optimal_norm_nods": optimal_norm_nods,
+         "nonoptimal_nods": nonoptimal_nods, "nonoptimal_norm_nods": nonoptimal_norm_nods,
+         "mix_nods": mix_nods, "mix_norm_nods": mix_norm_nods}
+    print("For chip {}".format(chip_num))
+    for key, this_nods in d.items():
+        fixed_nods = clean_nods(this_nods)
+        avg, med, sum_ = nod_calcs(this_nods)
+        fix_avg, fix_med, fix_sum_ = nod_calcs(fixed_nods)
+
+        print("{} mean combined   = {}".format(key, sampled_snr(avg, chip_num)))
+        print("{} mean combined   = {} (> 4 sigma removed)".format(key, sampled_snr(fix_avg, chip_num)))
+        print("{} median combined = {}".format(key, sampled_snr(med, chip_num)))
+        print("{} median combined = {}(> 4 sigma removed)".format(key, sampled_snr(fix_med, chip_num)))
+        print("{} sum combined    = {}".format(key, sampled_snr(sum_, chip_num)))
+        print("{} sum combined    = {} (> 4 sigma removed)".format(key, sampled_snr(fix_sum_, chip_num)))
 
 
 def sampled_snr(spectrum, chip):
