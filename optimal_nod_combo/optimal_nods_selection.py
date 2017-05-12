@@ -115,41 +115,51 @@ def main(**kwargs):
 
         if kwargs["snr"]:
             snr_calculations(nod_names, norm_names, nod_mask, chip_num)
+
         combined_data = fits.getdata(combined_path + combined_name[0])
-    # for combo in comb_methods:
-        if combined_data.shape != (3, 1, 1024):
+        for combo in comb_methods:
+            if combined_data.shape != (3, 1, 1024):
+                raise ValueError("Fits files do no have the right shape, [3, 1, 1024]")
 
-            raise ValueError("Fits files do no have the right shape, [3,1,1024]")
-        else:
-            optimal_nods = [fits.getdata(name)[0, 0] for name in nod_names]
-            optimal_norm_nods = [fits.getdata(name)[0, 0] for name in norm_names]
-            nonoptimal_nods = [fits.getdata(name)[1, 0] for name in nod_names]
-            nonoptimal_norm_nods = [fits.getdata(name)[1, 0] for name in norm_names]
-
-            # print("this chips nod bools =", nod_mask[chip_num - 1])
-            if "mix" in comb_methods:
+            if combo == "optimal":  # "optimal", "non-opt", "mix"
+                nods = [fits.getdata(name)[0, 0] for name in nod_names]
+                nods_norm = [fits.getdata(name)[0, 0] for name in norm_names]
+                nod_combo_name = "Optimal"
+            elif combo == "non-opt":
+                nods = [fits.getdata(name)[1, 0] for name in nod_names]
+                nods_norm = [fits.getdata(name)[1, 0] for name in norm_names]
+                nod_combo_name = "Non-optimal"
+            elif combo == "mix":
                 # True values map to index zero. whereas False maps to index 1.
                 band_index = [int(not x) for x in nod_mask[chip_num - 1]]
-                mix_nods = [fits.getdata(name)[indx, 0] for name, indx in zip(nod_names, band_index)]
-                mix_norm_nods = [fits.getdata(name)[indx, 0] for name, indx in zip(norm_names, band_index)]
-            else:
-                mix_nods, mix_norm_nods = [], []
+                nods = [fits.getdata(name)[indx, 0] for name, indx in zip(nod_names, band_index)]
+                nods_norm = [fits.getdata(name)[indx, 0] for name, indx in zip(norm_names, band_index)]
+                nod_combo_name = "Mixed Combination"
 
             # Replace bad pixels in normalized spectra
-            # Just focus on the norm and mean one here. Leave snr for everything else.
+            pbfix_nods = clean_nods(nods)
+            pbfix_nods_norm = clean_nods(nods_norm)
 
-            fix_opt_norm_nods = clean_nods(optimal_norm_nods)
-            fix_nonopt_norm_nods = clean_nods(nonoptimal_norm_nods)
-            fix_mix_norm_nods = clean_nods(mix_norm_nods)
+            mean_nods = np.mean(nods, axis=0)
+            mean_nods_norm = np.mean(nods_norm, axis=0)
 
-            mean_opt_norm_nods = np.mean(optimal_norm_nods, axis=0)
-            mean_nonopt_norm_nods = np.mean(nonoptimal_norm_nods, axis=0)
-            mean_mix_norm_nods = np.mean(mix_norm_nods, axis=0)
+            mean_pbfix_nods = np.mean(pbfix_nods, axis=0)
+            mean_pbfix_nods_norm = np.mean(pbfix_nods_norm, axis=0)
 
-            mean_fix_opt_norm_nods = np.mean(fix_opt_norm_nods, axis=0)
-            mean_fix_nonopt_norm_nods = np.mean(fix_nonopt_norm_nods, axis=0)
-            mean_fix_mix_norm_nods = np.mean(fix_mix_norm_nods, axis=0)
+
         # plot Results
+            plt.figure()
+            plt.subplot(211)
+            plt.plot(mean_nods, label="{}".format(nod_combo_name))
+            plt.plot(mean_pbfix_nods, label="Fixed {}".format(nod_combo_name))
+            plt.title("Average combination")
+
+            plt.subplot(212)
+            plt.plot(mean_nods_norm, label="norm {}".format(nod_combo_name))
+            plt.plot(mean_pbfix_nods_norm, label="Fixed norm {}".format(nod_combo_name))
+            plt.legend()
+            plt.title("Normalized")
+            plt.show()
 
         # save results
 
