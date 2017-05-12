@@ -1,7 +1,8 @@
 #!/home/jneal/anaconda3/bin/python
 
-"""Select optimal/non-optimal spectra in regards to specification
-   Median and norm Combine spectra after
+"""Select optimal/non-optimal spectra in regards to specification.
+
+Median and norm Combine spectra after
 """
 from __future__ import division, print_function
 import os
@@ -24,7 +25,8 @@ nod_mask_file = "optimal_nod_masks.txt"
 
 
 # Try parse 4*8 bools.
-def parse_boolgrid(filename: str, nod: int=8, chip: int=4) -> Any:
+def parse_boolgrid(filename, nod=8, chip=4):
+    # type: (str, int, int) -> np.ndarray
     """Parse file with 4*8 bool values."""
     line_num = 0
     boolgrid = np.empty((chip, nod), dtype=bool)
@@ -47,6 +49,7 @@ def parse_boolgrid(filename: str, nod: int=8, chip: int=4) -> Any:
 # Plot all 8 normalized reduced spectra
 # plot mean combined and median combined spectra.
 def _parser():
+    # type: () -> argparse.Namespace
     """Take care of all the argparse stuff.
 
     :returns: the args
@@ -66,8 +69,8 @@ def _parser():
 
 
 def main(**kwargs):
+    # type: (...) -> bool
     """Main function."""
-
     # Raising errors on non implemented features.
     if kwargs["spectralcoords"]:
         raise NotImplementedError("Spectral coordinate not available.")
@@ -204,6 +207,7 @@ def main(**kwargs):
 
 
 def sampled_snr(spectrum, chip):
+    # type: (Any, int) -> np.float64
     """Sample SNR with Predefined continuim locations per chip."""
     limits = {1: [900, 960], 2: [460, 600], 3: [240, 310], 4: [450, 490]}
     section = spectrum[slice(limits[chip][0], limits[chip][1])]

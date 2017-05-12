@@ -3,9 +3,11 @@ import logging
 import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
+from typing import List, Tuple, Any, Union
 
 
 def sigma_detect(nods, plot=True):
+    # type: (Any, bool) -> List[Tuple[int, int]]
     """Detect the local pixels that are outside 4sigma from all nods.
 
     Local means 2 pixels either side.
@@ -22,7 +24,7 @@ def sigma_detect(nods, plot=True):
     new_nods[:] = nods
 
     bad_pixel_count = 0
-    bad_pixel_record = []
+    bad_pixel_record = []  # type: List[Tuple[int, int, float]]
 
     iteration = 0
     # Iterate untill no more bad pixels are replaced by nans during an iteration. or less than 5.
@@ -54,7 +56,7 @@ def sigma_detect(nods, plot=True):
             if np.any(sig):
                 bad_nod = sig.nonzero()[0]
                 if len(bad_nod) > 1:
-                    logging.Warning("More then one nod has a bad pixel value here, in pixel #{}".format(pixel))
+                    logging.warning("More then one nod has a bad pixel value here, in pixel #{}".format(pixel))
                 for val in bad_nod:
                     bad_pixel_count += 1
                     bad_pixel_record += [(val, pixel, this_pixel[val])]
@@ -82,6 +84,7 @@ def sigma_detect(nods, plot=True):
 
 
 def interp_badpixels(nods, bad_pixels):
+    # type: (np.ndarray, List[Union[List[int, int],Tuple[int, int]]]) -> Any
     """Linearly interpolate over nearby pixels.
 
     If it is at the end then just replace with the next pixel value.
@@ -146,6 +149,7 @@ def interp_badpixels(nods, bad_pixels):
 
 
 def left_consec_search(pixel, bad_pixels):
+    # type: (Union[List[int], Tuple[int, int]], List[Union[List[int], Tuple[int, int]]]) -> int
     """Count number of consecutive bad pixels to the left of this pixel."""
     prev_pixel = [pixel[0], pixel[1] - 1]
     if (prev_pixel in bad_pixels) or (tuple(prev_pixel) in bad_pixels):
@@ -156,6 +160,7 @@ def left_consec_search(pixel, bad_pixels):
 
 
 def right_consec_search(pixel, bad_pixels):
+    # type: (Union[List[int, int], Tuple[int, int]], List[Union[List[int, int], Tuple[int, int]]]) -> int
     """Count number of consecutive bad pixels to the right of this."""
     next_pixel = [pixel[0], pixel[1] + 1]
     if (next_pixel in bad_pixels) or (tuple(next_pixel) in bad_pixels):
@@ -166,6 +171,7 @@ def right_consec_search(pixel, bad_pixels):
 
 
 def consec_badpixels(bad_pixels):
+    # type: (List[Union[List[int, int], Tuple[int, int]]]) -> bool
     """Check for consecutive badpixels in the same nod.
 
     Consecutive in in axis=1 for the same axis=0 value.
@@ -190,6 +196,7 @@ def consec_badpixels(bad_pixels):
 
 
 def warn_consec_badpixels(bad_pixels, stop=True):
+    # type: (List[Union[List[int, int], Tuple[int, int]]], bool) -> None
     """Raise erro on consecutive badpixels in the same nod.
 
     parameters

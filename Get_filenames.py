@@ -7,9 +7,11 @@ Possibly better to use the glob module.
 """
 import os
 import fnmatch
+from typing import List
 
 
-def get_filenames(path, regexp, regexp2=False):
+def get_filenames(path, regexp, regexp2=None):
+    # type: (str, str, str) -> List[str]
     """Regexp must be a regular expression as a string.
 
     eg '*.ms.*', '*_2.*', '*.ms.norm.fits*'
@@ -20,7 +22,7 @@ def get_filenames(path, regexp, regexp2=False):
     os.chdir(path)
     filelist = []
     for file in os.listdir('.'):
-        if regexp2:  # Match two regular expresions
+        if regexp2 is not None:  # Match two regular expresions
             if fnmatch.fnmatch(file, regexp) and fnmatch.fnmatch(file, regexp2):
                 filelist.append(file)
         else:
@@ -31,6 +33,7 @@ def get_filenames(path, regexp, regexp2=False):
 
 
 def main():
+    # type: () -> None
     """Some test examples."""
     path = "/home/jneal/data/BrownDwarfs-PedrosCode/HD30501-1/"
 
