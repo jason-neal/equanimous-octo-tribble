@@ -83,7 +83,7 @@ def main(**kwargs):
         comb_methods = ["optimal", "non-opt", "mix"]
     else:
         comb_methods = kwargs["combination"]
-
+    print("Combiunation mehtod", comb_methods)
     # Get optimal nod grid
     if kwargs["optimal_nods"]:
         try:
@@ -130,91 +130,62 @@ def main(**kwargs):
             else:
                 mix_nods, mix_norm_nods = [], []
 
-            opt_median = np.median(optimal_nods, axis=0)
-            opt_mean = np.mean(optimal_nods, axis=0)
-            opt_norm_median = np.median(optimal_norm_nods, axis=0)
-            opt_norm_mean = np.mean(optimal_norm_nods, axis=0)
-            opt_norm_sum = np.sum(optimal_norm_nods, axis=0)
-            nonopt_median = np.median(nonoptimal_nods, axis=0)
-            nonopt_mean = np.mean(nonoptimal_nods, axis=0)
-            nonopt_norm_median = np.median(nonoptimal_norm_nods, axis=0)
-            nonopt_norm_mean = np.mean(nonoptimal_norm_nods, axis=0)
-            nonopt_norm_sum = np.sum(nonoptimal_norm_nods, axis=0)
-            mix_median = np.median(mix_nods, axis=0)
-            mix_mean = np.mean(mix_nods, axis=0)
-            mix_norm_median = np.median(mix_norm_nods, axis=0)
-            mix_norm_mean = np.mean(mix_norm_nods, axis=0)
-            mix_norm_sum = np.sum(mix_norm_nods, axis=0)
+            # Replace bad pixels in normalized spectra
+            # Just focus on the norm and mean one here. Leave snr for everything else.
 
-            fig = plt.figure()
-            # ax1 = plt.subplot(211)
-            # plt.plot(opt_median, label="opt_median")
-            # plt.plot(opt_mean, label="opt_mean")
-            # plt.plot(nonopt_median, label="nonopt_median")
-            # plt.plot(nonopt_mean, label="nonopt_mean")
-            # plt.plot(mix_median, label="mix_median")
-            # plt.plot(mix_mean, label="mix_mean")
-            # plt.legend()
+            fix_opt_norm_nods = clean_nods(optimal_norm_nods)
+            fix_nonopt_norm_nods = clean_nods(nonoptimal_norm_nods)
+            fix_mix_norm_nods = clean_nods(mix_norm_nods)
 
-            # ax2 = plt.subplot(212)
-            plt.plot(opt_norm_median, label="opt_norm_median")
-            plt.plot(opt_norm_mean, label="opt_norm_mean")
-            plt.plot(nonopt_norm_median, label="nonopt_norm_median")
-            plt.plot(nonopt_norm_mean, label="nonopt_norm_mean")
-            plt.plot(mix_norm_median, label="mix_norm_median")
-            plt.plot(mix_norm_mean, label="mix_norm_mean")
+            mean_opt_norm_nods = np.mean(optimal_norm_nods, axis=0)
+            mean_nonopt_norm_nods = np.mean(nonoptimal_norm_nods, axis=0)
+            mean_mix_norm_nods = np.mean(mix_norm_nods, axis=0)
 
-            plt.legend()
-            plt.show()
-            # print result
+            mean_fix_opt_norm_nods = np.mean(fix_opt_norm_nods, axis=0)
+            mean_fix_nonopt_norm_nods = np.mean(fix_nonopt_norm_nods, axis=0)
+            mean_fix_mix_norm_nods = np.mean(fix_mix_norm_nods, axis=0)
 
             if kwargs["snr"]:
                 # Analysis signal to noise in a part of the continuim of each spectra.
-                # Normlazied result.
+                d = {"optimal_nods": optimal_nods, "optimal_norm_nods": optimal_norm_nods,
+                     "nonoptimal_nods": nonoptimal_nods, "nonoptimal_norm_nods": nonoptimal_norm_nods,
+                     "mix_nods": mix_nods, "mix_norm_nods": mix_norm_nods}
                 print("For chip {}".format(chip_num))
-                print("opt_norm_mean snr = {}".format(sampled_snr(opt_norm_mean, chip_num)))
-                print("opt_norm_median snr = {}".format(sampled_snr(opt_norm_median, chip_num)))
-                print("opt_norm_sum snr = {}".format(sampled_snr(opt_norm_sum, chip_num)))
-                print("nonopt_norm_mean snr = {}".format(sampled_snr(nonopt_norm_mean, chip_num)))
-                print("nonopt_norm_median snr = {}".format(sampled_snr(nonopt_median, chip_num)))
-                print("nonopt_norm_sum snr = {}".format(sampled_snr(nonopt_norm_sum, chip_num)))
-                print("mix_norm_mean snr = {}".format(sampled_snr(mix_norm_mean, chip_num)))
-                print("mix_norm_median snr = {}".format(sampled_snr(mix_norm_median, chip_num)))
-                print("mix_norm_sum snr = {}".format(sampled_snr(mix_norm_sum, chip_num)))
+                for key, this_nods in d.items():
+                    fixed_nods = clean_nods(this_nods)
+                    avg, med, sum_ = nod_calcs(this_nods)
+                    fix_avg, fix_med, fix_sum_ = nod_calcs(fixed_nods)
+
+                    print("{} mean combined   = {}".format(key, sampled_snr(avg, chip_num)))
+                    print("{} median combined = {}".format(key, sampled_snr(med, chip_num)))
+                    print("{} sum combined    = {}".format(key, sampled_snr(sum_, chip_num)))
+                    print("fixed {} mean combined = {}".format(key, sampled_snr(fix_avg, chip_num)))
+                    print("fixed {} median combined = {}".format(key, sampled_snr(fix_med, chip_num)))
+                    print("fixed {} sum combined = {}".format(key, sampled_snr(fix_sum_, chip_num)))
         # plot Results
 
         # save results
-            # try sigma clipping on norm data
 
-            # turn to array here ( can do before just need to work out how/where what to change)
-            fix_opt_nods = clean_nods(optimal_norm_nods)
-            fix_nonopt_nods = clean_nods(nonoptimal_norm_nods)
-            fix_mix_nods = clean_nods(mix_norm_nods)
-
-            # bad_pixel_record = bp.sigma_detect(mix_norm_nods_arr, plot=True)
-            #
-            # bp.warn_consec_badpixels(bad_pixel_record, stop=True)
-            #
-            # fix_mix_nods = bp.interp_badpixels(mix_norm_nods_arr, bad_pixel_record)
-            # if len(bad_pixel_record) > 0:
-            #     assert np.any(fix_mix_nods != mix_norm_nods_arr)
-
-            plt.plot(fix_opt_nods.T, ".", label="opt")
-            plt.plot(fix_mix_nods.T, label="fixed")
-            plt.title("After bad pixel correction")
-            plt.legend()
-            plt.show()
 
     return 0
+
+
+def nod_calcs(nods):
+    # type: (np.ndarray) -> List[np.ndarray, np.ndarray, np.ndarray]
+    """Returns calculation across the nods."""
+    nod_mean = np.mean(nods, axis=0)
+    nod_median = np.median(nods, axis=0)
+    nod_sum = np.sum(nods, axis=0)
+    return nod_mean, nod_median, nod_sum
 
 
 def clean_nods(nods):
     # type: (Union[np.ndarray, List[List[float]]]) -> np.ndarray
     """Clean bad pixels from the nods."""
     nod_array = np.asarray(nods)
-    bad_pixels = bp.sigma_detect(nod_array, plot=True)
+    bad_pixels = bp.sigma_detect(nod_array, plot=False)
 
-    bp.warn_consec_badpixels(bad_pixels, stop=True)
+    bp.warn_consec_badpixels(bad_pixels, stop=False)
 
     fixed_nods = bp.interp_badpixels(nod_array, bad_pixels)
     print("Number of bad pixels = {}".format(len(bad_pixels)))
