@@ -169,6 +169,15 @@ def main(**kwargs):
             plt.show()
 
         # save results
+        if combo == "optimal":  # "optimal", "non-opt", "mix"
+            Output_name = "..... .norm.optavg.fits"
+        elif combo == "non-opt":
+            Output_name = "..... .norm.nonoptavg.fits"
+        elif combo == "mix":
+            Output_name = "..... .norm.mixavg.fits"
+
+        # Need to do the save to fits file stuff... See old codes.
+
 
 
     return 0
