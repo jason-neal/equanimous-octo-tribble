@@ -156,11 +156,16 @@ def main(**kwargs):
             else:
                 plt.title("Combined Normalized Spectra.")
 
+            # Add difference plot
             plt.subplot(212)
-            plt.plot(mean_nods_norm, label="norm {}".format(nod_combo_name))
-            plt.plot(mean_pbfix_nods_norm, label="Fixed norm {}".format(nod_combo_name))
-            plt.legend()
-            plt.title("Normalized")
+            if kwargs["unnorm"]:
+                original_combine = combined_data[1, 0, :]
+            else:
+                original_combine = combined_data[0, 0, :]
+            plt.plot(mean_pbfix_nods - original_combine, label="{} - Optimal".format(nod_combo_name))
+            plt.title("Difference from optimal combination.")
+            plt.ylabel("Flux")
+            plt.xlabel("Pixel")
             plt.show()
 
         # save results
