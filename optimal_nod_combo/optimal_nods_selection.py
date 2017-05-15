@@ -63,6 +63,7 @@ def _parser():
     parser.add_argument("-n", "--nod_num", help="Number of nods in the nod cycle, default=8", default=8, type=int)
     parser.add_argument("-c", "--combination", help="Nod combination method, default=all means do all three.",
                         default="all", choices=["all", "optimal", "non-opt", "mix"])
+    parser.add_argument("-u", "--unnorm", help="Combine the unnormalized nods.", action="store_true")
     parser.add_argument("--snr", help="Show snr of continuum.", action="store_true")
     args = parser.parse_args()
     return args
@@ -98,8 +99,6 @@ def main(**kwargs):
         else:
             nod_mask = None
 
-    # Now need to load in the spectra. Cycle over combination options []
-
     # def file structure
     dir_path = os.getcwd()
     intermediate_path = dir_path + "/Intermediate_steps/"
@@ -108,51 +107,54 @@ def main(**kwargs):
     observation_name = os.path.split(dir_path)[-1]
 
     for chip_num in tqdm(range(1, 5)):
-        # print("Starting Chip # {}".format(chip_num))
         combined_name = get_filenames(combined_path, 'CRIRE*norm.sum.fits', "*_{0}.*".format(chip_num))
-        nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
-        norm_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
 
         if kwargs["snr"]:
-            snr_calculations(nod_names, norm_names, nod_mask, chip_num)
+            snr_nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
+            snr_norm_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
+            snr_calculations(snr_nod_names, snr_norm_names, nod_mask, chip_num)
+
+        if kwargs["unnorm"]:
+            nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
+        else:
+            nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
 
         combined_data = fits.getdata(combined_path + combined_name[0])
         for combo in comb_methods:
+            print("This combo = {}".format(combo))
             if combined_data.shape != (3, 1, 1024):
                 raise ValueError("Fits files do no have the right shape, [3, 1, 1024]")
 
             if combo == "optimal":  # "optimal", "non-opt", "mix"
                 nods = [fits.getdata(name)[0, 0] for name in nod_names]
-                nods_norm = [fits.getdata(name)[0, 0] for name in norm_names]
                 nod_combo_name = "Optimal"
             elif combo == "non-opt":
                 nods = [fits.getdata(name)[1, 0] for name in nod_names]
-                nods_norm = [fits.getdata(name)[1, 0] for name in norm_names]
                 nod_combo_name = "Non-optimal"
             elif combo == "mix":
                 # True values map to index zero. whereas False maps to index 1.
                 band_index = [int(not x) for x in nod_mask[chip_num - 1]]
                 nods = [fits.getdata(name)[indx, 0] for name, indx in zip(nod_names, band_index)]
-                nods_norm = [fits.getdata(name)[indx, 0] for name, indx in zip(norm_names, band_index)]
-                nod_combo_name = "Mixed Combination"
+                nod_combo_name = "Mixed"
 
             # Replace bad pixels in normalized spectra
             pbfix_nods = clean_nods(nods)
-            pbfix_nods_norm = clean_nods(nods_norm)
 
             mean_nods = np.mean(nods, axis=0)
-            mean_nods_norm = np.mean(nods_norm, axis=0)
 
             mean_pbfix_nods = np.mean(pbfix_nods, axis=0)
-            mean_pbfix_nods_norm = np.mean(pbfix_nods_norm, axis=0)
 
-
-        # plot Results
+            # Plot Results
             plt.figure()
             plt.subplot(211)
             plt.plot(mean_nods, label="{}".format(nod_combo_name))
             plt.plot(mean_pbfix_nods, label="Fixed {}".format(nod_combo_name))
-            plt.title("Average combination")
+            plt.ylabel("Flux")
+            plt.legend()
+            if kwargs["unnorm"]:
+                plt.title("Combined Spectra")
+            else:
+                plt.title("Combined Normalized Spectra.")
 
             plt.subplot(212)
             plt.plot(mean_nods_norm, label="norm {}".format(nod_combo_name))
