@@ -18,11 +18,6 @@ import matplotlib.pyplot as plt
 import bp_replacement as bp
 from Get_filenames import get_filenames
 
-# TODO: argparse file with suitbale nods. (optimal nod mask)
-# TODO: optimal nod mask)
-
-nod_mask_file = "optimal_nod_masks.txt"
-
 
 # Try parse 4*8 bools.
 def parse_boolgrid(filename, nod=8, chip=4):
@@ -65,6 +60,7 @@ def _parser():
                         default="all", choices=["all", "optimal", "non-opt", "mix"])
     parser.add_argument("-u", "--unnorm", help="Combine the unnormalized nods.", action="store_true")
     parser.add_argument("--snr", help="Show snr of continuum.", action="store_true")
+    parser.add_argument("-p", "--plot", help="Show the plots.", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -145,28 +141,32 @@ def main(**kwargs):
             mean_pbfix_nods = np.mean(pbfix_nods, axis=0)
 
             # Plot Results
-            plt.figure()
-            plt.subplot(211)
-            plt.plot(mean_nods, label="{}".format(nod_combo_name))
-            plt.plot(mean_pbfix_nods, label="Fixed {}".format(nod_combo_name))
-            plt.ylabel("Flux")
-            plt.legend()
-            if kwargs["unnorm"]:
-                plt.title("Combined Spectra")
-            else:
-                plt.title("Combined Normalized Spectra.")
+            if kwargs["plot"]:
+                plt.figure()
+                plt.subplot(211)
+                plt.plot(mean_nods, label="{}".format(nod_combo_name))
+                plt.plot(mean_pbfix_nods, label="Fixed {}".format(nod_combo_name))
+                plt.ylabel("Flux")
+                plt.legend()
+                if kwargs["unnorm"]:
+                    plt.title("Combined Spectra")
+                else:
+                    plt.title("Combined Normalized Spectra.")
 
-            # Add difference plot
-            plt.subplot(212)
-            if kwargs["unnorm"]:
-                original_combine = combined_data[1, 0, :]
+                # Add difference plot
+                plt.subplot(212)
+                if kwargs["unnorm"]:
+                    original_combine = combined_data[1, 0, :]
+                else:
+                    original_combine = combined_data[0, 0, :]
+                plt.plot(mean_pbfix_nods - original_combine, label="{} - Optimal".format(nod_combo_name))
+                plt.title("Difference from optimal combination.")
+                plt.ylabel("Flux")
+                plt.xlabel("Pixel")
+
+                plt.show()
             else:
-                original_combine = combined_data[0, 0, :]
-            plt.plot(mean_pbfix_nods - original_combine, label="{} - Optimal".format(nod_combo_name))
-            plt.title("Difference from optimal combination.")
-            plt.ylabel("Flux")
-            plt.xlabel("Pixel")
-            plt.show()
+                pass
 
         # save results
         if combo == "optimal":  # "optimal", "non-opt", "mix"
