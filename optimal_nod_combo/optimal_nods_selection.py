@@ -104,6 +104,7 @@ def main(**kwargs):
     image_path = os.path.join(dir_path, "images", "")
     observation_name = os.path.split(dir_path)[-1]
 
+    created_files = []     # names of files created.
     for chip_num in tqdm(range(1, 5)):
         combined_name = get_filenames(combined_path, 'CRIRE*norm.sum.fits', "*_{0}.*".format(chip_num))
 
@@ -118,6 +119,7 @@ def main(**kwargs):
         else:
             nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
             word_split = "ms.norm"   # For saving
+
         combined_data = fits.getdata(os.path.join(combined_path, combined_name[0]))
         for combo in comb_methods:
             print("This combo = {}".format(combo))
@@ -201,6 +203,9 @@ def main(**kwargs):
             fits.writeto(output_name, mean_pbfix_nods, header, output_verify=kwargs["output_verify"], overwrite=kwargs["overwrite"])
             print("Saved nod combination to {}".format(output_name))
             created_files += [output_name]
+    print("\nList of created files")
+    for f in created_files:
+        print(f)
     return 0
 
 
