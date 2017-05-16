@@ -97,9 +97,9 @@ def main(**kwargs):
 
     # def file structure
     dir_path = os.getcwd()
-    intermediate_path = dir_path + "/Intermediate_steps/"
-    combined_path = dir_path + "/Combined_Nods/"
-    image_path = dir_path + "/images/"
+    intermediate_path = os.path.join(dir_path, "Intermediate_steps", "")
+    combined_path = os.path.join(dir_path, "Combined_Nods", "")
+    image_path = os.path.join(dir_path, "images", "")
     observation_name = os.path.split(dir_path)[-1]
 
     for chip_num in tqdm(range(1, 5)):
@@ -115,7 +115,7 @@ def main(**kwargs):
         else:
             nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
 
-        combined_data = fits.getdata(combined_path + combined_name[0])
+        combined_data = fits.getdata(os.path.join(combined_path, combined_name[0]))
         for combo in comb_methods:
             print("This combo = {}".format(combo))
             if combined_data.shape != (3, 1, 1024):
