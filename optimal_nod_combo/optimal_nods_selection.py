@@ -61,6 +61,8 @@ def _parser():
     parser.add_argument("-u", "--unnorm", help="Combine the unnormalized nods.", action="store_true")
     parser.add_argument("--snr", help="Show snr of continuum.", action="store_true")
     parser.add_argument("-p", "--plot", help="Show the plots.", action="store_true")
+    parser.add_argument("--output_verify", help="Fits file verification mode", default="fix+warn")
+    parser.add_argument("-r", "--overwrite", help="Overwrite output file if already exists", action="store_true")
     args = parser.parse_args()
     return args
 
