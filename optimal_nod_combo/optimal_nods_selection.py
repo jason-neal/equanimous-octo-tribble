@@ -114,9 +114,10 @@ def main(**kwargs):
 
         if kwargs["unnorm"]:
             nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
+            word_split = "ms"        # For saving
         else:
             nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
-
+            word_split = "ms.norm"   # For saving
         combined_data = fits.getdata(os.path.join(combined_path, combined_name[0]))
         for combo in comb_methods:
             print("This combo = {}".format(combo))
@@ -170,18 +171,36 @@ def main(**kwargs):
             else:
                 pass
 
-        # save results
-        if combo == "optimal":  # "optimal", "non-opt", "mix"
-            Output_name = "..... .norm.optavg.fits"
-        elif combo == "non-opt":
-            Output_name = "..... .norm.nonoptavg.fits"
-        elif combo == "mix":
-            Output_name = "..... .norm.mixavg.fits"
+            # Save results as fits file
+            # Extension for new nod combination
+            if combo == "optimal":  # "optimal", "non-opt", "mix"
+                combo_ext = ".optavg.fits"
+            elif combo == "non-opt":
+                combo_ext = ".nonoptavg.fits"
+            elif combo == "mix":
+                combo_ext = ".mixavg.fits"
 
-        # Need to do the save to fits file stuff... See old codes.
+            first_obsname = nod_names[0]
+            obs_name = os.path.split(first_obsname)[1]  # incase path is included.
+            obs_prefix = obs_name.split(word_split)[0]
+            header = fits.getheader(first_obsname)
 
+            output_name = os.path.join(combined_path, obs_prefix + word_split + combo_ext)
 
+            # Add header entries
+            header["NodSelectionMethod"] = (nod_combo_name, "Method of selecting nod spectra.")
+            header["CombinationMethod"] = ("Average", "Method of combing nod spectra.")
+            header["BadPixelNum"] = (len(bad_pixels), " Number of points removed from nod spectra.")
+            header["comment"] = "4 sigma bad pixel detction performed"
+            header["comment"] = "All nods and 2 pixels either side of each pixel recursively."
+            header["comment"] = "Bad pixels found >4sigma = {}".format(bad_pixels)
 
+            # Convience function to save fits file.
+
+            # Fix fits files to allow floating point numbers with lower case "e".
+            fits.writeto(output_name, mean_pbfix_nods, header, output_verify=kwargs["output_verify"], overwrite=kwargs["overwrite"])
+            print("Saved nod combination to {}".format(output_name))
+            created_files += [output_name]
     return 0
 
 
