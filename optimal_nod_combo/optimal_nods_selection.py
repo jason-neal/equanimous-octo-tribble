@@ -134,7 +134,7 @@ def main(**kwargs):
                 nod_combo_name = "Mixed"
 
             # Replace bad pixels in normalized spectra
-            pbfix_nods = clean_nods(nods)
+            pbfix_nods, bad_pixels = clean_nods(nods)
 
             mean_nods = np.mean(nods, axis=0)
 
@@ -205,7 +205,7 @@ def clean_nods(nods):
     if len(bad_pixels) > 0:
         assert np.any(fixed_nods != nod_array)
 
-    return fixed_nods
+    return fixed_nods, bad_pixels
 
 
 def snr_calculations(nod_names, norm_names, nod_mask, chip_num):
@@ -228,7 +228,7 @@ def snr_calculations(nod_names, norm_names, nod_mask, chip_num):
          "mix_nods": mix_nods, "mix_norm_nods": mix_norm_nods}
     print("For chip {}".format(chip_num))
     for key, this_nods in d.items():
-        fixed_nods = clean_nods(this_nods)
+        fixed_nods, bad_pix = clean_nods(this_nods)
         avg, med, sum_ = nod_calcs(this_nods)
         fix_avg, fix_med, fix_sum_ = nod_calcs(fixed_nods)
 
@@ -238,6 +238,7 @@ def snr_calculations(nod_names, norm_names, nod_mask, chip_num):
         print("{} median combined = {}(> 4 sigma removed)".format(key, sampled_snr(fix_med, chip_num)))
         print("{} sum combined    = {}".format(key, sampled_snr(sum_, chip_num)))
         print("{} sum combined    = {} (> 4 sigma removed)".format(key, sampled_snr(fix_sum_, chip_num)))
+        print("{} bad pixels num   = {}".format(key, len(bad_pix)))
 
 
 def sampled_snr(spectrum, chip):
