@@ -92,8 +92,6 @@ setup(
     entry_points={
         #    'console_scripts': [
         #        'sample=sample:main',
-        'console_scripts': [
-            'optimal_nods_selection=optimal_nods_selection:main',
-        ],
+        # ],
     },
 )
