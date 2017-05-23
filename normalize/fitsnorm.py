@@ -30,9 +30,8 @@ def onclick(event):
 
 def onpick(event):
     # when the user clicks right on a continuum point, remove it
-    if event.mouseevent.button == 3:
-        if hasattr(event.artist, 'get_label') and event.artist.get_label() == 'cont_pnt':
-            event.artist.remove()
+    if event.mouseevent.button == 3 and hasattr(event.artist, 'get_label') and event.artist.get_label() == 'cont_pnt':
+        event.artist.remove()
 
 
 def ontype(event):
@@ -91,9 +90,11 @@ def _parser():
 
     :returns: the args
     """
-    parser = argparse.ArgumentParser(description='Interactively normalize fits spectra.')
+    parser = argparse.ArgumentParser(
+        description='Interactively normalize fits spectra.')
 
-    parser.add_argument("filename", type=str, help="Specturm to continuum normalize.")
+    parser.add_argument("filename", type=str,
+                        help="Specturm to continuum normalize.")
 
     args = parser.parse_args()
     return args
