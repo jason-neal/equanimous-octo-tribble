@@ -93,5 +93,8 @@ setup(
         #    'console_scripts': [
         #        'sample=sample:main',
         # ],
+        'console_scripts': [
+            'cont_norm=normalize:cont_norm'
+        ],
     },
 )
