@@ -2,10 +2,10 @@
 # Test the effect of convolving straight to 20000 and convolving first to an intermediate resolution say 80000.
 
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-from IP_multi_Convolution import unitary_Gauss, ip_convolution
+from IP_multi_Convolution import ip_convolution, unitary_Gauss
 
 
 def main():

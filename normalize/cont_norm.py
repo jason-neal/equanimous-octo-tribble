@@ -2,13 +2,13 @@
 
 Based on http://www.hs.uni-hamburg.de/DE/Ins/Per/Czesla/PyA/PyA/pyaGuiDoc/continuumFinder.html.
 """
-import sys
 import argparse
+import sys
 
+import matplotlib.pylab as plt
+import numpy as np
 from astropy.io import fits
 from PyAstronomy import pyaGui as pg
-import numpy as np
-import matplotlib.pylab as plt
 
 
 def _parser():

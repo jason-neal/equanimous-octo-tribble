@@ -4,13 +4,15 @@
 
 """
 from __future__ import print_function
-import os
+
 import argparse
+import os
+
 import numpy as np
-from astropy.time import Time, TimeDelta
-from astropy.io import fits
 from astropy import units as u
 from astropy.coordinates import Angle
+from astropy.io import fits
+from astropy.time import Time, TimeDelta
 
 
 def _parser():

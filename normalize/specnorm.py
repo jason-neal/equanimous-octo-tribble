@@ -1,8 +1,9 @@
-import pylab as plt
-import numpy as np
-from scipy.interpolate import splrep, splev
-import sys
 import os
+import sys
+
+import numpy as np
+import pylab as plt
+from scipy.interpolate import splev, splrep
 
 
 def onclick(event):

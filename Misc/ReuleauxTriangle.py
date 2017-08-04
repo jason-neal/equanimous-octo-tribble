@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """ReuleauxTriangle.py."""
 from __future__ import division
+
 import math as math
+
 import matplotlib.pyplot as plt
 
 

@@ -4,9 +4,10 @@
 # I want to test the diference between doppler factor and non-relativistic version.
 
 from __future__ import division, print_function
+
 import numpy as np
-from astropy import constants
 from astropy import units as u
+from astropy import constants
 
 c = 299792458 * u.meter / u.second
 

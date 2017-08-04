@@ -3,8 +3,8 @@
 #    Functions to read column-separated files
 #
 ################################################################################
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 def pdread_2col(filename, noheader=False):

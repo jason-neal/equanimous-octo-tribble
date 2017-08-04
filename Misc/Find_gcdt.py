@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # Find_gcdt.py
 # Find a common step size dt of a timeseries.
-import numpy as np
 import decimal
+
+import numpy as np
 
 
 def gcdt(ts, dp=False):

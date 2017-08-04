@@ -3,10 +3,12 @@
 # The spectra does not have to be equidistant in wavelength.
 
 from __future__ import division, print_function
+
 import logging
-import numpy as np
-import matplotlib.pyplot as plt
 from datetime import datetime as dt
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def wav_selector(wav, flux, wav_min, wav_max):

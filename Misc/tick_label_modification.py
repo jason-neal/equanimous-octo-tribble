@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def convert_labels_to_rv(x, labels):
     x_mid = np.mean(x)
     c = 299792.458   # km/s

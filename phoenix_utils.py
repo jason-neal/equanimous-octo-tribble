@@ -7,6 +7,7 @@ Jason Neal, Janurary 2017
 """
 import glob
 import itertools
+
 import numpy as np
 
 

@@ -7,11 +7,13 @@
 # Multiprocess use and speed timing was contributed by Jorge Martins
 
 from __future__ import division, print_function
-import numpy as np
-from tqdm import tqdm
+
+from datetime import datetime as dt
+
 import matplotlib.pyplot as plt
 import multiprocess as mprocess
-from datetime import datetime as dt
+import numpy as np
+from tqdm import tqdm
 
 
 def wav_selector(wav, flux, wav_min, wav_max):

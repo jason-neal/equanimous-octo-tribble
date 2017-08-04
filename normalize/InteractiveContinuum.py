@@ -2,9 +2,9 @@
 
 http://www.hs.uni-hamburg.de/DE/Ins/Per/Czesla/PyA/PyA/pyaGuiDoc/continuumFinder.html
 """
-from PyAstronomy import pyaGui as pg
-import numpy as np
 import matplotlib.pylab as plt
+import numpy as np
+from PyAstronomy import pyaGui as pg
 
 # Create some artificial data/spectrum
 x = np.arange(1000)
