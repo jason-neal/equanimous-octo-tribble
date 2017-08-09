@@ -1,4 +1,4 @@
-# Setup file for equnaimousoctotribble
+# Setup file for equanimousoctotribble
 
 
 from setuptools import setup, find_packages
@@ -17,7 +17,7 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 setup(
-    name='equanimous-octo-tribble',
+    name='equanimous_octo_tribble',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
