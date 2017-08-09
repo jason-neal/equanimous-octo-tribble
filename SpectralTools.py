@@ -43,10 +43,6 @@ def inverse_BERV(w1, Berv):
 #  return None
 
 
-def Convolution():  # IP convolution ?
-    return None
-
-
 def air2vac(air):
     """Conversion of air wavelenghts to vacuum wavelenghts.
 
@@ -150,9 +146,9 @@ def unitary_Gauss(x, center, FWHM):
     p[2] = FWHM
     """
     sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)))
-    Amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
+    amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
     tau = -((x - center)**2) / (2 * (sigma**2))
-    result = Amp * np.exp(tau)
+    result = amp * np.exp(tau)
 
     return result
 
@@ -174,9 +170,6 @@ def fast_convolve(wav_val, R, wav_extended, flux_extended, fwhm_lim):
 
 def instrument_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True, verbose=True):
     """Convolution code adapted from pedros code and speed up with np mask logic."""
-    # print("types", type(wav), type(flux), type(chip))
-    # print("lengths", len(wav), len(flux), len(chip))
-
     # CRIRES HDR vals for chip limits don't match well with calibrated values (get interpolation out of range error)
     # So will use limits from the obs data instead
     # wav_chip, flux_chip = chip_selector(wav, flux, chip)
@@ -189,13 +182,15 @@ def instrument_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True, v
     # wide wavelength bin for the resolution_convolution
     wav_extended, flux_extended = wav_selector(wav, flux, wav_chip[0] - fwhm_lim * FWHM_min,
                                                wav_chip[-1] + fwhm_lim * FWHM_max, verbose=False)
+
     # isinstance check is ~100 * faster then arraying the array again.
     if not isinstance(wav_extended, np.ndarray):
         wav_extended = np.array(wav_extended, dtype="float64")
     if not isinstance(flux_extended, np.ndarray):
         flux_extended = np.array(flux_extended, dtype="float64")
 
-    print("Starting the Resolution convolution...")
+    if verbose:
+        print("Starting the Resolution convolution...")
     # Predefine np array space
     flux_conv_res = np.empty_like(wav_chip, dtype="float64")
     counter = 0
@@ -206,12 +201,10 @@ def instrument_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True, v
         flux_conv_res[n] = fast_convolve(wav, R, wav_extended, flux_extended, fwhm_lim)
         if (n % base_val == 0) and verbose:
             counter = counter + 5
-            print("Resolution Convolution at {}%%...".format(counter))
+            print("Resolution Convolution at {0}%%...".format(counter))
 
-    # if not isinstance(flux_conv_res, np.ndarray):
-    #    flux_conv_res = np.array(flux_conv_res, dtype="float64")
-
-    print("Done.\n")
+    if verbose:
+        print("Done.\n")
 
     if(plot):
         fig = plt.figure(1)
