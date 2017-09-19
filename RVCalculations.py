@@ -7,8 +7,9 @@ present with a given wavelength shift in the NIR range
 we have.
 """
 from __future__ import division
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def Calculate_RV(Lambda, deltalambda):

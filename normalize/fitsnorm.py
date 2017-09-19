@@ -5,13 +5,13 @@ Interactively normalize fits spectra.
 Based on https://python4esac.github.io/plotting/publication.html
 
 """
+import argparse
 import os
 import sys
-import argparse
 
-import pylab as plt
 import numpy as np
-from scipy.interpolate import splrep, splev
+import pylab as plt
+from scipy.interpolate import splev, splrep
 
 
 def onclick(event):

@@ -1,7 +1,9 @@
 # test_fits_renamer.py
-import pytest
 import os
-from file_renamer import main, char_replace
+
+import pytest
+
+from file_renamer import char_replace, main
 
 
 def test_char_replace():

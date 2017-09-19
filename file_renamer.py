@@ -4,8 +4,9 @@
 # Author: Jason J. Neal <jason.neal@astro.up.pt>
 """
 from __future__ import division, print_function
-import os
+
 import argparse
+import os
 
 
 def _parser():

@@ -6,14 +6,16 @@
 
 # generate some values for paper
 
-from __future__ import print_function, division
-import os
-import datetime
+from __future__ import division, print_function
+
 import argparse
+import datetime
+import os
+
 import numpy as np
-from astropy.io import fits
 from astropy import units as u
 from astropy.coordinates import Angle
+from astropy.io import fits
 from astropy.time import Time, TimeDelta
 
 

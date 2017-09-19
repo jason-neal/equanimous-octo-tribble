@@ -3,16 +3,19 @@
 
 # My imports
 from __future__ import division, print_function
+
+import argparse
 import os
 import urllib
-import argparse
+
 import matplotlib
-import numpy as np
-from astropy.io import fits
-import scipy.interpolate as sci
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy.interpolate as sci
+from astropy.io import fits
+from astropy.modeling import fitting, models
+
 from gooey import Gooey, GooeyParser
-from astropy.modeling import models, fitting
 
 
 def _download_spec(fout):

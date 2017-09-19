@@ -7,12 +7,14 @@
 # If you do not want to use multiprocessing then see IP_Convolution.py
 
 from __future__ import division, print_function
+
 import logging
-import numpy as np
-from tqdm import tqdm
+from datetime import datetime as dt
+
 import matplotlib.pyplot as plt
 import multiprocess as mprocess
-from datetime import datetime as dt
+import numpy as np
+from tqdm import tqdm
 
 
 def setup_debug(debug_val=False):

@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
 from __future__ import division
+
 import argparse
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from astropy.io import fits
-import matplotlib.pyplot as plt
 from numpy.lib import stride_tricks
 
 # Testing for a snr of my spectra

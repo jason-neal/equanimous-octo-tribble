@@ -1,11 +1,12 @@
 # Setup file for equanimousoctotribble
 
 
-from setuptools import setup, find_packages
+import os
 # from setuptools.command.test import test as TestCommand
 # To use a consistent encoding
 from codecs import open
-import os
+
+from setuptools import find_packages, setup
 
 long_description = " "
 

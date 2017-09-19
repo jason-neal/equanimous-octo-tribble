@@ -1,6 +1,8 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 from RVCalculations import Calculate_WLshift
+
 
 def s_profile(wave, wav_0, depth, width, k):
     """Generate an S-profile from appendix of ferluga et al. """

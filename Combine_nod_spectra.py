@@ -7,15 +7,17 @@ Script that take one imput parameter which is the path to the normobs directory
 
 Needs functions/modules to get the filenames, export to a fits tablefile, change fits hdr
 """
+import argparse
+import fnmatch
 import os
 import time
-import fnmatch
-import argparse
-import IOmodule
+
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 from astropy.io import fits
-import matplotlib.pyplot as plt
+
+import IOmodule
 
 
 def get_filenames(path, regexp, regexp2=False):

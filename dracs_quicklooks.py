@@ -5,10 +5,13 @@
 # plot mean combined and median combined spectra.
 
 from __future__ import division, print_function
+
 import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
-import matplotlib.pyplot as plt
+
 from Get_filenames import get_filenames
 
 # observation_name = "HD162020-1"

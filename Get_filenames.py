@@ -5,8 +5,8 @@
 
 Possibly better to use the glob module.
 """
-import os
 import fnmatch
+import os
 from typing import List
 
 

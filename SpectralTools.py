@@ -2,9 +2,11 @@
 
 # Collection of useful tools for dealing with spectra:
 from __future__ import division
+
 import time
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.interpolate import interp1d
 
 

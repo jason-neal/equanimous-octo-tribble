@@ -3,12 +3,12 @@
 # Grid Chi-square
 # Module to perform Chi-square analysis for a grid of values.
 from __future__ import division, print_function
-import os
-import numpy as np
-from joblib import Memory
-import matplotlib.pyplot as plt
-from joblib import Parallel, delayed
 
+import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+from joblib import Memory, Parallel, delayed
 
 path = "/home/jneal/Phd/Codes/equanimous-octo-tribble/"  # save path
 cachedir = os.path.join(path, "cache")  # save path

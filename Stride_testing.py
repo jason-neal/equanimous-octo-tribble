@@ -6,13 +6,15 @@
 
 # In[21]:
 
-import numpy as np
-from astropy.io import fits
-import matplotlib.pyplot as plt
 from __future__ import division
-from numpy.lib import stride_tricks
+
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
+from astropy.io import fits
+from numpy.lib import stride_tricks
+
 get_ipython().magic('matplotlib inline')
 
 
