@@ -4,7 +4,7 @@ scipy==0.19.1
 astroquery==0.3.6.post2
 pandas==0.20.3
 argparse==1.4.0
-PyAstronomy
+PyAstronomy==0.11.1
 matplotlib
 seaborn
 tqdm
