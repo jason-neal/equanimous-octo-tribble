@@ -11,4 +11,4 @@ tqdm==4.17.1
 multiprocess==0.70.5
 ephem==3.7.6.0
 seaborn==0.8.1
-joblib
+joblib==0.11
