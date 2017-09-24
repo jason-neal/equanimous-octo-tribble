@@ -1,7 +1,7 @@
 numpy==1.13.1
 astropy==2.0.2
 scipy==0.19.1
-astroquery
+astroquery==0.3.6.post2
 pandas
 argparse
 PyAstronomy
