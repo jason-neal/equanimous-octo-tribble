@@ -2,7 +2,7 @@ numpy==1.13.1
 astropy==2.0.2
 scipy==0.19.1
 astroquery==0.3.6.post2
-pandas
+pandas==0.20.3
 argparse
 PyAstronomy
 matplotlib
