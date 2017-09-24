@@ -1,5 +1,5 @@
 numpy==1.13.1
-astropy
+astropy==2.0.2
 scipy
 astroquery
 pandas
