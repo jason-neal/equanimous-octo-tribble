@@ -1,5 +1,5 @@
 codacy-coverage
-codeclimate-test-reporter
+codeclimate-test-reporter==0.2.3
 hypothesis
 pytest
 pytest-cov
