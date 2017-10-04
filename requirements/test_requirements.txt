@@ -1,6 +1,6 @@
 codacy-coverage
 codeclimate-test-reporter
-hypothesis
+hypothesis==3.31.2
 pytest
 pytest-cov
 python-coveralls
