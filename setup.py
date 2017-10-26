@@ -14,7 +14,7 @@ long_description = " "
 base_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)))
 
 # https://www.reddit.com/r/Python/comments/3uzl2a/setuppy_requirementstxt_or_a_combination/
-with open('requirements.txt') as f:
+with open('requirements/requirements.txt') as f:
     requirements = f.read().splitlines()
 
 setup(
