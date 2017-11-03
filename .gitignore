@@ -4,6 +4,8 @@ __pycache__/
 requests/
 cache/
 *.coverage
+.eggs/
+equanimous_octo_tribble.egg-info/
 
 #### GIT IGNORE ###
 
