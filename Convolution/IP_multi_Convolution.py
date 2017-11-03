@@ -16,6 +16,7 @@ import multiprocess as mprocess
 import numpy as np
 from tqdm import tqdm
 
+from spectrum_overload import Spectrum
 
 def setup_debug(debug_val=False):
     """Set debug level."""
@@ -82,6 +83,16 @@ def wrapper_fast_convolve(args):
     arguments.
     """
     return fast_convolve(*args)
+
+def convolve_spectrum(spec, *args, **kwargs):
+    """Convovle a spectrum using ip_convolution.
+
+    ip_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True,
+                       verbose=False, numProcs=None, progbar=True, debug=False)
+    """
+    spec = spec.copy()
+    conv = ip_convolution(spec.xaxis, spec.flux, *args, **kwargs)
+    return Spectrum(xaxis=conv[0], flux=conv[1], header=spec.header)
 
 
 def ip_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True,

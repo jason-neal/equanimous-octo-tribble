@@ -1,4 +1,4 @@
-argparse==1.4.0
+argparse>=1.0
 astropy==2.0.2
 astroquery==0.3.6.post2
 ephem==3.7.6.0
