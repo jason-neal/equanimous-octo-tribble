@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-from file_renamer import char_replace, main
+from octotribble.file_renamer import char_replace, main
 
 
 def test_char_replace():
