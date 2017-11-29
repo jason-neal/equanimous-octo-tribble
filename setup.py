@@ -98,4 +98,6 @@ setup(
             'cont_norm=normalize:cont_norm'
         ],
     },
+    scripts=["octotribble/file_renamer.py",
+            ],
 )
