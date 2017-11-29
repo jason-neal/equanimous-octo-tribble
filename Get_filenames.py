@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
-"""Get Filenames of files that match regular expresion.
+"""Get names of files that match regular expression.
 
 Possibly better to use the glob module.
 """
 import fnmatch
 import os
 from typing import List
+
+# TODO: Try glob.glob
 
 
 def get_filenames(path, regexp, regexp2=None):
@@ -16,13 +18,13 @@ def get_filenames(path, regexp, regexp2=None):
 
     eg '*.ms.*', '*_2.*', '*.ms.norm.fits*'
 
-    resexp2 is if want to match two expressions such as
+    regexp2 is if want to match two expressions such as
     '*_1*' and '*.ms.fits*'
     """
     os.chdir(path)
     filelist = []
     for file in os.listdir('.'):
-        if regexp2 is not None:  # Match two regular expresions
+        if regexp2 is not None:  # Match two regular expressions
             if fnmatch.fnmatch(file, regexp) and fnmatch.fnmatch(file, regexp2):
                 filelist.append(file)
         else:
