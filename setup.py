@@ -25,11 +25,11 @@ setup(
     # https://packaging.python.org/en/latest/single_source_version.html
     version="0.1",
 
-    description='Spectrum class that overloads operators.',
+    description='Collection of random scripts.',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/jason-neal/spectrum_overload',
+    url='https://github.com/jason-neal/equanimous_octo_tribble',
     author='Jason Neal',
     author_email='jason.neal@astro.up.pt',
     license='MIT',
@@ -45,6 +45,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+		'Programming Language :: Python :: 3.6',
         'Natural Language :: English',
     ],
 
@@ -99,5 +100,19 @@ setup(
         ],
     },
     scripts=["octotribble/file_renamer.py",
+			 "octotribble/extraction/cp_obs_info.sh",
+			 "octotribble/extraction/CRIRES_renamer.sh",
+			 "octotribble/extraction/Deorganize_Dracs.sh",
+			 "octotribble/extraction/dracs_quicklooks2017.py",
+			 "octotribble/extraction/dracs_quicklooks.py",
+			 "octotribble/extraction/dracs_quicklooks_unsorted_files.py",
+			 "octotribble/extraction/list_all_creator.sh",
+			 "octotribble/extraction/list_crires_files.sh",
+			 "octotribble/extraction/list_file_object_exptime.sh",
+			 "octotribble/extraction/organize_Dracs_postIRAF2017.sh",
+			 "octotribble/extraction/Organize_Dracs_postIRAF.sh",
+			 "octotribble/extraction/plot_mixed_combination.py",
+			 "octotribble/extraction/remake_all_quicklooks.sh",
+			 "octotribble/extraction/removal_processed.sh",
             ],
 )
