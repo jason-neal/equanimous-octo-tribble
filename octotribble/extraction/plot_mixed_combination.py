@@ -2,14 +2,16 @@
 """ Plot the Iraf sum and the mixed combination spectra together and the differences"""
 
 from __future__ import division, print_function
+
+import argparse
 import os
 import sys
-import argparse
-import numpy as np
-from tqdm import tqdm
-from astropy.io import fits
+
 import matplotlib.pyplot as plt
-from Get_filenames import get_filenames
+from astropy.io import fits
+from tqdm import tqdm
+
+from octotribble.Get_filenames import get_filenames
 
 
 def _parser():

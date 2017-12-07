@@ -13,15 +13,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
 
-from Get_filenames import get_filenames
+# observation_name = "HD162020-1"
 
-#observation_name = "HD162020-1"
+# path = "C:/Users/Jason/Dropbox/PhD/CriresReduction/{0}/".format(observation_name)
 
-#path = "C:/Users/Jason/Dropbox/PhD/CriresReduction/{0}/".format(observation_name)
-
-#intermediate_path =  path + "Intermediate_steps/"
-#combined_path =  path + "Combined_Nods/"
-#image_path = path + "quicklooks/"
+# intermediate_path =  path + "Intermediate_steps/"
+# combined_path =  path + "Combined_Nods/"
+# image_path = path + "quicklooks/"
 
 # To run
 dir_path = os.getcwd()
@@ -33,15 +31,15 @@ observation_name = os.path.split(dir_path)[-1]
 
 for chip_num in range(1, 5):
     try:
-        #combined_name = get_filenames('CRIRE*.sum.fits', "*_{0}.*".format(chip_num))
+        # combined_name = get_filenames('CRIRE*.sum.fits', "*_{0}.*".format(chip_num))
         combined_name = glob('CRIRE*.sum.fits')
         combined_data = fits.getdata(combined_name[0])
     except:
         combined_data = []
 
-    #nod_names = get_filenames('CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
+    # nod_names = get_filenames('CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
     nod_names = glob('CRIRE*_{0}.*.ms.fits'.format(chip_num))
-    #norm_names = get_filenames('CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
+    # norm_names = get_filenames('CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
     norm_names = glob('CRIRE*_{0}.*.ms.norm.fits'.format(chip_num))
 
     nod_data = [fits.getdata(name) for name in nod_names]
@@ -49,7 +47,7 @@ for chip_num in range(1, 5):
     norm_data = [fits.getdata(name) for name in norm_names]
     print("Norm data names", norm_names)
 
-    median_nod = np.median(norm_data, axis=0)    # Median combine normalzied spectra
+    median_nod = np.median(norm_data, axis=0)  # Median combine normalzied spectra
 
     print(nod_names[0])
     print(nod_data[0])
@@ -59,14 +57,13 @@ for chip_num in range(1, 5):
     plt.suptitle("{0}, Chip-{1}".format(observation_name, chip_num), fontsize=16)
     ax1 = plt.subplot(311)
     for i, data in enumerate(nod_data):
-
         ax1.plot(data, label=i + 1)
     plt.ylabel("Intensity")
     plt.title("Extracted Nod Spectra")
     plt.xlim([0, 1024])
-    #start, end = ax1.get_ylim()
-    #ax1.yaxis.set_ticks(np.arange(start, end, 2000))
-    #ax1.legend()
+    # start, end = ax1.get_ylim()
+    # ax1.yaxis.set_ticks(np.arange(start, end, 2000))
+    # ax1.legend()
 
     ax2 = plt.subplot(312)
     for data in norm_data:
@@ -91,6 +88,6 @@ for chip_num in range(1, 5):
     # plt.show()
 
     # Save figure
-    fig.savefig(image_path+"quicklook_{0}_{1}_reduction.pdf".format(observation_name, chip_num))
-    fig.savefig(image_path+"quicklook_{0}_{1}_reduction.png".format(observation_name, chip_num))
+    fig.savefig(image_path + "quicklook_{0}_{1}_reduction.pdf".format(observation_name, chip_num))
+    fig.savefig(image_path + "quicklook_{0}_{1}_reduction.png".format(observation_name, chip_num))
     plt.close(fig)

@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
 
-from Get_filenames import get_filenames
+from octotribble.Get_filenames import get_filenames
 
 # observation_name = "HD162020-1"
 
@@ -39,7 +39,7 @@ for chip_num in range(1, 5):
     nod_data = [fits.getdata(name) for name in nod_names]
     norm_data = [fits.getdata(name) for name in norm_names]
 
-    median_nod = np.median(norm_data, axis=0)    # Median combine normalzied spectra
+    median_nod = np.median(norm_data, axis=0)  # Median combine normalzied spectra
 
     # Plot Reuslts
     fig = plt.figure()

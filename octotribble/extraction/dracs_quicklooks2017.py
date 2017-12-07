@@ -5,14 +5,18 @@
 # plot mean combined and median combined spectra.
 
 from __future__ import division, print_function
+
+import argparse
 import os
 import sys
-import argparse
-import numpy as np
-from tqdm import tqdm
-from astropy.io import fits
+
 import matplotlib.pyplot as plt
-from Get_filenames import get_filenames
+import numpy as np
+from astropy.io import fits
+from tqdm import tqdm
+
+from octotribble.Get_filenames import get_filenames
+
 
 # observation_name = "HD162020-1"
 
@@ -30,14 +34,15 @@ def _parser():
     """
     parser = argparse.ArgumentParser(description='Make Dracs quicklook plots.')
     parser.add_argument("-p", "--showplots", help="Show the plots.", default=False, action="store_true")
-    parser.add_argument("-c", "--chip", help="Specify chip to plot. Default is all.", choices=["1", "2", "3", "4"], default=None)
-    parser.add_argument("-b", "--band", help="Specify band to plot. Default is all.", choices=["1", "2", "3"], default=None)
+    parser.add_argument("-c", "--chip", help="Specify chip to plot. Default is all.", choices=["1", "2", "3", "4"],
+                        default=None)
+    parser.add_argument("-b", "--band", help="Specify band to plot. Default is all.", choices=["1", "2", "3"],
+                        default=None)
     args = parser.parse_args()
     return args
 
 
 def main(chip=None, band=None, showplots=False):
-
     if chip is None:
         chip = range(1, 5)
     else:
@@ -74,11 +79,11 @@ def main(chip=None, band=None, showplots=False):
                 nod_data = [fits.getdata(name)[indx, 0] for name in nod_names]
 
                 norm_data = [fits.getdata(name)[indx, 0] for name in norm_names]
-                median_nod = np.median(norm_data, axis=0)    # Median combine normalzied spectra
+                median_nod = np.median(norm_data, axis=0)  # Median combine normalzied spectra
 
-                mean_nod = combined_data[indx][0]   # From norm.sum.fits file.
+                mean_nod = combined_data[indx][0]  # From norm.sum.fits file.
 
-                mean_median_diff = mean_nod - median_nod   # For plot 4
+                mean_median_diff = mean_nod - median_nod  # For plot 4
                 diff_mask = np.abs(mean_median_diff) > 0.025
                 mean_median_diff[diff_mask] = np.nan
 
@@ -133,7 +138,7 @@ def main(chip=None, band=None, showplots=False):
 
                 print("starting plot 4")
                 mean_median_diff = mean_nod - median_nod
-                mean_median_diff[np.abs(mean_median_diff) > 0.02] = np.nan   # mask out the large differences.
+                mean_median_diff[np.abs(mean_median_diff) > 0.02] = np.nan  # mask out the large differences.
                 ax4 = plt.subplot(414)
                 ax4.plot(mean_median_diff, label="Mean-median")
                 plt.xlabel("Pixel Position", fontsize=10)
@@ -151,7 +156,7 @@ def main(chip=None, band=None, showplots=False):
                 # fig.savefig(image_path + "quicklook_{0}_{1}_reduction_band{2}.pdf".format(observation_name, chip_num,
                 #            indx + 1))
                 fig.savefig(image_path + "quicklook_{0}_{1}_reduction_band{2}.png".format(observation_name, chip_num,
-                            indx + 1))
+                                                                                          indx + 1))
                 plt.close(fig)
 
                 if indx == 0:
@@ -168,7 +173,6 @@ def main(chip=None, band=None, showplots=False):
             diff_of_mean = optimal_mean - non_optimal_mean
             diff_of_median = optimal_median - non_optimal_median
 
-
             print("diff_of_mean", diff_of_mean)
 
             # After looping though orders plot difference between mean and median spectra
@@ -177,7 +181,7 @@ def main(chip=None, band=None, showplots=False):
             ax1 = plt.subplot(111)
             plt.plot(diff_of_mean, label="mean")
             plt.plot(diff_of_median, "--", label="medain")
-            plt.ylim([-0.02, 0.02])    # Limit to +- 2%
+            plt.ylim([-0.02, 0.02])  # Limit to +- 2%
             plt.title("Differences between optimal - non-optimal combined spectra.")
             plt.ylabel("Flux diff")
             plt.legend(loc=0)
@@ -190,7 +194,7 @@ def main(chip=None, band=None, showplots=False):
         else:
             nod_data = [fits.getdata(name) for name in nod_names]
             norm_data = [fits.getdata(name) for name in norm_names]
-            median_nod = np.median(norm_data, axis=0)    # Median combine normalzied spectra
+            median_nod = np.median(norm_data, axis=0)  # Median combine normalzied spectra
 
             # Plot Reuslts
             fig = plt.figure()
