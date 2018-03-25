@@ -12,7 +12,7 @@ from typing import List
 # TODO: Try glob.glob
 
 
-def get_filenames(path, regexp, regexp2=None):
+def get_filenames(path, regexp, regexp2=None, fullpath=False):
     # type: (str, str, str) -> List[str]
     """Regexp must be a regular expression as a string.
 
@@ -21,6 +21,7 @@ def get_filenames(path, regexp, regexp2=None):
     regexp2 is if want to match two expressions such as
     '*_1*' and '*.ms.fits*'
     """
+    current_path= os.getcwd()
     os.chdir(path)
     filelist = []
     for file in os.listdir('.'):
@@ -31,6 +32,10 @@ def get_filenames(path, regexp, regexp2=None):
             if fnmatch.fnmatch(file, regexp):
                 filelist.append(file)
     filelist.sort()
+    os.chdir(current_path)
+    if fullpath:
+        filelist = [os.path.join(path, f) for f in filelist]
+
     return filelist
 
 
