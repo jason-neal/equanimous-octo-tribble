@@ -14,8 +14,7 @@ import numpy as np
 def wav_selector(wav, flux, wav_min, wav_max):
     """Wavelenght selector.
 
-    If passed lists it will return lists.
-    If passed np arrays it will return arrays
+    It will return arrays.
     """
     wav = np.asarray(wav)
     flux = np.asarray(flux)

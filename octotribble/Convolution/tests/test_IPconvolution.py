@@ -16,8 +16,6 @@ def test_wav_selector():
     y_np = np.array(y)
     assert isinstance(wav_selector(x, y, 1, 3), list)
     assert isinstance(wav_selector(x_np, y_np, 1, 3), list)
-    assert isinstance(wav_selector(x, y, 1, 3)[0], list)
-    assert isinstance(wav_selector(x, y, 1, 3)[1], list)
     assert isinstance(wav_selector(x_np, y_np, 1, 3)[0], np.ndarray)
     assert isinstance(wav_selector(x_np, y_np, 1, 3)[1], np.ndarray)
     assert wav_selector(x, y, 0, 3)[0] == [1, 2]
@@ -40,7 +38,7 @@ def test_fast_convolution():
 
 def test_IPconvolution():
     wave = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11]
-    flux = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    flux = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     chip_limits = [2, 9]
     R = 100
     ans = IPconvolution(wave, flux, chip_limits, R, plot=False)
@@ -50,7 +48,7 @@ def test_IPconvolution():
 def test_ip_wrapper():
     a = np.linspace(2130, 2170, 1024)
     b = np.linspace(2100, 2200, 1024)
-    assert np.all(IPconvolution(a, b, [2140, 2165], R=50000, plot=False),
+    assert np.allclose(IPconvolution(a, b, [2140, 2165], R=50000, plot=False),
                   ip_convolution(a, b, [2140, 2165], R=50000, plot=False))
 
 
