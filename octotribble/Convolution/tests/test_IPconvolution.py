@@ -1,5 +1,7 @@
+from hypothesis import given
+import hypothesis.strategies as st
 import numpy as np
-import py.test
+import pytest
 
 from octotribble.Convolution.IP_Convolution import (IPconvolution, fast_convolve,
                                                     ip_convolution, unitary_Gauss,
@@ -8,6 +10,17 @@ from octotribble.Convolution.IP_multi_Convolution import fast_convolve as fast_c
 from octotribble.Convolution.IP_multi_Convolution import ip_convolution as ip_multi_Convolution
 from octotribble.Convolution.IP_multi_Convolution import wav_selector as wav_selector_multi
 
+
+@given(st.lists(st.floats()), st.floats(allow_nan=False), st.floats(allow_nan=False))
+def test_wav_selector(wav, wav_min, wav_max):
+    y = np.copy(wav)
+    wav2, y2 = wav_selector(wav, y, wav_min, wav_max)
+
+    assert isinstance(wav2, np.ndarray)
+    assert isinstance(y2, np.ndarray)
+    assert all(wav2 >= wav_min)
+    assert all(wav2 <= wav_max)
+    assert len(wav2) == len(y2)
 
 def test_wav_selector():
     x = [1, 2, 3, 4, 6]
@@ -18,8 +31,8 @@ def test_wav_selector():
     assert isinstance(wav_selector(x_np, y_np, 1, 3), list)
     assert isinstance(wav_selector(x_np, y_np, 1, 3)[0], np.ndarray)
     assert isinstance(wav_selector(x_np, y_np, 1, 3)[1], np.ndarray)
-    assert wav_selector(x, y, 0, 3)[0] == [1, 2]
-    assert wav_selector(x, y, 0, 3)[0] == wav_selector_multi(x, y, 0, 3)[0]
+    assert np.allclose(wav_selector(x, y, 0, 3)[0], [1, 2])
+    assert np.allclose(wav_selector(x, y, 0, 3)[0],wav_selector_multi(x, y, 0, 3)[0])
 
 
 def test_fast_convolution():
@@ -41,8 +54,10 @@ def test_IPconvolution():
     flux = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     chip_limits = [2, 9]
     R = 100
-    ans = IPconvolution(wave, flux, chip_limits, R, plot=False)
-    assert ans == [1, 1]
+    x, y = IPconvolution(wave, flux, chip_limits, R, plot=False)
+    assert np.allclose(x, [ 3, 5, 6, 7, 8])
+    assert np.allclose(y, [ 1, 1, 1, 1, 1])
+
 
 
 def test_ip_wrapper():
