@@ -81,15 +81,15 @@ def ip_convolution(wav, flux, chip_limits, R, fwhm_lim=5.0, plot=True,
     print("Starting the Resolution convolution...")
     # Predefine array space
     flux_conv_res = np.empty_like(wav_chip, dtype="float64")
-    counter = 0
-    base_val = len(wav_chip) // 20   # Adjust here to change % between reports
-
+    size = len(wav_chip)
+    base_val = size // 20   # Adjust here to change % between reports
+    if base_val == 0:
+        base_val = 1  # Cannot be zero
     for n, wav in enumerate(wav_chip):
         # Put convolution value directly into the array
         flux_conv_res[n] = fast_convolve(wav, R, wav_ext, flux_ext, fwhm_lim)
         if (n % base_val == 0) and verbose:
-            counter = counter + 5  # And ajust here to change % between reports
-            print("Resolution Convolution at {0}%%...".format(counter))
+            print("Resolution Convolution at {0}%%...".format(100* n / size))
 
     timeEnd = dt.now()
     print("Single-Process convolution has been completed in"
