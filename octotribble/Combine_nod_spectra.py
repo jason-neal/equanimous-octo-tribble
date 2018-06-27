@@ -12,12 +12,11 @@ import fnmatch
 import os
 import time
 
+import IOmodule
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 from astropy.io import fits
-
-import IOmodule
 
 
 def get_filenames(path, regexp, regexp2=False):
@@ -75,7 +74,7 @@ def SumNods(Spectra, Headers, Pos="All", Norm="None"):
         # Sum B nods
         # NodNum = 4
         # for i in [1, 2, 5, 6]:
-            # NodSum += np.array(Spectra[i])
+        # NodSum += np.array(Spectra[i])
         for Spec, hdr in zip(Spectra, Headers):
             if hdr["HIERARCH ESO SEQ NODPOS"] == "B":
                 NodSum += np.array(Spec)
@@ -98,8 +97,7 @@ def ExportToFits(Outputfile, Norm_All, NodA, NodB, hdr, hdrkeys, hdrvals):
     prihdr = append_hdr(hdr, hdrkeys, hdrvals)
     prihdu = fits.PrimaryHDU(header=prihdr)
     thdulist = fits.HDUList([prihdu, tbhdu])
-    # print("Writing to fits file")
-    thdulist.writeto(Outputfile, output_verify="silentfix")   # Fixing errors to work properly
+    thdulist.writeto(Outputfile, output_verify="silentfix")  # Fixing errors to work properly
     return None
 
 
@@ -117,7 +115,7 @@ def append_hdr(hdr, keys, values, item=0):
     # hdr = hdulist[item].header
     # print repr(hdr[0:10])
     # assert type(keys) == type(values), 'keys and values do not match'
-    if type(keys) == str:           # To handle single value
+    if type(keys) == str:  # To handle single value
         hdr[keys] = values
     else:
         assert len(keys) == len(values), 'Not the same number of keys as values'
@@ -161,12 +159,12 @@ if __name__ == '__main__':
 
         # print(norm_vals)
         for name in norm_vals:
-                ThisFile = path + name
-                ThisNorm = fits.open(ThisFile)
-                Last_normhdr = ThisNorm[0].header
-                i_norm_hdrs.append(Last_normhdr)
-                i_norm.append(ThisNorm[0].data)
-                ThisNorm.close()
+            ThisFile = path + name
+            ThisNorm = fits.open(ThisFile)
+            Last_normhdr = ThisNorm[0].header
+            i_norm_hdrs.append(Last_normhdr)
+            i_norm.append(ThisNorm[0].data)
+            ThisNorm.close()
 
         print("Inorm", i_norm)
 
@@ -175,30 +173,31 @@ if __name__ == '__main__':
         Norm_A = SumNods(i_norm, i_norm_hdrs, Pos="A", Norm=NormalizeMethod)
         Norm_B = SumNods(i_norm, i_norm_hdrs, Pos="B", Norm=NormalizeMethod)
 
-#        plt.plot(dracs_All, label="dracs All")
-#        plt.plot(dracs_A, label="dracs A")
-#        plt.plot(dracs_B, label="dracs B")
-#        plt.legend()
-#        plt.show()
-
-#        plt.plot(Norm_All, label="All")
-#        plt.plot(Norm_A, label="A")
-#        plt.plot(Norm_B, label="B")
-#        plt.legend()
-#        plt.show()
+        # plt.plot(dracs_All, label="dracs All")
+        # plt.plot(dracs_A, label="dracs A")
+        # plt.plot(dracs_B, label="dracs B")
+        # plt.legend()
+        # plt.show()
+        #
+        # plt.plot(Norm_All, label="All")
+        # plt.plot(Norm_A, label="A")
+        # plt.plot(Norm_B, label="B")
+        # plt.legend()
+        # plt.show()
 
         # write ouput to fits file
-#        testhdr = fits.Header()
-#        testhdr['TESTVal'] = 'Edwin Hubble'
+        # testhdr = fits.Header()
+        # testhdr['TESTVal'] = 'Edwin Hubble'
+        # testhdr['Date'] = (T_Now, ' Time fits was last changed')
         T_Now = str(time.gmtime()[0:6])
-#        testhdr['Date'] = (T_Now, ' Time fits was last changed')
 
         outputfile = path + norm_vals[-1][0:-4] + "comb.fits"
         print("Output file name", outputfile)
         hdrkeys = ["Description"]
         hdrvals = ["Combine DRACS Nomalized CRIRES Nod Spectra"]
         hdrkeys = ['COMBINEDATE', "COMBINEMETHOD", "COMBNORMALIZE"]
-        hdrvals = [(T_Now, "Time Nods were combined"), ("Addition", "How nods were added")
+        hdrvals = [(T_Now, "Time Nods were combined"),
+                   ("Addition", "How nods were added"),
                    (NormalizeMethod, "Method for normalizing combined spectra (divide/mean/median)")]
 
         for i, name in zip(range(len(org_vals)), org_vals):
