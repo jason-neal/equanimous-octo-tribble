@@ -7,7 +7,7 @@ import pandas as pd
 
 def convert(filename, transpose=False):
     """convert csv to tex table."""
-    df = pd.from_csv(filename)
+    df = pd.read_csv(filename)
 
     if transpose:
         df = df.transpose()
@@ -16,11 +16,15 @@ def convert(filename, transpose=False):
         tex_name = filename.replace(".csv", ".tex")
     with open(tex_name, "w") as f:
         f.write(r"\begin{table}")
+        f.write("\n")
         f.write(r"\label{}")
+        f.write("\n")
         f.write(r"\caption{}")
+        f.write("\n")
 
-        f.write(tex_name.df.to_latex(na_rep="-"))
+        f.write(df.to_latex(na_rep="-"))
         f.write(r"\end{table}")
+        f.write("\n")
 
 
 if __name__ == "__main__":
