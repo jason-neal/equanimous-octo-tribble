@@ -6,24 +6,17 @@
 
 from __future__ import division, print_function
 
-import sys
-
 import argparse
+import os
+import sys
+from os.path import join
+
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 from astropy.io import fits
-from octotribble.Get_filenames import get_filenames
 from tqdm import tqdm
 
-
-# observation_name = "HD162020-1"
-
-# path = "C:/Users/Jason/Dropbox/PhD/CriresReduction/{0}/".format(observation_name)
-
-# intermediate_path =  path + "Intermediate_steps/"
-# combined_path =  path + "Combined_Nods/"
-# image_path = path + "quicklooks/"
+from octotribble.Get_filenames import get_filenames
 
 
 def _parser():
@@ -66,9 +59,9 @@ def main(chip=None, band=None, showplots=False):
     # To run
     dir_path = os.getcwd()
 
-    intermediate_path = dir_path + "/Intermediate_steps/"
-    combined_path = dir_path + "/Combined_Nods/"
-    image_path = dir_path + "/images/"
+    intermediate_path = os.path.join(dir_path, "Intermediate_steps")
+    combined_path = os.path.join(dir_path, "Combined_Nods")
+    image_path = os.path.join(dir_path, "images")
     observation_name = os.path.split(dir_path)[-1]
 
     for chip_num in tqdm(chip):
@@ -83,7 +76,11 @@ def main(chip=None, band=None, showplots=False):
             intermediate_path, "CRIRE*.ms.norm.fits", "*_{0}.*".format(chip_num)
         )
 
-        combined_data = fits.getdata(combined_path + combined_name[0])
+        print("combined_names", combined_name)
+        print("nod names", nod_names)
+        print("norm names", norm_names)
+
+        combined_data = fits.getdata(join(combined_path, combined_name[0]))
         print("length of combined_data =", len(combined_data))
         if len(combined_data) == 3:
             optimal_median = []
@@ -93,9 +90,11 @@ def main(chip=None, band=None, showplots=False):
 
             for indx in band:
                 print("index of extras ", indx)
-                nod_data = [fits.getdata(name)[indx, 0] for name in nod_names]
+                nod_data = [fits.getdata(join(intermediate_path, name))[indx, 0] for name in
+                            nod_names]
 
-                norm_data = [fits.getdata(name)[indx, 0] for name in norm_names]
+                norm_data = [fits.getdata(join(intermediate_path, name))[indx, 0] for name
+                             in norm_names]
                 median_nod = np.median(
                     norm_data, axis=0
                 )  # Median combine normalzied spectra
@@ -161,7 +160,7 @@ def main(chip=None, band=None, showplots=False):
                 mean_median_diff = mean_nod - median_nod
                 mean_median_diff[
                     np.abs(mean_median_diff) > 0.02
-                ] = np.nan  # mask out the large differences.
+                    ] = np.nan  # mask out the large differences.
                 ax4 = plt.subplot(414)
                 ax4.plot(mean_median_diff, label="Mean-median")
                 plt.xlabel("Pixel Position", fontsize=10)
@@ -178,12 +177,11 @@ def main(chip=None, band=None, showplots=False):
                 # Save figure
                 # fig.savefig(image_path + "quicklook_{0}_{1}_reduction_band{2}.pdf".format(observation_name, chip_num,
                 #            indx + 1))
-                fig.savefig(
-                    image_path
-                    + "quicklook_{0}_{1}_reduction_band{2}.png".format(
+                fig.savefig(join(
+                    image_path, "quicklook_{0}_{1}_reduction_band{2}.png".format(
                         observation_name, chip_num, indx + 1
                     )
-                )
+                ))
                 plt.close(fig)
 
                 if indx == 0:
@@ -214,19 +212,18 @@ def main(chip=None, band=None, showplots=False):
             plt.title("Differences between optimal - non-optimal combined spectra.")
             plt.ylabel("Flux diff")
             plt.legend(loc=0)
-            fig.savefig(
-                image_path
-                + "combine_diff_{0}_{1}_reduction_opt_minus_nonopt.png".format(
-                    observation_name, chip_num
-                )
-            )
+            fig.savefig(join(image_path,
+                             "combine_diff_{0}_{1}_reduction_opt_minus_nonopt.png".format(
+                                 observation_name, chip_num
+                             ))
+                        )
             if showplots:
                 plt.show()
             plt.close(fig)
 
         else:
-            nod_data = [fits.getdata(name) for name in nod_names]
-            norm_data = [fits.getdata(name) for name in norm_names]
+            nod_data = [fits.getdata(join(intermediate_path, name)) for name in nod_names]
+            norm_data = [fits.getdata(join(intermediate_path, name)) for name in norm_names]
             median_nod = np.median(
                 norm_data, axis=0
             )  # Median combine normalzied spectra
@@ -270,14 +267,13 @@ def main(chip=None, band=None, showplots=False):
                 plt.show()
 
             # Save figure
-            fig.savefig(
-                image_path
-                + "quicklook_{0}_{1}_reduction.pdf".format(observation_name, chip_num)
-            )
-            fig.savefig(
-                image_path
-                + "quicklook_{0}_{1}_reduction.png".format(observation_name, chip_num)
-            )
+            fig.savefig(join(
+                image_path, "quicklook_{0}_{1}_reduction.pdf".format(observation_name, chip_num)
+            ))
+            fig.savefig(join(
+                image_path,
+                "quicklook_{0}_{1}_reduction.png".format(observation_name, chip_num)
+            ))
             plt.close(fig)
 
     return 0
