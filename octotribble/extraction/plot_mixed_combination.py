@@ -19,15 +19,22 @@ def _parser():
 
     :returns: the args
     """
-    parser = argparse.ArgumentParser(description='Make Dracs quicklook plots.')
-    parser.add_argument("-p", "--showplots", help="Show the plots.", default=False, action="store_true")
-    parser.add_argument("-c", "--chip", help="Specify chip to plot. Default is all.", choices=["1", "2", "3", "4"], default=None)
+    parser = argparse.ArgumentParser(description="Make Dracs quicklook plots.")
+    parser.add_argument(
+        "-p", "--showplots", help="Show the plots.", default=False, action="store_true"
+    )
+    parser.add_argument(
+        "-c",
+        "--chip",
+        help="Specify chip to plot. Default is all.",
+        choices=["1", "2", "3", "4"],
+        default=None,
+    )
     args = parser.parse_args()
     return args
 
 
 def main(chip=None, showplots=False):
-
     if chip is None:
         chips = range(1, 5)
     else:
@@ -43,12 +50,19 @@ def main(chip=None, showplots=False):
 
     for chip_num in tqdm(chips):
         print("Starting Chip # {}".format(chip_num))
-        irafsum_name = get_filenames(combined_path, 'CRIRE*norm.sum.fits', "*_{0}.*".format(chip_num))
-        mix_name = get_filenames(combined_path, 'CRIRE*.mixavg.fits', "*_{0}.*".format(chip_num))
+        irafsum_name = get_filenames(
+            combined_path, "CRIRE*norm.sum.fits", "*_{0}.*".format(chip_num)
+        )
+        mix_name = get_filenames(
+            combined_path, "CRIRE*.mixavg.fits", "*_{0}.*".format(chip_num)
+        )
         print(mix_name)
-        optavg_name = get_filenames(combined_path, 'CRIRE*.ms.norm.optavg.fits', "*_{0}.*".format(chip_num))
-        nonoptavg_name = get_filenames(combined_path, 'CRIRE*.ms.norm.nonoptavg.fits', "*_{0}.*".format(chip_num))
-
+        optavg_name = get_filenames(
+            combined_path, "CRIRE*.ms.norm.optavg.fits", "*_{0}.*".format(chip_num)
+        )
+        nonoptavg_name = get_filenames(
+            combined_path, "CRIRE*.ms.norm.nonoptavg.fits", "*_{0}.*".format(chip_num)
+        )
 
         irafsum_data = fits.getdata(combined_path + irafsum_name[0])
         iraf_opt = irafsum_data[0][0]
@@ -57,7 +71,6 @@ def main(chip=None, showplots=False):
         optavg_data = fits.getdata(combined_path + optavg_name[0])
         nonoptavg_data = fits.getdata(combined_path + nonoptavg_name[0])
 
-
         fig = plt.figure()
         plt.plot(iraf_opt + 0, label="iraf optimal")
         plt.plot(iraf_nonopt + 0.04, label="iraf nonopt")
@@ -65,7 +78,9 @@ def main(chip=None, showplots=False):
         plt.legend()
         plt.xlabel("Pixel")
         plt.ylabel("Flux")
-        plt.savefig(image_path + "opt-nonop-mix-{0}_{1}.png".format(observation_name, chip_num))
+        plt.savefig(
+            image_path + "opt-nonop-mix-{0}_{1}.png".format(observation_name, chip_num)
+        )
         if showplots:
             plt.show()
         plt.close(fig)
@@ -76,7 +91,10 @@ def main(chip=None, showplots=False):
         plt.plot(mixavg_data, "--", label="mixed")
         plt.xlabel("Pixel")
         plt.ylabel("Flux")
-        plt.savefig(image_path + "mix_and_optimal-{0}_{1}.png".format(observation_name, chip_num))
+        plt.savefig(
+            image_path
+            + "mix_and_optimal-{0}_{1}.png".format(observation_name, chip_num)
+        )
         plt.legend()
         if showplots:
             plt.show()
@@ -89,7 +107,10 @@ def main(chip=None, showplots=False):
         plt.ylabel("Flux difference")
         plt.title("Python - Iraf optimal combination")
         plt.legend()
-        plt.savefig(image_path + "optavg-optimalsum-{0}_{1}.png".format(observation_name, chip_num))
+        plt.savefig(
+            image_path
+            + "optavg-optimalsum-{0}_{1}.png".format(observation_name, chip_num)
+        )
         if showplots:
             plt.show()
         plt.close(fig)
@@ -101,7 +122,10 @@ def main(chip=None, showplots=False):
         plt.ylabel("Flux difference")
         plt.title("Python - Iraf non-optimal combination")
         plt.legend()
-        plt.savefig(image_path + "nonoptavg-nonoptimalsum-{0}_{1}.png".format(observation_name, chip_num))
+        plt.savefig(
+            image_path
+            + "nonoptavg-nonoptimalsum-{0}_{1}.png".format(observation_name, chip_num)
+        )
         if showplots:
             plt.show()
         plt.close(fig)
@@ -112,7 +136,9 @@ def main(chip=None, showplots=False):
         plt.xlabel("Pixel")
         plt.ylabel("Flux difference")
         plt.legend()
-        plt.savefig(image_path + "mix-optimal-{0}_{1}.png".format(observation_name, chip_num))
+        plt.savefig(
+            image_path + "mix-optimal-{0}_{1}.png".format(observation_name, chip_num)
+        )
         if showplots:
             plt.show()
         plt.close(fig)
@@ -120,7 +146,7 @@ def main(chip=None, showplots=False):
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = vars(_parser())
     opts = {k: args[k] for k in args}
     sys.exit(main(**opts))

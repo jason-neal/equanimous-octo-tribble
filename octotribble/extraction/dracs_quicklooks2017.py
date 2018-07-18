@@ -6,16 +6,15 @@
 
 from __future__ import division, print_function
 
-import argparse
-import os
 import sys
 
+import argparse
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 from astropy.io import fits
-from tqdm import tqdm
-
 from octotribble.Get_filenames import get_filenames
+from tqdm import tqdm
 
 
 # observation_name = "HD162020-1"
@@ -32,12 +31,24 @@ def _parser():
 
     :returns: the args
     """
-    parser = argparse.ArgumentParser(description='Make Dracs quicklook plots.')
-    parser.add_argument("-p", "--showplots", help="Show the plots.", default=False, action="store_true")
-    parser.add_argument("-c", "--chip", help="Specify chip to plot. Default is all.", choices=["1", "2", "3", "4"],
-                        default=None)
-    parser.add_argument("-b", "--band", help="Specify band to plot. Default is all.", choices=["1", "2", "3"],
-                        default=None)
+    parser = argparse.ArgumentParser(description="Make Dracs quicklook plots.")
+    parser.add_argument(
+        "-p", "--showplots", help="Show the plots.", default=False, action="store_true"
+    )
+    parser.add_argument(
+        "-c",
+        "--chip",
+        help="Specify chip to plot. Default is all.",
+        choices=["1", "2", "3", "4"],
+        default=None,
+    )
+    parser.add_argument(
+        "-b",
+        "--band",
+        help="Specify band to plot. Default is all.",
+        choices=["1", "2", "3"],
+        default=None,
+    )
     args = parser.parse_args()
     return args
 
@@ -62,9 +73,15 @@ def main(chip=None, band=None, showplots=False):
 
     for chip_num in tqdm(chip):
         print("Starting Chip # {}".format(chip_num))
-        combined_name = get_filenames(combined_path, 'CRIRE*norm.sum.fits', "*_{0}.*".format(chip_num))
-        nod_names = get_filenames(intermediate_path, 'CRIRE*.ms.fits', "*_{0}.*".format(chip_num))
-        norm_names = get_filenames(intermediate_path, 'CRIRE*.ms.norm.fits', "*_{0}.*".format(chip_num))
+        combined_name = get_filenames(
+            combined_path, "CRIRE*norm.sum.fits", "*_{0}.*".format(chip_num)
+        )
+        nod_names = get_filenames(
+            intermediate_path, "CRIRE*.ms.fits", "*_{0}.*".format(chip_num)
+        )
+        norm_names = get_filenames(
+            intermediate_path, "CRIRE*.ms.norm.fits", "*_{0}.*".format(chip_num)
+        )
 
         combined_data = fits.getdata(combined_path + combined_name[0])
         print("length of combined_data =", len(combined_data))
@@ -79,7 +96,9 @@ def main(chip=None, band=None, showplots=False):
                 nod_data = [fits.getdata(name)[indx, 0] for name in nod_names]
 
                 norm_data = [fits.getdata(name)[indx, 0] for name in norm_names]
-                median_nod = np.median(norm_data, axis=0)  # Median combine normalzied spectra
+                median_nod = np.median(
+                    norm_data, axis=0
+                )  # Median combine normalzied spectra
 
                 mean_nod = combined_data[indx][0]  # From norm.sum.fits file.
 
@@ -94,7 +113,9 @@ def main(chip=None, band=None, showplots=False):
 
                 # Plot Results
                 fig = plt.figure(figsize=(10, 10))
-                plt.suptitle("{0}, Chip-{1}".format(observation_name, chip_num), fontsize=16)
+                plt.suptitle(
+                    "{0}, Chip-{1}".format(observation_name, chip_num), fontsize=16
+                )
                 ax1 = plt.subplot(411)
                 for i, data in enumerate(nod_data):
                     # add some limits to data displayed, help the scaling.
@@ -125,7 +146,7 @@ def main(chip=None, band=None, showplots=False):
                 print("starting plot 3")
                 ax3 = plt.subplot(413)
                 ax3.plot(mean_nod, label="Nod Mean")
-                ax3.plot(median_nod, '--r', label="Nod Median")
+                ax3.plot(median_nod, "--r", label="Nod Median")
                 # plt.xlabel("Pixel Position", fontsize=14)
                 plt.ylabel("Normalized\nIntensity")
                 plt.title("Combined Nod Spectra")
@@ -138,7 +159,9 @@ def main(chip=None, band=None, showplots=False):
 
                 print("starting plot 4")
                 mean_median_diff = mean_nod - median_nod
-                mean_median_diff[np.abs(mean_median_diff) > 0.02] = np.nan  # mask out the large differences.
+                mean_median_diff[
+                    np.abs(mean_median_diff) > 0.02
+                ] = np.nan  # mask out the large differences.
                 ax4 = plt.subplot(414)
                 ax4.plot(mean_median_diff, label="Mean-median")
                 plt.xlabel("Pixel Position", fontsize=10)
@@ -155,8 +178,12 @@ def main(chip=None, band=None, showplots=False):
                 # Save figure
                 # fig.savefig(image_path + "quicklook_{0}_{1}_reduction_band{2}.pdf".format(observation_name, chip_num,
                 #            indx + 1))
-                fig.savefig(image_path + "quicklook_{0}_{1}_reduction_band{2}.png".format(observation_name, chip_num,
-                                                                                          indx + 1))
+                fig.savefig(
+                    image_path
+                    + "quicklook_{0}_{1}_reduction_band{2}.png".format(
+                        observation_name, chip_num, indx + 1
+                    )
+                )
                 plt.close(fig)
 
                 if indx == 0:
@@ -177,7 +204,9 @@ def main(chip=None, band=None, showplots=False):
 
             # After looping though orders plot difference between mean and median spectra
             fig = plt.figure(figsize=(10, 8))
-            plt.suptitle("{0}, Chip-{1}".format(observation_name, chip_num), fontsize=16)
+            plt.suptitle(
+                "{0}, Chip-{1}".format(observation_name, chip_num), fontsize=16
+            )
             ax1 = plt.subplot(111)
             plt.plot(diff_of_mean, label="mean")
             plt.plot(diff_of_median, "--", label="medain")
@@ -185,8 +214,12 @@ def main(chip=None, band=None, showplots=False):
             plt.title("Differences between optimal - non-optimal combined spectra.")
             plt.ylabel("Flux diff")
             plt.legend(loc=0)
-            fig.savefig(image_path + "combine_diff_{0}_{1}_reduction_opt_minus_nonopt.png".format(observation_name,
-                                                                                                  chip_num))
+            fig.savefig(
+                image_path
+                + "combine_diff_{0}_{1}_reduction_opt_minus_nonopt.png".format(
+                    observation_name, chip_num
+                )
+            )
             if showplots:
                 plt.show()
             plt.close(fig)
@@ -194,11 +227,15 @@ def main(chip=None, band=None, showplots=False):
         else:
             nod_data = [fits.getdata(name) for name in nod_names]
             norm_data = [fits.getdata(name) for name in norm_names]
-            median_nod = np.median(norm_data, axis=0)  # Median combine normalzied spectra
+            median_nod = np.median(
+                norm_data, axis=0
+            )  # Median combine normalzied spectra
 
             # Plot Reuslts
             fig = plt.figure()
-            plt.suptitle("{0}, Chip-{1}".format(observation_name, chip_num), fontsize=16)
+            plt.suptitle(
+                "{0}, Chip-{1}".format(observation_name, chip_num), fontsize=16
+            )
             ax1 = plt.subplot(311)
             for i, data in enumerate(nod_data):
                 ax1.plot(data, label=i + 1)
@@ -220,7 +257,7 @@ def main(chip=None, band=None, showplots=False):
 
             ax3 = plt.subplot(313)
             ax3.plot(combined_data, label="Nod Mean")
-            ax3.plot(median_nod, '--r', label="Nod Median")
+            ax3.plot(median_nod, "--r", label="Nod Median")
             plt.xlabel("Pixel Position", fontsize=14)
             plt.ylabel("Normalized\nIntensity")
             plt.title("Combined Nod Spectra")
@@ -233,14 +270,20 @@ def main(chip=None, band=None, showplots=False):
                 plt.show()
 
             # Save figure
-            fig.savefig(image_path + "quicklook_{0}_{1}_reduction.pdf".format(observation_name, chip_num))
-            fig.savefig(image_path + "quicklook_{0}_{1}_reduction.png".format(observation_name, chip_num))
+            fig.savefig(
+                image_path
+                + "quicklook_{0}_{1}_reduction.pdf".format(observation_name, chip_num)
+            )
+            fig.savefig(
+                image_path
+                + "quicklook_{0}_{1}_reduction.png".format(observation_name, chip_num)
+            )
             plt.close(fig)
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = vars(_parser())
     opts = {k: args[k] for k in args}
     sys.exit(main(**opts))
