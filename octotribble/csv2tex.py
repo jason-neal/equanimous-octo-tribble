@@ -12,8 +12,16 @@ def convert(filename, transpose=False):
     if transpose:
         df = df.transpose()
         tex_name = filename.replace(".csv", "_transpose.tex")
+        index = True
     else:
         tex_name = filename.replace(".csv", ".tex")
+        index=False
+
+    assert tex_name != filename, "This will overwrite the file, did you pass in a csv?"
+
+    
+    latex = df.to_latex(na_rep="-", index=index)
+
     with open(tex_name, "w") as f:
         f.write(r"\begin{table}")
         f.write("\n")
@@ -22,7 +30,7 @@ def convert(filename, transpose=False):
         f.write(r"\caption{}")
         f.write("\n")
 
-        f.write(df.to_latex(na_rep="-"))
+        f.write(latex)
         f.write(r"\end{table}")
         f.write("\n")
 
