@@ -3,6 +3,6 @@
 for FOLDER in $(ls -d HD*); do
     echo "Remaking quicklooks in $FOLDER"
     cd $FOLDER
-    python ../dracs_quicklooks2017.py
+    dracs_quicklooks2017.py
     cd ..
 done

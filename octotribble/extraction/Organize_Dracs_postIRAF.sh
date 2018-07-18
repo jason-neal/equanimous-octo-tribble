@@ -20,9 +20,9 @@ mv M.CRIRES*.fits Raw_files/
 
 # Make Quicklook plots
 mkdir images
-python ../dracs_quicklooks.py
+python dracs_quicklooks.py
 
 # Replace : characters in reduced data in Combined_Nods data
-python ../file_renamer.py ./Combined_Nods/* -x ":" -v "-"
+python file_renamer.py ./Combined_Nods/* -x ":" -v "-"
 
 
