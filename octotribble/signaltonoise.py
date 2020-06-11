@@ -46,8 +46,7 @@ def load_telluric(tapas_path, filename):
 
 
 def snr(spectra):
-    snr = np.mean(spectra) / np.std(spectra, ddof=0)
-    return snr
+    return np.mean(spectra) / np.std(spectra, ddof=0)
 
 
 def snr_map(spectra, mindt=3, maxdt=10):

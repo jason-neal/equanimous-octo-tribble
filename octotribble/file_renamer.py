@@ -19,8 +19,7 @@ def _parser():
     parser.add_argument('filenames', nargs='+', type=str, help='List of Filenames')
     parser.add_argument("-x", "--cut", type=str, default=":", help="Character to Remove (cut)")
     parser.add_argument("-v", "--paste", type=str, default="", help="Character to replace with (paste)")
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def char_replace(fname, remove_char, replace_char=""):
@@ -48,8 +47,7 @@ def char_replace(fname, remove_char, replace_char=""):
 
     """
     name_parts = fname.split(remove_char)
-    new_name = replace_char.join(name_parts)
-    return new_name
+    return replace_char.join(name_parts)
 
 
 def main(filenames, cut=":", paste=""):

@@ -28,8 +28,7 @@ def _parser():
                         help="Calculate normalization fucntion errors on the flux.")
     parser.add_argument("-p", "--plot", default=False, action="store_true",
                         help="Plot normalized result.")
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main():
@@ -69,10 +68,7 @@ def main():
 
 
     fitssave = args.fitsname.replace(".fits", ".{!s}.fits".format(args.suffix))
-    if len(data) == 2:
-        fits.writeto(fitssave, norm_flux, header=hdr)
-    else:
-        fits.writeto(fitssave, norm_flux, header=hdr)
+    fits.writeto(fitssave, norm_flux, header=hdr)
 
 
 def flux_error(wave, flux, c):

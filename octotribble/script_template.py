@@ -12,8 +12,7 @@ def _parser():
     parser = argparse.ArgumentParser(description='Helpful description')
     parser.add_argument('pos_arg', help='A postitional argument', dtype=str)
     parser.add_argument('-f', "--flag", action="store_true", help='A toggle flag')
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main(pos_arg, flag=False):

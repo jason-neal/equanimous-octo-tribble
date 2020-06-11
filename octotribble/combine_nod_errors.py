@@ -8,6 +8,8 @@ from astropy.io import fits
 
 def combine_errors(chips=range(1, 5), save_path=None):
     """Assumes the current directory contains the files for the nod cycle."""
+    # Update header
+    from datetime import datetime
     for chip in chips:
         # print("Chip", chip)
         ms_files = sorted(glob("C*_{0}.*ms.fits.*".format(chip)))
@@ -19,8 +21,8 @@ def combine_errors(chips=range(1, 5), save_path=None):
         assert len(norm_sum_file) == 1
         norm_sum_file = norm_sum_file[0]
         # Check ms_file and norm_file match the start of norm_sum_file
-        assert any([os.path.basename(norm_sum_file)[0:29] in name for name in ms_files])
-        assert any([os.path.basename(norm_sum_file)[0:29] in name for name in norm_files])
+        assert any(os.path.basename(norm_sum_file)[0:29] in name for name in ms_files)
+        assert any(os.path.basename(norm_sum_file)[0:29] in name for name in norm_files)
 
         # Combine Spectrum errors quadratically
         square_error = np.zeros(1024)
@@ -48,8 +50,6 @@ def combine_errors(chips=range(1, 5), save_path=None):
 
         assert error_spectrum.shape == sum_spectrum.shape
 
-        # Update header
-        from datetime import datetime
         header["history"] = "Errors combined on {}".format(datetime.now())
         header["comment"] = "Errors normalized, added in quadrature, then divide by number of nods"
 

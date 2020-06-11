@@ -96,8 +96,7 @@ def _parser():
     parser.add_argument("filename", type=str,
                         help="Specturm to continuum normalize.")
 
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
