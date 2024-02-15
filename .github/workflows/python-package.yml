@@ -39,7 +39,7 @@ jobs:
     #    continue-on-error: true
     - name: Test with pytest
       run: |
-        pytest --cov=. --cov-report term-missing --durations=10 ./tests
+        pytest --cov=. --cov-report term-missing --durations=10 ./test
         coverage xml -i
     - name: After success
       run: |
