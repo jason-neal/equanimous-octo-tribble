@@ -5,7 +5,7 @@
 
 Script that take one imput parameter which is the path to the normobs directory
 
-Needs functions/modules to get the filenames, export to a fits tablefile, change fits hdr
+Needs functions/modules to get the filenames, export them to a fits tablefile, change fits hdr
 """
 import argparse
 import fnmatch
@@ -48,10 +48,7 @@ def SumNods(Spectra, Headers, Pos="All", Norm="None"):
     If want to be more sure the correct nods are added the headers
     should be checked for its nod position.
     """
-    if Pos == "All":
-        NodNum = len(Spectra)
-    else:
-        NodNum = len(Spectra) / 2.0
+    NodNum = len(Spectra) if Pos == "All" else len(Spectra) / 2.0
     # print("number of nods ", NodNum)
     # if Headers[i]["HIERARCH ESO SEQ NODPOS"] == Pos:
     NodSum = np.zeros_like(Spectra[0])

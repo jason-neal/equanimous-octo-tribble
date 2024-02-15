@@ -48,8 +48,7 @@ def _parser():
     parser.add_argument("-n", "--request_number", help="Tapas request number. Iterate on previous request number.",
                         type=int)
     parser.add_argument("-v", "--verbose", action="store_true", help="Turn on verbosity.")
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main(fname=("/home/jneal/Phd/data/Crires/BDs-DRACS/HD30501-1/Combined_Nods/"

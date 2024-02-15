@@ -36,13 +36,11 @@ def _parser():
                         'calculate snr for in format [min, max]')
     parser.add_argument('-p', '--plot', action='store_true',
                         help="Display plots")
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def snr(spectra, ddof=0):
-    snr = np.mean(spectra) / np.std(spectra, ddof=ddof)
-    return snr
+    return np.mean(spectra) / np.std(spectra, ddof=ddof)
 
 
 def snrscan(Spec, width):

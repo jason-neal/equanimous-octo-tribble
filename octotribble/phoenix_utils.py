@@ -42,17 +42,8 @@ def find_closest_phoenix(data_dir, teff, logg, feh, alpha=None):
     closest_logg = loggs[np.abs(loggs - logg).argmin()]
     closest_feh = fehs[np.abs(fehs - feh).argmin()]
 
-    if alpha is not None:
-        if abs(alpha) > 0.2:
-            print("Warning! Alpha is outside acceptable range -0.2->0.2")
-        closest_alpha = alphas[np.abs(alphas - alpha).argmin()]
-        phoenix_glob = ("/Z{2:+4.1f}.Alpha={3:+5.2f}/*{0:05d}{1:4.2f}"
-                        "{2:+4.1f}.Alpha={3:+5.2f}.PHOENIX*.fits"
-                        "").format(closest_teff, closest_logg, closest_feh,
-                                   closest_alpha)
-    else:
-        phoenix_glob = ("/Z{2:+4.1f}/*{0:05d}{1:4.2f}{2:+4.1f}.PHOENIX*.fits"
-                        "").format(closest_teff, closest_logg, closest_feh)
+    phoenix_glob = ("/Z{2:+4.1f}/*{0:05d}{1:4.2f}{2:+4.1f}.PHOENIX*.fits"
+                    "").format(closest_teff, closest_logg, closest_feh)
     files = glob.glob(data_dir + phoenix_glob)
     if len(files) > 1:
         print("More than one file returned")

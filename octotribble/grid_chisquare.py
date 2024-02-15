@@ -31,28 +31,38 @@ def chi_squared(observed, expected, error=None):
 
 
 def parallel_chisqr_1D(iter_1, obs, model, model_params, n_jobs=4):
-    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(a, *model_params)) for a in iter_1)
-    return grid
+    return Parallel(n_jobs=n_jobs)(
+        delayed(chi_squared)(obs, model(a, *model_params)) for a in iter_1
+    )
 
 
 # @memory.cache
 def parallel_chisqr_2D(iter_1, iter_2, obs, model, model_params, n_jobs=4):
-    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(a, b, *model_params))
-                                   for a in iter_1 for b in iter_2)
-    return grid
+    return Parallel(n_jobs=n_jobs)(
+        delayed(chi_squared)(obs, model(a, b, *model_params))
+        for a in iter_1
+        for b in iter_2
+    )
 
 
 # @memory.cache
 def parallel_chisqr_3D(iter_1, iter_2, iter_3, obs, model, model_params, n_jobs=4):
-    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(a, b, c, *model_params))
-                                   for a in iter_1 for b in iter_2 for c in iter_3)
-    return grid
+    return Parallel(n_jobs=n_jobs)(
+        delayed(chi_squared)(obs, model(a, b, c, *model_params))
+        for a in iter_1
+        for b in iter_2
+        for c in iter_3
+    )
 
 
 def parallel_chisqr_4D(iter_1, iter_2, iter_3, iter_4, obs, model, model_params, n_jobs=4):
-    grid = Parallel(n_jobs=n_jobs)(delayed(chi_squared)(obs, model(a, b, c, d, *model_params))
-                                   for a in iter_1 for b in iter_2 for c in iter_3 for d in iter_4)
-    return grid
+    return Parallel(n_jobs=n_jobs)(
+        delayed(chi_squared)(obs, model(a, b, c, d, *model_params))
+        for a in iter_1
+        for b in iter_2
+        for c in iter_3
+        for d in iter_4
+    )
 
 
 # @memory.cache

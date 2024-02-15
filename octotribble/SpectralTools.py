@@ -120,15 +120,15 @@ def wl_interpolation(wl, spec, ref_wl, method="scipy", kind="linear", verbose=Fa
     v_print = print if verbose else lambda *a, **k: None
 
     starttime = time.time()
-    if method == "scipy":
-        v_print(kind + " scipy interpolation")
-        linear_interp = interp1d(wl, spec, kind=kind)
-        new_spec = linear_interp(ref_wl)
-    elif method == "numpy":
+    if method == "numpy":
         if kind.lower() is not "linear":
             v_print("Warning: Cannot do " + kind + " interpolation with numpy, switching to linear")
         v_print("Linear numpy interpolation")
         new_spec = np.interp(ref_wl, wl, spec)  # 1-d peicewise linear interpolat
+    elif method == "scipy":
+        v_print(kind + " scipy interpolation")
+        linear_interp = interp1d(wl, spec, kind=kind)
+        new_spec = linear_interp(ref_wl)
     else:
         v_print("Method was given as " + method)
         raise("Interpolation method not correct")
@@ -150,9 +150,7 @@ def unitary_Gauss(x, center, FWHM):
     sigma = np.abs(FWHM) / (2 * np.sqrt(2 * np.log(2)))
     amp = 1.0 / (sigma * np.sqrt(2 * np.pi))
     tau = -((x - center)**2) / (2 * (sigma**2))
-    result = amp * np.exp(tau)
-
-    return result
+    return amp * np.exp(tau)
 
 
 def fast_convolve(wav_val, R, wav_extended, flux_extended, fwhm_lim):

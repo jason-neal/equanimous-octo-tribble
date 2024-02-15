@@ -29,8 +29,7 @@ def _parser():
     parser.add_argument("-o", "--output", help="Specify output filename", default=False)
     parser.add_argument("-s", "--separator", help="Separator for time section of fits", default=":")
 
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main(fname, output=False, separator=":", verbose=True):

@@ -30,16 +30,11 @@ def _parser():
         choices=["1", "2", "3", "4"],
         default=None,
     )
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main(chip=None, showplots=False):
-    if chip is None:
-        chips = range(1, 5)
-    else:
-        chips = [int(chip)]
-
+    chips = range(1, 5) if chip is None else [int(chip)]
     dir_path = os.getcwd()
 
     intermediate_path = os.path.join(dir_path, "Intermediate_steps", "")

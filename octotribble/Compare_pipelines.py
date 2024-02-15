@@ -61,7 +61,7 @@ def ccf_astro(spectrum1, spectrum2, rvmin=0, rvmax=200, drv=1):
     s = False
     w, f = spectrum1
     tw, tf = spectrum2
-    if not len(w) or not len(tw):
+    if not (len(w) and len(tw)):
         return 0, 0, 0, 0, 0
     c = 299792.458
     drvs = np.arange(rvmin, rvmax, drv)
@@ -441,7 +441,7 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
         else:
             print('Warning: Solar spectrum not available in wavelength range.')
             sun = False
-    elif sun and model:
+    elif sun:
         print('Warning: Both solar spectrum and a model spectrum are selected. Using model spectrum.')
         sun = False
 
@@ -495,7 +495,7 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
     if ccf != 'none':
         if ccf in ['sun', 'both'] and sun:
             # remove tellurics from the Solar spectrum
-            if telluric and sun:
+            if telluric:
                 print('Correcting solar spectrum for tellurics...')
                 i_sun = i_sun / i_tel
             print('Calculating CCF for the Sun...')
@@ -628,9 +628,9 @@ def main(fname, fname2, lines=False, model=False, telluric=False, sun=False,
     elif rv1 and rv2:
         ax1.set_title(
             '{0!s}\nSun/model: {1!s} km/s, telluric: {2!s} km/s'.format(fname, rv1, rv2))
-    elif rv1 and not rv2:
+    elif rv1:
         ax1.set_title('{0!s}\nSun/model: {1!s} km/s'.format(fname, rv1))
-    elif not rv1 and rv2:
+    elif rv2:
         ax1.set_title('{0!s}\nTelluric: {1!s} km/s'.format(fname, rv2))
     elif ccf == 'model':
         ax1.set_title('{0!s}\nModel(CCF): {1!s} km/s'.format(fname, rv1))

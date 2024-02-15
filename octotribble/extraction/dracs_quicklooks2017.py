@@ -42,8 +42,7 @@ def _parser():
         choices=["1", "2", "3"],
         default=None,
     )
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main(chip=None, band=None, showplots=False):

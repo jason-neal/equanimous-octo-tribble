@@ -21,15 +21,13 @@ def doppler_factor_shift(wave, velocity):
     beta = velocity / constants.c
     doppler_factor = ((1 + beta) / (1 - beta)) ** 0.5
 
-    y = wave * doppler_factor
-    return y
+    return wave * doppler_factor
 
 
 def doppler_shift(wave, velocity):
     """Doppler shift using non-realtivistically."""
     beta = velocity / constants.c
-    y = wave * (1 + beta)
-    return y
+    return wave * (1 + beta)
 
 
 shift_factor = doppler_factor_shift(wavelength, rv)

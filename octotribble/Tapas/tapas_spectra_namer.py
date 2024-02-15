@@ -26,8 +26,7 @@ def _parser():
     parser.add_argument("-k", "--keep_original", help="Keep the original file", action="store_true")
     parser.add_argument("-s", "--species", help="Specify constituents if known e.g. h20, noh20", type=str)
 
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def main(fname, extract=False, prefix="", keep_original=False, species=False):

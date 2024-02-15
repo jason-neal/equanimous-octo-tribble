@@ -14,8 +14,7 @@ import numpy as np
 
 def Calculate_RV(Lambda, deltalambda):
     c = 299792458.  # m/s
-    V = [c * deltalambda / lmda for lmda in Lambda]
-    return V
+    return [c * deltalambda / lmda for lmda in Lambda]
 
 
 def Calculate_WLshift(wav, v):
@@ -27,22 +26,19 @@ def Calculate_WLshift(wav, v):
     if isinstance(v, (int, float)):
         return (v / c) * wav
     else:
-        deltalambda = [(v / c) * lmda for lmda in wav]
-        return deltalambda
+        return [(v / c) * lmda for lmda in wav]
 
 
 def Calc_RV(Lambda, deltalambda):
     # Fixed wavelength
     c = 299792458.  # m/s
-    V = [c * (delta / Lambda) for delta in deltalambda]
-    return V
+    return [c * (delta / Lambda) for delta in deltalambda]
 
 
 def Calc_WLshift(Lambda, vels):
     # Fixed wavelength
     c = 299792458.  # m/s
-    V = [(vel / c) * Lambda for vel in vels]
-    return V
+    return [(vel / c) * Lambda for vel in vels]
 # NIR range we have
 # 2110 nm to 2170 nm
 
