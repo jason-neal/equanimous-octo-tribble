@@ -5,7 +5,7 @@
 
 Script that take one imput parameter which is the path to the normobs directory
 
-Needs functions/modules to get the filenames, export to a fits tablefile, change fits hdr
+Needs functions/modules to get the filenames, export them to a fits tablefile, change fits hdr
 """
 import argparse
 import fnmatch
