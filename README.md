@@ -1,6 +1,6 @@
 # equanimous-octo-tribble
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7fc5c278070a4ff188f5c88cccd6be64)](https://www.codacy.com/app/jason-neal/equanimous-octo-tribble?utm_source=github.com&utm_medium=referral&utm_content=jason-neal/equanimous-octo-tribble&utm_campaign=badger)
+[![Python package](https://github.com/jason-neal/equanimous-octo-tribble/actions/workflows/python-package.yml/badge.svg?branch=master)](https://github.com/jason-neal/equanimous-octo-tribble/actions/workflows/python-package.yml)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7fc5c278070a4ff188f5c88cccd6be64)](https://www.codacy.com/app/jason-neal/equanimous-octo-tribble?utm_source=github.com&utm_medium=referral&utm_content=jason-neal/equanimous-octo-tribble&utm_campaign=badger)
 
 Useful scripts for astronomy and the like.
 
